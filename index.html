@@ -4,23 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+
+    <style>
+        ul {
+            list-style-type: none;
+        }
+    </style>
+
 </head>
 <body>
-    <h1>Hello there one again</h1>    
-    <div id="time"></div>
+    <h1>Hello there</h1>
+    <label for="name"></label>
+    <input type="text" id="name" name="name" >
 
-    
+    <label for="text"></label>
+    <input type="text" id="text" name="text">
+
+    <ul id="board"></ul>
+
+    <!-- <div id="time"></div> -->
+
+
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        const time = document.querySelector('#time');
 
-        socket.on('time', (data) => {
-            time.innerHTML = data;
+        const name = document.querySelector('#name');
+        const text = document.querySelector('#text');
+        // const board = document.querySelector('#board');
+
+        var username = '';
+
+        name.onchange = () => {
+            username = name.value;
+            console.log(`your name is ${username}`);
+        }
+
+        text.onchange = () => {
+            let str = $(text).val();
+            let tote = `${username}: ${str}`;
+            $(text).val('');
+            socket.emit('message', tote);
+        };
+
+        socket.on('message', data => {
+            $(board).append(`<li>${data}</li>`);
         });
 
     </script>
+
+    
+
     
 
 

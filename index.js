@@ -12,11 +12,11 @@ const server = express()
 
 const io = socketIO(server);
 
+// io.on('connection', (socket) => { console.log('client connected'); });
+// setInterval( () => { io.emit('time', new Date().toTimeString()) }, 1000);
+
 io.on('connection', (socket) => {
-  console.log('client connected');
+  socket.on('message', data => {
+    socket.broadcast.emit('message', data);
+  });
 });
-
-
-setInterval( () => {
-  io.emit('time', new Date().toTimeString())
-}, 1000);
