@@ -1,1 +1,28 @@
-Hello there
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello there one again</h1>    
+    <div id="time"></div>
+
+    
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const time = document.querySelector('#time');
+
+        socket.on('time', (data) => {
+            time.innerHTML = data;
+        });
+
+    </script>
+    
+
+
+</body>
+</html>
