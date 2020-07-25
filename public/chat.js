@@ -1,26 +1,37 @@
 
-
-
 const socket = io();
 
-const name = document.querySelector('#name');
-const text = document.querySelector('#text');
-// const board = document.querySelector('#board');
 
-var username = '';
 
-name.onchange = () => {
-    username = name.value;
-    console.log(`your name is ${username}`);
+
+var name = 'none';
+
+
+
+
+const modal = document.querySelector('#modal');
+const pickName = document.querySelector('#pick-name');
+const lobbyUsers = document.querySelector('#lobbyUsers');
+
+
+
+pickName.onchange = () => {
+    name = pickName.value;
+    modal.style.display = "none";
+    socket.emit('new-user', name);
 }
 
-text.onchange = () => {
-    let str = $(text).val();
-    let tote = `${username}: ${str}`;
-    $(text).val('');
-    socket.emit('message', tote);
-};
 
-socket.on('message', data => {
-    $(board).append(`<li>${data}</li>`);
+
+socket.on('new-user', data => {
+    let str = '';
+    data.forEach( val => {
+        str += `<div>${val.name}</div>`;
+    });
+    lobbyUsers.innerHTML = str;
 });
+
+
+
+
+
