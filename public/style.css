@@ -5,9 +5,12 @@ input {
 }
 
 
+
+
+
+
 #container {
     background: #0001;
-    /* display: block; */
     position: fixed;
     top: 0;
     bottom: 0;
@@ -20,13 +23,30 @@ input {
 
 #container > div {
     background: white;
-    margin:10px;
+    margin: 4px;
 }
 
 
+
+
+
+
+#roomSpace > div {
+    background: #0001;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    height: 100px;
+}
+
+
+
+
+
+
 #modal {
-    display: block;
     background: white;
+    display: block;
 }
 
 #modal > div {
@@ -39,7 +59,7 @@ input {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: 1s;
+    /* transition: 1s; */
 }
 
 .card {
@@ -53,6 +73,10 @@ input {
     align-items: center;
     /* transition: 1s; */
 }
+
+
+
+
 
 
 .gone {
