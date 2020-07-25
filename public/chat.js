@@ -1,4 +1,6 @@
 
+
+
 const socket = io();
 
 
@@ -21,6 +23,8 @@ const pickName = document.querySelector('#pick-name');
 const lobbySpace = document.querySelector('#lobbySpace');
 const roomSpace = document.querySelector('#roomSpace');
 const boardSpace = document.querySelector('#boardSpace');
+
+const board = document.querySelector('#board');
 
 
 
@@ -49,10 +53,51 @@ function makeRooms(num) {
 
 
 
+resizeBoard();
+function resizeBoard() {
+    let x = window.innerWidth - 240;
+    let y = window.innerHeight - 40;
+    let dim = Math.min(x, y);
+    board.style.width = dim + 'px';
+    board.style.height = dim + 'px';
+}
+
+
+
+makeSquares(6);
+function makeSquares(num) {
+
+    let str = '';
+    for ( i=1 ; i<=num ; i++ ) {
+        str += 'auto ';
+    }
+    console.log(str);
+    $(board).css('grid-template-columns', str);
+
+    for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
+        let num = i;
+        let elem = document.createElement('div');
+        elem.setAttribute('class', 'square');
+        elem.innerText = num;
+        elem.onclick = () => {
+            console.log(num);
+        }
+        $(board).append(elem);
+    }
+}
+
+
 
 
 
 // EVENT HANDLERS ________________________________________
+
+window.onresize = () => {
+    resizeBoard();
+}
+
+
+
 
 pickName.onchange = () => {
     name = pickName.value;
