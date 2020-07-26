@@ -8,7 +8,7 @@ const socket = io();
 // LOCAL VARIABLES ________________________________________
 
 var name = 'none';
-var room = 'room0';
+var room = 'lobby';
 var numOfRooms = 4;
 
 
@@ -33,12 +33,13 @@ const board = document.querySelector('#board');
 
 // INITIAL CONDITIONS ________________________________________
 
+resizeBoard();
 
 $(board).fadeOut(0, () => { $(board).css('visibility', 'visible'); });
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
-
+socket.on('board config', data => { makeSquares(data); });
 
 
 
@@ -48,7 +49,7 @@ $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); })
 
 
 
-resizeBoard();
+
 function resizeBoard() {
     let x = window.innerWidth - 340;
     let y = window.innerHeight - 40;
@@ -60,10 +61,7 @@ function resizeBoard() {
 
 
 
-socket.on('board config', data => { 
-    makeSquares(data); 
-    console.log('board config?');
-});
+
 function makeSquares(num) {
 
     let str = `repeat(${num}, auto)`;
@@ -98,11 +96,16 @@ function ArrToMap( arr, keyStr, valStr ) {
 
 
 
-// _______________________________________ LOCAL FUNCTIONS 
+
+
+
+
+// _________________________________ LOCAL FUNCTIONS (END)
 
 // EVENT HANDLERS ________________________________________
 
 window.onresize = () => { resizeBoard(); }
+
 
 
 pickName.onchange = () => {
@@ -130,11 +133,11 @@ $('#room-name').on('change', () => {
 
 
 
-lobbySpace.onclick = () => {
-    room = 'lobby';
-    $('#board').fadeOut(1000);
-    socket.emit('join room', room);
-}
+// lobbySpace.onclick = () => {
+//     room = 'lobby';
+//     $('#board').fadeOut(1000);
+//     socket.emit('join room', room);
+// }
 
 
 
@@ -144,25 +147,21 @@ lobbySpace.onclick = () => {
 
 
 
-// END of EVENT HANDLERS _________________________________
+// ___________________________________ EVENT HANDLERS (END)
 
 // SOCKET EVENTS __________________________________________
 
 socket.on('update names', arr => {
-    
     let num = $('div[id^="rm-"]').length;
     for ( i=0 ; i<num ; i++ ) {
         $('div[id^="rm-"]').eq(i).html('');
     }
-
     arr.forEach( obj => {
         let str = obj.name;
         if (name == obj.name) str = `<b>${name}</b>`;
         $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
     });
-
 });
-
 
 
 
@@ -174,19 +173,42 @@ socket.on('create room', roomName => {
     
     let button = document.createElement('button');
     button.innerText = 'JOIN';
-    button.onclick = () => {
-        room = roomName;
-        $('#board').fadeOut(500, () => {
+    button.classList.add('noselect');
+    button.classList.add('join-leave');
+    button.onclick = ev => {
+        if (room == 'lobby') {
+            room = roomName;
+            $('#board').fadeOut(100, () => {
+                socket.emit('join room', room);
+                let num = $('.join-leave').length;
+                for ( i=0 ; i<num ; i++ ) {
+                    $('.join-leave').eq(i).hide();
+                }
+                $(ev.target).show();
+                ev.target.innerText = "LEAVE";
+                $('#board').fadeIn(100);
+            });
+        } else {
+            console.log('whats happening?');
+            room = 'lobby';
+            let num = $('.join-leave').length;
+            for ( i=0 ; i<num ; i++ ) {
+                $('.join-leave').eq(i).show();
+                $('.join-leave').eq(i).html('JOIN');
+            }
+            $('#board').fadeOut(1000);
             socket.emit('join room', room);
-            $('#board').fadeIn(500);
-        });
+        }
     }
-
 
     $(elem).append(button);
     $(elem).append(`<div id='rm-${roomName}'></div>`);
     $(roomSpace).append(elem);
 });
+
+
+
+
 
 
 
@@ -200,5 +222,6 @@ socket.on('update board', data => {
 });
 
 
+// ______________________________________ SOCKET EVENTS (END)
 
-// END OF EVERYTHING ________________________________________
+// __________________________________________EVERYTHING (END)
