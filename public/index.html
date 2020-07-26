@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="style.css">
 
@@ -20,18 +22,22 @@
 
         <div id="lobbySpace">
             <b>Lobby</b>
-            <div id="room0"></div>
+            <div id="rm-lobby"></div>
         </div>
 
         <div id="roomSpace">
-            <!-- <b>Rooms</b> -->
+            <div id="create-room">
+                <div id="room-plus"><b>+</b></div>
+                <input type="text" id="room-name" placeholder="room name" autocomplete="off">
+            </div>
+            
         </div>
 
 
         <div id="boardSpace">
             <div id="board"></div>
         </div>
-        
+
     </div>
 
 

@@ -29,33 +29,24 @@ const board = document.querySelector('#board');
 
 
 
+// INITIAL CONDITIONS ________________________________________
+
+
+$(board).fadeOut(0, () => { $(board).css('visibility', 'visible'); });
+
+$('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
+
+
+
 
 
 // LOCAL FUNCTIONS ____________________________________________
-
-makeRooms( numOfRooms );
-function makeRooms(num) {
-    for ( i=1 ; i<=num ; i++ ) {
-        let elem = document.createElement('div');
-        $(elem).append(`<b>Room ${i}</b>`);
-        let button = document.createElement('button');
-            let roomID = `room${i}`;
-            button.innerText = 'JOIN';
-            button.onclick = () => {
-                room = roomID;
-                socket.emit('join room', roomID);
-            }
-        $(elem).append(button);
-        $(elem).append(`<div id='room${i}'></div>`);
-        $(roomSpace).append(elem);
-    }
-}
 
 
 
 resizeBoard();
 function resizeBoard() {
-    let x = window.innerWidth - 240;
+    let x = window.innerWidth - 340;
     let y = window.innerHeight - 40;
     let dim = Math.min(x, y);
     board.style.width = dim + 'px';
@@ -64,14 +55,15 @@ function resizeBoard() {
 
 
 
-makeSquares(6);
+
+socket.on('board config', data => { 
+    makeSquares(data); 
+    console.log('board config?');
+});
+
 function makeSquares(num) {
 
-    let str = '';
-    for ( i=1 ; i<=num ; i++ ) {
-        str += 'auto ';
-    }
-    console.log(str);
+    let str = `repeat(${num}, auto)`;
     $(board).css('grid-template-columns', str);
 
     for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
@@ -79,8 +71,9 @@ function makeSquares(num) {
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
         elem.innerText = num;
-        elem.onclick = () => {
+        elem.onclick = ev => {
             console.log(num);
+            ev.target.style.background = "white";
         }
         $(board).append(elem);
     }
@@ -90,13 +83,13 @@ function makeSquares(num) {
 
 
 
+
+
+
+
 // EVENT HANDLERS ________________________________________
 
-window.onresize = () => {
-    resizeBoard();
-}
-
-
+window.onresize = () => { resizeBoard(); }
 
 
 pickName.onchange = () => {
@@ -107,8 +100,26 @@ pickName.onchange = () => {
 
 
 
+$('#room-plus').on('click', () => {
+    $('#room-plus').toggle();
+    $('#room-name').toggle(500);
+    $('#room-name').focus();
+});
+
+$('#room-name').on('change', () => {
+    let str = $('#room-name').val();
+    $('#room-name').val('');
+    $('#room-plus').toggle();
+    $('#room-name').toggle();
+    socket.emit('create room', str);
+});
+
+
+
+
 lobbySpace.onclick = () => {
-    room = 'room0';
+    room = 'lobby';
+    $('#board').fadeOut(1000);
     socket.emit('join room', room);
 }
 
@@ -124,16 +135,53 @@ lobbySpace.onclick = () => {
 
 // SOCKET EVENTS __________________________________________
 
-socket.on('update names', data => {
-    for ( i=0 ; i<=numOfRooms ; i++ ) {
-        $(`div[id="room${i}"]`).html('');
+socket.on('update names', arr => {
+    
+    let num = $('div[id^="rm-"]').length;
+    for ( i=0 ; i<num ; i++ ) {
+        $('div[id^="rm-"]').eq(i).html('');
     }
 
-    data.forEach( obj => {
+    arr.forEach( obj => {
         let str = obj.name;
         if (name == obj.name) str = `<b>${name}</b>`;
-        $(`div[id="${obj.room}"]`).append(`<div>${str}</div>`);
+        $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
     });
+
 });
 
 
+
+
+
+
+socket.on('create room', roomName => {
+    let elem = document.createElement('div');
+    $(elem).append(`<b>${roomName}</b><br>`);
+    
+    let button = document.createElement('button');
+    button.innerText = 'JOIN';
+    button.onclick = () => {
+        room = roomName;
+        $('#board').fadeOut(500, () => {
+            socket.emit('join room', room);
+            $('#board').fadeIn(500);
+        });
+    }
+
+
+    $(elem).append(button);
+    $(elem).append(`<div id='rm-${roomName}'></div>`);
+    $(roomSpace).append(elem);
+});
+
+
+
+
+
+socket.on('update board', data => {
+    let num = $('#board >').length;    
+    for ( i=0 ; i<num ; i++ ) {
+        $('#board >').eq(i).css('background', data[i]);
+    }
+});

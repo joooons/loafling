@@ -1,5 +1,18 @@
 
 
+/************ VARIABLES ****************/
+:root {
+    --col1: 100px;
+    --col2: 200px;
+}
+
+
+
+
+
+/****************** GLOBAL **********************/
+
+
 input {
     text-align: center;
 }
@@ -8,6 +21,7 @@ input {
 
 
 
+/********************** CONTAINER ********************/
 
 #container {
     background: #0001;
@@ -17,7 +31,7 @@ input {
     left: 0;
     right: 0;
     display: grid;
-    grid-template-columns: 100px 100px auto;
+    grid-template-columns: var(--col1) var(--col2) auto;
     /* gap: 10px; */
 }
 
@@ -30,41 +44,68 @@ input {
 
 
 
+/* ******************* ROOMSPACE ***************** */
 
 #roomSpace > div {
     background: #0001;
     margin: 5px;
     padding: 5px;
+    text-align: center;
     border-radius: 5px;
-    height: 100px;
+    /* height: 100px; */
+    overflow: hidden;
+}
+
+#room-plus {
+    cursor: pointer;
+}
+
+#room-name {
+    visibility: hidden;
 }
 
 
+
+
+
 #boardSpace {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #board {
+    /* position: absolute; */
+    /* left: 100px; */
     background: #0002;
     width: 200px;
     height: 200px;
     display: grid;
-    grid-template-columns: auto auto auto;
+    /* grid-template-columns: auto auto auto; */
     /* grid-template-rows: auto auto auto; */
     padding: 5px;
     gap: 5px;
+    visibility: hidden;
 }
 
 .square {
     background: white;
-    border-radius: 5px;
+    border-radius: 35%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.square:hover {
+    cursor: pointer;
+}
+
+.square:active {
+    color: red;
+    /* font-size: large; */
+    font-weight: bold;
+}
 
 
 

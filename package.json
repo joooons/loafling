@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "hrk": "heroku local web",
     "test": "node test.js"
   },
   "dependencies": {

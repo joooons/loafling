@@ -13,15 +13,13 @@ const io = socketIO(server);
 
 
 
-// local variables __________________________
+// LOCAL VARIABLES _________________________________
 
 var ID_Name = new Map();
-  // Map { socket.id , name }
-
 var Name_Room = new Map();
-  // Map { name , room }
+var Room_Grid = new Map();
 
-
+const boardDim = 4;
 
 
 
@@ -40,7 +38,11 @@ function MapToArray( map, keyStr, valStr ) {
 }
 
 
-
+function emptyGrid(num) {
+  let length = Math.pow(num, 2);
+  let arr = new Array(length).fill(0);
+  return arr;
+}
 
 
 
@@ -55,6 +57,7 @@ io.on('connection', (socket) => {
   
   console.log('--------------------------');
   console.log('A user connected. But who?');
+
 
 
   // DISCONNECT
@@ -74,13 +77,19 @@ io.on('connection', (socket) => {
 
   // WHEN NEW USER ENTERS
   socket.on('new user', name => {
+    socket.emit('board config', boardDim);
+    
     ID_Name.set(socket.id, name);
-    Name_Room.set(name, 'room0');
+    Name_Room.set(name, 'lobby');
     console.log(`${name} connected!`);
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
+    
+    
   });
+
+
 
 
   // WHEN USER JOINS A ROOM
@@ -90,11 +99,25 @@ io.on('connection', (socket) => {
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
+
+    if (roomID != 'lobby') {
+      socket.join(roomID);
+      // io.to(roomID).emit('update board', Room_Grid.get(roomID));
+    }
   });
 
 
 
-});
+  // WHEN USER CREATES A ROOM
+  socket.on('create room', roomName => {
+    Room_Grid.set(roomName, emptyGrid(boardDim));
+    io.emit('create room', roomName);
+
+  });
+
+
+
+});   // END OF IO.ON()
 
 
 
