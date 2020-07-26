@@ -29,12 +29,16 @@ const board = document.querySelector('#board');
 
 
 
+
+
 // INITIAL CONDITIONS ________________________________________
 
 
 $(board).fadeOut(0, () => { $(board).css('visibility', 'visible'); });
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
+
+
 
 
 
@@ -60,7 +64,6 @@ socket.on('board config', data => {
     makeSquares(data); 
     console.log('board config?');
 });
-
 function makeSquares(num) {
 
     let str = `repeat(${num}, auto)`;
@@ -84,8 +87,18 @@ function makeSquares(num) {
 
 
 
+function ArrToMap( arr, keyStr, valStr ) {
+    let newMap = new Map();
+    arr.forEach( obj => {
+        newMap.set(obj[keyStr], obj[valStr]);
+    });
+    return newMap;
+}
 
 
+
+
+// _______________________________________ LOCAL FUNCTIONS 
 
 // EVENT HANDLERS ________________________________________
 
@@ -131,7 +144,7 @@ lobbySpace.onclick = () => {
 
 
 
-
+// END of EVENT HANDLERS _________________________________
 
 // SOCKET EVENTS __________________________________________
 
@@ -185,3 +198,7 @@ socket.on('update board', data => {
         $('#board >').eq(i).css('background', data[i]);
     }
 });
+
+
+
+// END OF EVERYTHING ________________________________________
