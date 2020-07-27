@@ -9,7 +9,9 @@ const socket = io();
 
 var name = 'none';
 var room = 'lobby';
-var numOfRooms = 4;
+// var numOfRooms = 4;
+
+
 
 
 
@@ -42,12 +44,20 @@ $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); })
 socket.on('board config', data => { makeSquares(data); });
 
 
+// addRoomBox('a');
+// addRoomBox('b');
+// addRoomBox('c');
+// addRoomBox('d');
+// addRoomBox('e');
+
+
+
+
+
 
 
 
 // LOCAL FUNCTIONS ____________________________________________
-
-
 
 
 function resizeBoard() {
@@ -74,11 +84,15 @@ function makeSquares(num) {
         elem.innerText = num;
         elem.onclick = ev => {
             console.log(num);
-            ev.target.style.background = "white";
+            let color = ev.target.style.backgroundColor;
+            console.log(color);
+            color = (color != "yellow") ? "yellow" : "white";
+            ev.target.style.background = color;
         }
         $(board).append(elem);
     }
 }
+
 
 
 
@@ -92,6 +106,100 @@ function ArrToMap( arr, keyStr, valStr ) {
     });
     return newMap;
 }
+
+
+
+
+
+
+
+
+allowCreateRooms();
+function allowCreateRooms() {
+    $('#room-plus').html('<b>+</b>');
+    $('#room-plus').show();
+    $('#room-plus').css('cursor', 'pointer');
+    $('#room-name').hide(500);
+    $('#room-plus').on('click', () => {
+        $('#room-plus').hide();
+        $('#room-name').show(500);
+        $('#room-name').focus();
+        onlyThisButtonLeave('--------');
+    });
+
+}
+
+function denyCreateRooms() {
+    $('#room-plus').html('<b>x</b>');
+    $('#room-plus').css('cursor', 'default');
+    $('#room-plus').off('click');
+}
+
+
+function allButtonsJoin() {
+    let num = $(`button[id^="bt-"]`).length;
+    for ( i=0 ; i<num ; i++ ) {
+        $(`button[id^="bt-"]`).eq(i).show();
+        let str = $(`button[id^="bt-"]`).eq(i).attr('id');
+        console.log(str);
+        addOnclick_JOIN(`#${str}`);
+    }
+}
+
+function onlyThisButtonLeave( room ) {
+    let num = $(`button[id^="bt-"]`).length;
+    for ( i=0 ; i<num ; i++ ) {
+        $(`button[id^="bt-"]`).eq(i).hide();
+    }
+    addOnclick_LEAVE(`#bt-${room}`);
+    $(`#bt-${room}`).show();
+}
+
+
+
+
+
+
+
+function addRoomBox( room ) {
+    $('#roomSpace').append(`<div id="rb-${room}"></div>`);
+    $(`#rb-${room}`).append(`<b>${room}</b><hr>`);
+    $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
+    $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
+}
+
+function delRoomBox( room ) {
+    $(`#rb-${room}`).remove();
+}
+
+
+
+
+function addOnclick_JOIN( room ) {
+    console.log('add onclick join joined');
+    $(room).html('JOIN');
+    $(room).off('click');
+    $(room).on('click', () => {
+        
+        console.log('join!');
+
+
+    });
+}
+
+
+
+function addOnclick_LEAVE( room ) {
+    $(room).html('LEAVE');
+    $(room).off('click');
+    $(room).on('click', () => {
+        
+        console.log('leave!');
+        
+    });
+}
+
+
 
 
 
@@ -116,20 +224,32 @@ pickName.onchange = () => {
 
 
 
-$('#room-plus').on('click', () => {
-    $('#room-plus').toggle();
-    $('#room-name').toggle(500);
-    $('#room-name').focus();
-});
+
+
+
 
 $('#room-name').on('change', () => {
     let str = $('#room-name').val();
+    
     $('#room-name').val('');
-    $('#room-plus').toggle();
-    $('#room-name').toggle();
-    socket.emit('create room', str);
+    $('#room-plus').show();
+    $('#room-name').hide();
+
+    // addRoomBox( str );
+
+    allButtonsJoin();
+
+    // socket.emit('create room', str);
+    // socket.emit('join room', str);
 });
 
+$('#room-name').on('focusout', () => {
+    
+    $('#room-plus').show();
+    $('#room-name').hide();
+    $('#room-name').val('');
+    allButtonsJoin();
+});
 
 
 
@@ -168,42 +288,15 @@ socket.on('update names', arr => {
 
 
 socket.on('create room', roomName => {
-    let elem = document.createElement('div');
-    $(elem).append(`<b>${roomName}</b><br>`);
     
-    let button = document.createElement('button');
-    button.innerText = 'JOIN';
-    button.classList.add('noselect');
-    button.classList.add('join-leave');
-    button.onclick = ev => {
-        if (room == 'lobby') {
-            room = roomName;
-            $('#board').fadeOut(100, () => {
-                socket.emit('join room', room);
-                let num = $('.join-leave').length;
-                for ( i=0 ; i<num ; i++ ) {
-                    $('.join-leave').eq(i).hide();
-                }
-                $(ev.target).show();
-                ev.target.innerText = "LEAVE";
-                $('#board').fadeIn(100);
-            });
-        } else {
-            console.log('whats happening?');
-            room = 'lobby';
-            let num = $('.join-leave').length;
-            for ( i=0 ; i<num ; i++ ) {
-                $('.join-leave').eq(i).show();
-                $('.join-leave').eq(i).html('JOIN');
-            }
-            $('#board').fadeOut(1000);
-            socket.emit('join room', room);
-        }
-    }
-
-    $(elem).append(button);
-    $(elem).append(`<div id='rm-${roomName}'></div>`);
-    $(roomSpace).append(elem);
+    room = roomName;
+    socket.emit('join room', room);
+    $('#board').fadeIn(100);
+    
+    addRoomBox(room);
+    // denyCreateRooms();
+    onlyThisButtonLeave(room);
+    
 });
 
 

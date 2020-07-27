@@ -6,6 +6,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+const _ = require('underscore');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -82,6 +84,25 @@ io.on('connection', (socket) => {
     ID_Name.set(socket.id, name);
     Name_Room.set(name, 'lobby');
     console.log(`${name} connected!`);
+
+    
+
+    let roomArr = [];
+    Name_Room.forEach( val => {
+      roomArr.push(val);
+      console.log('room ', val);
+    });
+    
+    
+    let newRoomArr = _.uniq(roomArr);
+    newRoomArr.forEach( val => {
+      console.log('new room: ', val);
+      if (val != 'lobby') {
+        socket.emit('create room', val);
+      }
+      
+    });
+
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);

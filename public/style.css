@@ -2,8 +2,8 @@
 
 /************ VARIABLES ****************/
 :root {
-    --col1: 100px;
-    --col2: 200px;
+    --col1: 160px;
+    --col2: 120px;
 }
 
 
@@ -23,6 +23,7 @@ body {
 
 input {
     text-align: center;
+    width: 90%;
 }
 
 button {
@@ -35,6 +36,9 @@ button {
     font-weight: bold;
     outline: none;
     cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     transition: 0.1s;
 }
 
@@ -64,10 +68,15 @@ button:hover {
 }
 
 
+/* ***************** LOBBY SPACE ******************** */
+
+#lobbySpace {
+    padding: 5px;
+}
 
 
 
-/* ******************* ROOMSPACE ***************** */
+/* ******************* ROOM SPACE ***************** */
 
 #roomSpace > div {
     background: #0001;
@@ -76,7 +85,7 @@ button:hover {
     text-align: center;
     border-radius: 5px;
     /* height: 100px; */
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 #room-plus {
@@ -89,6 +98,8 @@ button:hover {
 
 
 
+
+/* ************* BOARD SPACE ************ */
 
 
 #boardSpace {
@@ -174,10 +185,10 @@ button:hover {
     background: green;
 }
 
-.noselect {
+/* .noselect {
     user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-}
+} */
 
 
