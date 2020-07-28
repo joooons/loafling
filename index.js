@@ -9,7 +9,6 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
-// const { has } = require('underscore');
 
 const app = express();
 const server = http.createServer(app);
@@ -21,8 +20,9 @@ const io = socketIO(server);
 
 
 
+// ________________________________________ INITIAL SETUP (END)
 
-// LOCAL VARIABLES _________________________________
+// LOCAL VARIABLES ____________________________________________
 
 var ID_Name = new Map();
 var Name_Room = new Map();
@@ -39,7 +39,12 @@ const roomSuffix = [ ', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 
 
 
-// LOCAL FUNCTIONS _________________________________
+
+
+
+// ______________________________________ LOCAL VARIABLES (END)
+
+// LOCAL FUNCTIONS ____________________________________________
 
 function MapToArray( map, keyStr, valStr ) {
   let arr = []; 
@@ -101,25 +106,37 @@ function avoidDuplicate( map, suggestedName, suffix ) {
 
 
 
-// THE SOCKET.IO ENVIRONMENT ______________________________________
+
+
+
+
+
+
+// ______________________________________ LOCAL FUNCTIONS (END)
+
+// THE SOCKET.IO ENVIRONMENT __________________________________
 
 io.on('connection', (socket) => {
   
   console.log(`----- ${socket.id} connected --------------`);
-  // console.log(`${ID_Name.size} users connected`);
 
 
 
-  // DISCONNECT
   socket.on('disconnect', () => {
     let name = ID_Name.get(socket.id);
-   
+    let oldRoom = Name_Room.get(name);
 
     Name_Room.delete(name);
     ID_Name.delete(socket.id);
 
     console.log(`( user: ${name} ) disconnected...`);
     console.log(`${ID_Name.size} users still connected`);
+
+    let bool = hasMapValue(Name_Room, oldRoom);
+
+    if ( !bool ) {
+      io.emit('del roombox', oldRoom );
+    }
 
     let arr = MapToArray(Name_Room, "name", "room");
     io.emit('update names', arr);
@@ -128,9 +145,7 @@ io.on('connection', (socket) => {
 
 
 
-  // WHEN NEW USER ENTERS
   socket.on('new user', suggestedName => {
-    // let name = suggestedName;
     socket.emit('board config', boardDim);
     
     let name = avoidDuplicate( ID_Name, suggestedName, nameSuffix );
@@ -141,7 +156,6 @@ io.on('connection', (socket) => {
     ID_Name.set(socket.id, name);
     Name_Room.set(name, 'lobby');
     console.log(`${name} connected!`);
-
 
     let roomArr = [];
     Name_Room.forEach( val => {
@@ -155,14 +169,10 @@ io.on('connection', (socket) => {
       }
     });
 
-
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
     
-    
   });
-
-
 
 
 
@@ -191,7 +201,6 @@ io.on('connection', (socket) => {
 
 
 
-
   socket.on('req grid update', room => {
     io.to(room).emit('res grid update', Room_Grid.get(room) );
   });
@@ -210,11 +219,6 @@ io.on('connection', (socket) => {
   socket.on('join room', room => {
     let name = ID_Name.get(socket.id);
     let oldRoom = Name_Room.get(name);
-      // console.log('          ');
-      // console.log('------------');
-      // console.log('oldRoom: ', oldRoom);
-      // console.log('newRoom: ', room);
-      // displayName_Room('join room');
 
     socket.leave(oldRoom);
 
@@ -222,14 +226,8 @@ io.on('connection', (socket) => {
   
     let bool = hasMapValue(Name_Room, oldRoom);
 
-    // console.log(`is ${oldRoom} included in Name_Room? `, bool);
-    // displayName_Room('after i set room');
-    // console.log(!bool);
-
     if ( !bool ) {
-      // console.log('did it work?');
       io.emit('del roombox', oldRoom );
-      // console.log('server: del roombox');
     }
 
     if ( room != 'lobby' ) {
@@ -245,13 +243,20 @@ io.on('connection', (socket) => {
 
 
 
-
-
-
 });   // END OF IO.ON()
 
 
 
+
+
+
+
+
+
+
+// ____________________________ THE SOCKET.IO ENVIRONMENT (END)
+
+// START LISTENING TO PORT ____________________________________
 
 app.use(express.static(path.join(__dirname, 'public') ) );
 server.listen(PORT, () => console.log(`Listening on ${PORT}`));
