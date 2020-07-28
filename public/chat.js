@@ -92,13 +92,18 @@ function setUpGrid( num ) {
 
 function addOnclick_Square( elem ) {
     elem.onclick = ev => {
+                
         let str = ev.target.innerText;
         let init = name.slice(0,1).toUpperCase();
-        if (str == '-') {
-            str = init;
-        } else if (str == init ) {
-            str = '-';
+        
+        if (str == '-') { 
+            str = init; 
+            // $(ev.target).addClass(name);
+        } else if (str == init ) { 
+            str = '-'; 
+            // $(ev.target).removeClass(name);
         }
+        
         ev.target.innerText = str;
         updateLocalGrid();
         socket.emit('update grid', gridArr);

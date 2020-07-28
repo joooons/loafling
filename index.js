@@ -45,6 +45,21 @@ const roomSuffix = [ ', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 
 // ______________________________________ LOCAL VARIABLES (END)
 
+// OBJECT CONSTRUCTOR__________________________________________
+
+function GameData() {
+    this.colorMap = new Map();
+    this.grid = [];
+}
+
+
+
+
+
+
+
+// ___________________________________ OBJECT CONSTRUCTOR (END)
+
 // LOCAL FUNCTIONS ____________________________________________
 
 function MapToArray( map, keyStr, valStr ) {
@@ -212,11 +227,8 @@ io.on('connection', (socket) => {
   socket.on('update grid', gridArr => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
-
     Room_Grid.set(room, gridArr);
-
     io.to(room).emit('res grid update', Room_Grid.get(room) );
-
   });
 
 
