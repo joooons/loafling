@@ -83,9 +83,7 @@ function setUpGrid( num ) {
     for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
-
         addOnclick_Square(elem);
-
         $(board).append(elem);
     }
 }
@@ -101,15 +99,12 @@ function addOnclick_Square( elem ) {
         } else if (str == init ) {
             str = '-';
         }
-        
         ev.target.innerText = str;
-
         updateLocalGrid();
-
         socket.emit('update grid', gridArr);
-
     }
 }
+
 
 
 function updateLocalGrid() {
@@ -360,10 +355,6 @@ socket.on('update names', arr => {
 
 
 
-
-
-
-
 socket.on('res grid update', arr => {
     updateGrid(arr);
 });
@@ -371,15 +362,6 @@ socket.on('res grid update', arr => {
 
 
 
-
-
-
-// socket.on('update board', data => {
-//     let num = $('#board >').length;    
-//     for ( i=0 ; i<num ; i++ ) {
-//         $('#board >').eq(i).css('background', data[i]);
-//     }
-// });
 
 
 // ______________________________________ SOCKET EVENTS (END)
