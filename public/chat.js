@@ -360,8 +360,8 @@ socket.on('update names', arr => {
 
 
 
-socket.on('res grid update', arr => {
-    updateGrid(arr);
+socket.on('res grid update', obj => {
+    updateGrid(obj.grid);
 });
 
 

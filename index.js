@@ -26,7 +26,7 @@ const io = socketIO(server);
 
 var ID_Name = new Map();
 var Name_Room = new Map();
-var Room_Grid = new Map();
+var Room_GameData = new Map();
 
 const boardDim = 5;
 
@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
 
     if ( !hasMapValue(Name_Room, oldRoom) ) {
       io.emit('del roombox', oldRoom );
-      Room_Grid.delete(oldRoom);
+      Room_GameData.delete(oldRoom);
     }
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -202,7 +202,11 @@ io.on('connection', (socket) => {
     Name_Room.set(name, room);
     socket.join(room);
 
-    Room_Grid.set( room, emptyGrid( boardDim ));
+    let obj = new GameData;
+    obj.grid = emptyGrid( boardDim);
+    // Room_GameData.set( room, emptyGrid( boardDim ));
+    Room_GameData.set( room, obj );
+
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -214,7 +218,7 @@ io.on('connection', (socket) => {
   
   // _______ REQ GRID UPDATE __________________________________
 
-  socket.on('req grid update', room => { io.to(room).emit('res grid update', Room_Grid.get(room) ); });
+  socket.on('req grid update', room => { io.to(room).emit('res grid update', Room_GameData.get(room) ); });
 
 
 
@@ -227,8 +231,11 @@ io.on('connection', (socket) => {
   socket.on('update grid', gridArr => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
-    Room_Grid.set(room, gridArr);
-    io.to(room).emit('res grid update', Room_Grid.get(room) );
+
+    let obj = new GameData;
+    obj.grid = gridArr;
+    Room_GameData.set(room, obj);
+    io.to(room).emit('res grid update', Room_GameData.get(room) );
   });
 
 
@@ -251,7 +258,7 @@ io.on('connection', (socket) => {
 
     if ( !bool ) {
       io.emit('del roombox', oldRoom );
-      Room_Grid.delete(oldRoom);
+      Room_GameData.delete(oldRoom);
     }
 
     if ( room != 'lobby' ) { socket.join(room); }
