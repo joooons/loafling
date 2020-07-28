@@ -9,6 +9,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
+// const { has } = require('underscore');
 
 const app = express();
 const server = http.createServer(app);
@@ -28,7 +29,8 @@ var Name_Room = new Map();
 var Room_Grid = new Map();
 
 const boardDim = 4;
-
+const nameSuffix = [ ', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
+const roomSuffix = [ ', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 
 
 
@@ -50,16 +52,11 @@ function MapToArray( map, keyStr, valStr ) {
   return arr;
 }
 
-function hasMapValue( map, roomName ) {
-  let arr = [];
-  map.forEach( (val) => {
-    arr.push(val);
-  });
-  let bool = arr.includes(roomName);
-  return bool;
+
+
+function hasMapValue( map, item ) {
+  return Array.from( map.values() ).includes( item );
 }
-
-
 
 
 
@@ -69,7 +66,6 @@ function emptyGrid(num) {
   let arr = new Array(length).fill(color);
   return arr;
 }
-
 
 
 
@@ -83,6 +79,26 @@ function displayName_Room( text ) {
 
 
 
+function avoidDuplicate( map, suggestedName, suffix ) {
+  let num = suffix.length;
+  let name = suggestedName;
+  while ( hasMapValue( map, name ) ) {
+    if (num > 0 ) { 
+      num--; 
+      name = suggestedName + `${ suffix[num]}`;
+    } else {
+      let str = '';
+      for ( i=0 ; i<4 ; i++ ) {
+        let num = Math.floor( Math.random() * 10 );
+        str += num.toString();
+      }
+      name = suggestedName + `-${str}`;
+    }
+  }
+  return name;
+}
+
+
 
 
 // THE SOCKET.IO ENVIRONMENT ______________________________________
@@ -90,16 +106,20 @@ function displayName_Room( text ) {
 io.on('connection', (socket) => {
   
   console.log(`----- ${socket.id} connected --------------`);
+  // console.log(`${ID_Name.size} users connected`);
 
 
 
   // DISCONNECT
   socket.on('disconnect', () => {
     let name = ID_Name.get(socket.id);
-    console.log(`( user: ${name} ) disconnected...`);
+   
 
     Name_Room.delete(name);
     ID_Name.delete(socket.id);
+
+    console.log(`( user: ${name} ) disconnected...`);
+    console.log(`${ID_Name.size} users still connected`);
 
     let arr = MapToArray(Name_Room, "name", "room");
     io.emit('update names', arr);
@@ -109,13 +129,14 @@ io.on('connection', (socket) => {
 
 
   // WHEN NEW USER ENTERS
-  socket.on('new user', name => {
-
+  socket.on('new user', suggestedName => {
+    // let name = suggestedName;
     socket.emit('board config', boardDim);
     
-
-    // hasMapValue( ID_Name, name);
-
+    let name = avoidDuplicate( ID_Name, suggestedName, nameSuffix );
+    if ( name != suggestedName ) {
+      socket.emit('change name', name );
+    }
 
     ID_Name.set(socket.id, name);
     Name_Room.set(name, 'lobby');
@@ -148,13 +169,20 @@ io.on('connection', (socket) => {
   // WHEN USER CREATES A ROOM
   socket.on('create room', roomName => {
 
+    let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
+
+    if ( room != roomName ) {
+      socket.emit('change room name', room );
+    }
+
+
     let name = ID_Name.get(socket.id);
-    Name_Room.set(name, roomName);
-    socket.join(roomName);
+    Name_Room.set(name, room);
+    socket.join(room);
 
-    Room_Grid.set( roomName, emptyGrid( boardDim ));
+    Room_Grid.set( room, emptyGrid( boardDim ));
 
-    io.emit('add roombox', roomName);
+    io.emit('add roombox', room);
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
@@ -188,7 +216,7 @@ io.on('connection', (socket) => {
     let bool = hasMapValue(Name_Room, oldRoom);
 
     // console.log(`is ${oldRoom} included in Name_Room? `, bool);
-    displayName_Room('after i set room');
+    // displayName_Room('after i set room');
     // console.log(!bool);
 
     if ( !bool ) {
@@ -203,6 +231,8 @@ io.on('connection', (socket) => {
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
+
+    displayName_Room('update names');
 
   });
 

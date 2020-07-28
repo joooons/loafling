@@ -258,8 +258,12 @@ pickName.onchange = () => {
 
 
 
+
+
+
 $('#room-name').on('change', () => {
-    if ( /\s+/.test( $('#room-name').val() ) ) {
+    let reg = /[\s\"\']/;
+    if ( reg.test( $('#room-name').val() ) ) {
         $('#room-name').attr('placeholder', 'no spaces!');
         $('#room-name').val('');
         return;    
@@ -300,6 +304,17 @@ $('#room-name').on('focusout', () => {
 // SOCKET EVENTS __________________________________________
 
 
+
+socket.on('change name', newName => {
+    name = newName;
+});
+
+
+socket.on('change room name', roomName => {
+    room = roomName;
+});
+
+
 socket.on('add roombox', roomName => {
     addRoomBox( roomName );
     updateButtons();
@@ -316,6 +331,8 @@ socket.on('del roombox', roomName => {
 socket.on('update names', arr => {
     updateNames( arr );
 });
+
+
 
 
 
