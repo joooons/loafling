@@ -219,7 +219,7 @@ function updateNames( arrayOfObject ) {
     }
     arrayOfObject.forEach( obj => {
         let str = obj.name;
-        if (name == obj.name) str = `<b class="me">${name}</b>`;
+        if (name == obj.name) str = `<b class="me">${name} (me)</b>`;
         $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
     });
 }
