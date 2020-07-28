@@ -9,7 +9,9 @@ const socket = io();
 
 var name = 'none';
 var room = 'lobby';
-// var numOfRooms = 4;
+
+
+
 
 
 
@@ -33,22 +35,24 @@ const board = document.querySelector('#board');
 
 
 
+
+
+
+
+
 // INITIAL CONDITIONS ________________________________________
 
 resizeBoard();
+
+allowCreateRooms();
 
 $(board).fadeOut(0, () => { $(board).css('visibility', 'visible'); });
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
-socket.on('board config', data => { makeSquares(data); });
+socket.on('board config', dim => { setUpGrid( dim ); });
 
 
-// addRoomBox('a');
-// addRoomBox('b');
-// addRoomBox('c');
-// addRoomBox('d');
-// addRoomBox('e');
 
 
 
@@ -58,7 +62,6 @@ socket.on('board config', data => { makeSquares(data); });
 
 
 // LOCAL FUNCTIONS ____________________________________________
-
 
 function resizeBoard() {
     let x = window.innerWidth - 340;
@@ -72,23 +75,23 @@ function resizeBoard() {
 
 
 
-function makeSquares(num) {
-
+function setUpGrid( num ) {
     let str = `repeat(${num}, auto)`;
     $(board).css('grid-template-columns', str);
-
     for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
         let num = i;
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
         elem.innerText = num;
+        elem.style.background = "yellow";
+
         elem.onclick = ev => {
-            console.log(num);
             let color = ev.target.style.backgroundColor;
-            console.log(color);
-            color = (color != "yellow") ? "yellow" : "white";
+            color = (color != "yellow") ? "yellow" : "skyblue";
             ev.target.style.background = color;
+            console.log(num, color);
         }
+
         $(board).append(elem);
     }
 }
@@ -96,25 +99,32 @@ function makeSquares(num) {
 
 
 
-
-
-
-function ArrToMap( arr, keyStr, valStr ) {
-    let newMap = new Map();
-    arr.forEach( obj => {
-        newMap.set(obj[keyStr], obj[valStr]);
+function updateGrid( arr ) {
+    arr.forEach( (val, i) => {
+        $('#board >').eq(i).css('background', arr[i] );
     });
-    return newMap;
 }
 
 
 
 
 
+// function ArrToMap( arr, keyStr, valStr ) {
+//     let newMap = new Map();
+//     arr.forEach( obj => {
+//         newMap.set(obj[keyStr], obj[valStr]);
+//     });
+//     return newMap;
+// }
 
 
 
-allowCreateRooms();
+
+
+
+
+
+
 function allowCreateRooms() {
     $('#room-plus').html('<b>+</b>');
     $('#room-plus').show();
@@ -126,7 +136,6 @@ function allowCreateRooms() {
         $('#room-name').focus();
         onlyThisButtonLeave('--------');
     });
-
 }
 
 function denyCreateRooms() {
@@ -156,6 +165,17 @@ function onlyThisButtonLeave( room ) {
 }
 
 
+function updateButtons() {
+    if ( room == 'lobby' ) {
+        allowCreateRooms();
+        allButtonsJoin();
+    } else {
+        denyCreateRooms();
+        onlyThisButtonLeave(room);
+    }
+}
+
+
 
 
 
@@ -181,23 +201,51 @@ function addOnclick_JOIN( room ) {
     $(room).off('click');
     $(room).on('click', () => {
         
+
+
         console.log('join!');
 
-
     });
 }
 
 
 
-function addOnclick_LEAVE( room ) {
-    $(room).html('LEAVE');
-    $(room).off('click');
-    $(room).on('click', () => {
+function addOnclick_LEAVE( roomName ) {
+    $(roomName).html('LEAVE');
+    $(roomName).off('click');
+    $(roomName).on('click', () => {
         
         console.log('leave!');
+        room = 'lobby';
+        socket.emit('join room', room);
+        updateButtons();
+
         
     });
 }
+
+
+
+
+function updateNames( arrayOfObject ) {
+    let num = $('div[id^="rm-"]').length;
+    for ( i=0 ; i<num ; i++ ) {
+        $('div[id^="rm-"]').eq(i).html('');
+    }
+    arrayOfObject.forEach( obj => {
+        let str = obj.name;
+        if (name == obj.name) str = `<b class="me">${name}</b>`;
+        $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
+    });
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -216,8 +264,10 @@ window.onresize = () => { resizeBoard(); }
 
 
 
+
 pickName.onchange = () => {
     name = pickName.value;
+    pickName.value = '';
     modal.style.display = "none";
     socket.emit('new user', name);
 }
@@ -229,35 +279,30 @@ pickName.onchange = () => {
 
 
 $('#room-name').on('change', () => {
-    let str = $('#room-name').val();
-    
+    room = $('#room-name').val();
     $('#room-name').val('');
+
     $('#room-plus').show();
     $('#room-name').hide();
 
-    // addRoomBox( str );
+    socket.emit('create room', room);
+    
+    socket.emit('req grid update', room );
 
-    allButtonsJoin();
+    $(board).fadeIn(500);
 
-    // socket.emit('create room', str);
-    // socket.emit('join room', str);
 });
 
-$('#room-name').on('focusout', () => {
-    
+$('#room-name').on('focusout', () => {    
     $('#room-plus').show();
     $('#room-name').hide();
     $('#room-name').val('');
-    allButtonsJoin();
+    // allButtonsJoin();
 });
 
 
 
-// lobbySpace.onclick = () => {
-//     room = 'lobby';
-//     $('#board').fadeOut(1000);
-//     socket.emit('join room', room);
-// }
+
 
 
 
@@ -271,32 +316,24 @@ $('#room-name').on('focusout', () => {
 
 // SOCKET EVENTS __________________________________________
 
+
+socket.on('add roombox', roomName => {
+    addRoomBox( roomName );
+    updateButtons();
+});
+
+
+
+socket.on('del roombox', roomName => {
+    delRoomBox( roomName );
+    
+
+});
+
+
+
 socket.on('update names', arr => {
-    let num = $('div[id^="rm-"]').length;
-    for ( i=0 ; i<num ; i++ ) {
-        $('div[id^="rm-"]').eq(i).html('');
-    }
-    arr.forEach( obj => {
-        let str = obj.name;
-        if (name == obj.name) str = `<b>${name}</b>`;
-        $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
-    });
-});
-
-
-
-
-
-socket.on('create room', roomName => {
-    
-    room = roomName;
-    socket.emit('join room', room);
-    $('#board').fadeIn(100);
-    
-    addRoomBox(room);
-    // denyCreateRooms();
-    onlyThisButtonLeave(room);
-    
+    updateNames( arr );
 });
 
 
@@ -305,14 +342,24 @@ socket.on('create room', roomName => {
 
 
 
+socket.on('res grid update', arr => {
+    updateGrid(arr);
 
 
-socket.on('update board', data => {
-    let num = $('#board >').length;    
-    for ( i=0 ; i<num ; i++ ) {
-        $('#board >').eq(i).css('background', data[i]);
-    }
 });
+
+
+
+
+
+
+
+// socket.on('update board', data => {
+//     let num = $('#board >').length;    
+//     for ( i=0 ; i<num ; i++ ) {
+//         $('#board >').eq(i).css('background', data[i]);
+//     }
+// });
 
 
 // ______________________________________ SOCKET EVENTS (END)

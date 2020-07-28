@@ -185,6 +185,10 @@ button:hover {
     background: green;
 }
 
+
+.me {
+    color: blue;
+}
 /* .noselect {
     user-select: none;
     -moz-user-select: none;
