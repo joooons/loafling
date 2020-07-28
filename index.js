@@ -28,7 +28,7 @@ var Name_Room = new Map();
 var Room_Grid = new Map();
 
 const boardDim = 4;
-// const squareCount = Math.pow(boardDim, 2);
+
 
 
 
@@ -51,12 +51,10 @@ function MapToArray( map, keyStr, valStr ) {
 }
 
 function hasMapValue( map, roomName ) {
-  // console.log('---------------');
   let arr = [];
   map.forEach( (val) => {
     arr.push(val);
   });
-  // let arr = Array.from( map.values() );
   let bool = arr.includes(roomName);
   return bool;
 }
@@ -77,7 +75,7 @@ function emptyGrid(num) {
 
 function displayName_Room( text ) {
   console.log('         ');
-  console.log(`--- Name_Room right after ( ${text} ) ----`)
+  console.log(`--- Name_Room @ ( ${text} ) ---`)
   Name_Room.forEach( (val, key) => {
     console.log('   ', key, val);
   });
@@ -115,23 +113,22 @@ io.on('connection', (socket) => {
 
     socket.emit('board config', boardDim);
     
+
+    // hasMapValue( ID_Name, name);
+
+
     ID_Name.set(socket.id, name);
     Name_Room.set(name, 'lobby');
     console.log(`${name} connected!`);
 
-    
-    // console.log('----------------');
-    // console.log('all rooms in Name_Room: ');
+
     let roomArr = [];
     Name_Room.forEach( val => {
       roomArr.push(val);
-      // console.log('    ', val);
     });
     
-    // console.log('unique rooms in Name_Room: ');
     let newRoomArr = _.uniq(roomArr);
     newRoomArr.forEach( val => {
-      // console.log('    ', val);
       if (val != 'lobby') {
         socket.emit('add roombox', val);
       }
@@ -147,21 +144,6 @@ io.on('connection', (socket) => {
 
 
 
-  // WHEN USER JOINS A ROOM
-  // socket.on('join room', roomID => {
-  //   let name = ID_Name.get(socket.id);
-  //   Name_Room.set(name, roomID);
-
-  //   let arr = MapToArray( Name_Room, "name", "room");
-  //   io.emit('update names', arr);
-
-  //   if (roomID != 'lobby') {
-  //     socket.join(roomID);
-  //     // io.to(roomID).emit('update board', Room_Grid.get(roomID));
-  //   }
-  // });
-
-
 
   // WHEN USER CREATES A ROOM
   socket.on('create room', roomName => {
@@ -172,13 +154,11 @@ io.on('connection', (socket) => {
 
     Room_Grid.set( roomName, emptyGrid( boardDim ));
 
-
     io.emit('add roombox', roomName);
 
     let arr = MapToArray( Name_Room, "name", "room");
     io.emit('update names', arr);
   
-    displayName_Room('end of create room');
   });
 
 

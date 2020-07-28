@@ -84,6 +84,7 @@ button:hover {
     padding: 5px;
     text-align: center;
     border-radius: 5px;
+    /* transition: 2s; */
     /* height: 100px; */
     /* overflow: hidden; */
 }
@@ -189,10 +190,4 @@ button:hover {
 .me {
     color: blue;
 }
-/* .noselect {
-    user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-} */
-
 

@@ -74,8 +74,6 @@ function resizeBoard() {
 
 
 
-
-
 function setUpGrid( num ) {
     let str = `repeat(${num}, auto)`;
     $(board).css('grid-template-columns', str);
@@ -99,14 +97,11 @@ function setUpGrid( num ) {
 
 
 
-
 function updateGrid( arr ) {
     arr.forEach( (val, i) => {
         $('#board >').eq(i).css('background', arr[i] );
     });
 }
-
-
 
 
 
@@ -117,12 +112,6 @@ function updateGrid( arr ) {
 //     });
 //     return newMap;
 // }
-
-
-
-
-
-
 
 
 
@@ -139,6 +128,8 @@ function allowCreateRooms() {
     });
 }
 
+
+
 function denyCreateRooms() {
     $('#room-plus').html('<b>x</b>');
     $('#room-plus').css('cursor', 'default');
@@ -146,15 +137,17 @@ function denyCreateRooms() {
 }
 
 
+
 function allButtonsJoin() {
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        console.log(str);
         addOnclick_JOIN(`#${str}`);
     }
 }
+
+
 
 function onlyThisButtonLeave( room ) {
     let num = $(`button[id^="bt-"]`).length;
@@ -166,6 +159,7 @@ function onlyThisButtonLeave( room ) {
 }
 
 
+
 function updateButtons() {
     if ( room == 'lobby' ) {
         allowCreateRooms();
@@ -175,10 +169,6 @@ function updateButtons() {
         onlyThisButtonLeave(room);
     }
 }
-
-
-
-
 
 
 
@@ -195,22 +185,15 @@ function delRoomBox( room ) {
 
 
 
-
 function addOnclick_JOIN( roomName ) {
-    console.log('add onclick join joined');
     $(roomName).html('JOIN');
     $(roomName).off('click');
     $(roomName).on('click', () => {
-        
-        // console.log('join!');
-        
         room = roomName.slice(4);
         socket.emit('join room', room);
         socket.emit('req grid update', room );
-
         $(board).fadeIn(fadeTime);
         updateButtons();
-
     });
 }
 
@@ -220,18 +203,12 @@ function addOnclick_LEAVE( roomName ) {
     $(roomName).html('LEAVE');
     $(roomName).off('click');
     $(roomName).on('click', () => {
-        
-        // console.log('leave!');
         room = 'lobby';
         socket.emit('join room', room);
         updateButtons();
-
         $(board).fadeOut(fadeTime);
-
-        
     });
 }
-
 
 
 
@@ -272,7 +249,6 @@ window.onresize = () => { resizeBoard(); }
 
 
 
-
 pickName.onchange = () => {
     name = pickName.value;
     pickName.value = '';
@@ -282,31 +258,29 @@ pickName.onchange = () => {
 
 
 
-
-
-
-
 $('#room-name').on('change', () => {
+    if ( /\s+/.test( $('#room-name').val() ) ) {
+        $('#room-name').attr('placeholder', 'no spaces!');
+        $('#room-name').val('');
+        return;    
+    }
     room = $('#room-name').val();
     $('#room-name').val('');
-
+    $('#room-name').attr('placeholder', 'room name');
     $('#room-plus').show();
     $('#room-name').hide();
-
     socket.emit('create room', room);
-    
     socket.emit('req grid update', room );
-
     $(board).fadeIn(fadeTime);
-
 });
+
+
 
 $('#room-name').on('focusout', () => {    
     $('#room-plus').show();
     $('#room-name').hide();
     $('#room-name').val('');
     updateButtons();
-    // allButtonsJoin();
 });
 
 
@@ -335,8 +309,6 @@ socket.on('add roombox', roomName => {
 
 socket.on('del roombox', roomName => {
     delRoomBox( roomName );
-    
-
 });
 
 
@@ -353,8 +325,6 @@ socket.on('update names', arr => {
 
 socket.on('res grid update', arr => {
     updateGrid(arr);
-
-
 });
 
 
