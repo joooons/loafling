@@ -10,6 +10,7 @@ const socket = io();
 var name = 'none';
 var room = 'lobby';
 
+const fadeTime = 500;
 
 
 
@@ -129,10 +130,10 @@ function allowCreateRooms() {
     $('#room-plus').html('<b>+</b>');
     $('#room-plus').show();
     $('#room-plus').css('cursor', 'pointer');
-    $('#room-name').hide(500);
+    $('#room-name').hide(fadeTime);
     $('#room-plus').on('click', () => {
         $('#room-plus').hide();
-        $('#room-name').show(500);
+        $('#room-name').show(fadeTime);
         $('#room-name').focus();
         onlyThisButtonLeave('--------');
     });
@@ -195,15 +196,20 @@ function delRoomBox( room ) {
 
 
 
-function addOnclick_JOIN( room ) {
+function addOnclick_JOIN( roomName ) {
     console.log('add onclick join joined');
-    $(room).html('JOIN');
-    $(room).off('click');
-    $(room).on('click', () => {
+    $(roomName).html('JOIN');
+    $(roomName).off('click');
+    $(roomName).on('click', () => {
         
+        // console.log('join!');
+        
+        room = roomName.slice(4);
+        socket.emit('join room', room);
+        socket.emit('req grid update', room );
 
-
-        console.log('join!');
+        $(board).fadeIn(fadeTime);
+        updateButtons();
 
     });
 }
@@ -215,10 +221,12 @@ function addOnclick_LEAVE( roomName ) {
     $(roomName).off('click');
     $(roomName).on('click', () => {
         
-        console.log('leave!');
+        // console.log('leave!');
         room = 'lobby';
         socket.emit('join room', room);
         updateButtons();
+
+        $(board).fadeOut(fadeTime);
 
         
     });
@@ -289,7 +297,7 @@ $('#room-name').on('change', () => {
     
     socket.emit('req grid update', room );
 
-    $(board).fadeIn(500);
+    $(board).fadeIn(fadeTime);
 
 });
 
@@ -297,6 +305,7 @@ $('#room-name').on('focusout', () => {
     $('#room-plus').show();
     $('#room-name').hide();
     $('#room-name').val('');
+    updateButtons();
     // allButtonsJoin();
 });
 

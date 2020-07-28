@@ -195,24 +195,26 @@ io.on('connection', (socket) => {
   socket.on('join room', room => {
     let name = ID_Name.get(socket.id);
     let oldRoom = Name_Room.get(name);
-      console.log('          ');
-      console.log('------------');
-      console.log('oldRoom: ', oldRoom);
-      console.log('newRoom: ', room);
+      // console.log('          ');
+      // console.log('------------');
+      // console.log('oldRoom: ', oldRoom);
+      // console.log('newRoom: ', room);
       // displayName_Room('join room');
+
+    socket.leave(oldRoom);
 
     Name_Room.set(name, room);
   
     let bool = hasMapValue(Name_Room, oldRoom);
 
-    console.log(`is ${oldRoom} included in Name_Room? `, bool);
+    // console.log(`is ${oldRoom} included in Name_Room? `, bool);
     displayName_Room('after i set room');
     // console.log(!bool);
 
     if ( !bool ) {
-      console.log('did it work?');
+      // console.log('did it work?');
       io.emit('del roombox', oldRoom );
-      console.log('server: del roombox');
+      // console.log('server: del roombox');
     }
 
     if ( room != 'lobby' ) {
