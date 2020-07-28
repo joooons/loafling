@@ -28,7 +28,7 @@ var ID_Name = new Map();
 var Name_Room = new Map();
 var Room_Grid = new Map();
 
-const boardDim = 4;
+const boardDim = 5;
 const nameSuffix = [ ', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [ ', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 
@@ -62,8 +62,8 @@ function hasMapValue( map, item ) {
 
 function emptyGrid(num) {
   let length = Math.pow(num, 2);
-  let color = '#0005';
-  let arr = new Array(length).fill(color);
+  let value = '-';
+  let arr = new Array(length).fill(value);
   return arr;
 }
 
@@ -197,6 +197,13 @@ io.on('connection', (socket) => {
   });
 
 
+
+  socket.on('update grid', gridArr => {
+    let name = ID_Name.get(socket.id);
+    let room = Name_Room.get(name);
+    Room_Grid.set(room, gridArr);
+    io.to(room).emit('res grid update', Room_Grid.get(room) );
+  });
 
 
 

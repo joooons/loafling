@@ -18,6 +18,9 @@
 
 body {
     font-family: 'Lato', sans-serif;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 
@@ -36,9 +39,9 @@ button {
     font-weight: bold;
     outline: none;
     cursor: pointer;
-    user-select: none;
+    /* user-select: none;
     -moz-user-select: none;
-    -ms-user-select: none;
+    -ms-user-select: none; */
     transition: 0.1s;
 }
 
@@ -104,7 +107,7 @@ button:hover {
 
 
 #boardSpace {
-    position: relative;
+    /* position: relative; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -114,19 +117,20 @@ button:hover {
     /* position: absolute; */
     /* left: 100px; */
     background: #0002;
-    width: 200px;
-    height: 200px;
+    /* width: 200px; */
+    /* height: 200px; */
     display: grid;
     /* grid-template-columns: auto auto auto; */
     /* grid-template-rows: auto auto auto; */
-    padding: 5px;
-    gap: 5px;
+    padding: 2px;
+    /* gap: 5px; */
     visibility: hidden;
 }
 
 .square {
     background: white;
-    border-radius: 35%;
+    border-radius: 30%;
+    margin: 2px;
     display: flex;
     justify-content: center;
     align-items: center;

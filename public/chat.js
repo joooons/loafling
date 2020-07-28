@@ -12,6 +12,8 @@ var room = 'lobby';
 
 const fadeTime = 500;
 
+var gridArr = [];
+
 
 
 
@@ -75,21 +77,14 @@ function resizeBoard() {
 
 
 function setUpGrid( num ) {
-    let str = `repeat(${num}, auto)`;
+    let percent = Math.floor( 100 / num );
+    let str = `repeat(${num}, ${percent}% )`;
     $(board).css('grid-template-columns', str);
     for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
-        let num = i;
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
-        elem.innerText = num;
-        elem.style.background = "yellow";
 
-        elem.onclick = ev => {
-            let color = ev.target.style.backgroundColor;
-            color = (color != "yellow") ? "yellow" : "skyblue";
-            ev.target.style.background = color;
-            console.log(num, color);
-        }
+        addOnclick_Square(elem);
 
         $(board).append(elem);
     }
@@ -97,10 +92,39 @@ function setUpGrid( num ) {
 
 
 
+function addOnclick_Square( elem ) {
+    elem.onclick = ev => {
+        let str = ev.target.innerText;
+        let init = name.slice(0,1).toUpperCase();
+        if (str == '-') {
+            str = init;
+        } else if (str == init ) {
+            str = '-';
+        }
+        
+        ev.target.innerText = str;
+
+        updateLocalGrid();
+
+        socket.emit('update grid', gridArr);
+
+    }
+}
+
+
+function updateLocalGrid() {
+    for ( i=0 ; i<$('.square').length ; i++ ){
+        gridArr[i] = $('.square').eq(i).html();
+    }
+}
+
+
+
 function updateGrid( arr ) {
     arr.forEach( (val, i) => {
-        $('#board >').eq(i).css('background', arr[i] );
+        $('.square').eq(i).html( arr[i] );
     });
+    updateLocalGrid();
 }
 
 
