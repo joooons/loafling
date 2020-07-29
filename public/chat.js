@@ -69,13 +69,30 @@ socket.on('board config', dim => { setUpGrid( dim ); });
 // LOCAL FUNCTIONS ____________________________________________
 
 function resizeBoard() {
-    let x = window.innerWidth - 340;
-    let y = window.innerHeight - 40;
-    let dim = Math.min(x, y);
-    boardFrame.style.width = dim + 'px';
-    boardFrame.style.height = dim + 'px';
-    // board.style.width = (0.9*dim) + 'px';
-    // board.style.height = (0.9*dim) + 'px';
+    let x = window.innerWidth - 314;
+    let y = window.innerHeight - 30;
+
+    let board_x, board_y;
+
+    let windowRatio = x / y;
+    let boardRatio = 1.5;
+
+    if ( windowRatio < boardRatio ) {
+        board_x = x;
+        board_y = x / boardRatio;
+    } else {
+        board_x = y * boardRatio;
+        board_y = y;
+    }
+
+    // let dim = Math.min(x, y);
+
+    boardFrame.style.width = board_x + 'px';
+    boardFrame.style.height = board_y + 'px';
+
+    let dim = board_y - 40;
+    board.style.width = dim + 'px';
+    board.style.height = dim + 'px';
 
 }
 
