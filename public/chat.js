@@ -252,8 +252,15 @@ function updateNames( arrayOfObject ) {
     }
     arrayOfObject.forEach( obj => {
         let str = obj.name;
-        if (name == obj.name) str = `<b class="me">${name} (me)</b>`;
-        $(`div[id="rm-${obj.room}"]`).append(`<div>${str}</div>`);
+
+        let [a, b, c, d] = ['', obj.name, '', ''];
+
+        if (name == obj.name) {
+            a = 'class="me"';
+            c = ' (me)';
+        }
+
+        $(`div[id="rm-${obj.room}"]`).append(`<div ${a}>${b} ${c}</div>`);
     });
 }
 
