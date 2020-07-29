@@ -10,6 +10,7 @@ const socket = io();
 var name = 'none';
 var room = 'lobby';
 
+const noName = 'zzzz'
 const fadeTime = 500;
 
 var gridArr = [];
@@ -80,62 +81,77 @@ function setUpGrid( num ) {
     let percent = Math.floor( 100 / num );
     let str = `repeat(${num}, ${percent}% )`;
     $(board).css('grid-template-columns', str);
-    for ( i=1 ; i<=Math.pow(num, 2) ; i++ ) {
+    for ( i=0 ; i<Math.pow(num, 2) ; i++ ) {
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
-        addOnclick_Square(elem);
+        addOnclick_Square(elem, i);
         $(board).append(elem);
     }
 }
 
 
 
-function addOnclick_Square( elem ) {
+function addOnclick_Square( elem, index ) {
     elem.onclick = ev => {
-                
-        let str = ev.target.innerText;
-        let init = name.slice(0,1).toUpperCase();
-        
-        if (str == '-') { 
-            str = init; 
-            // $(ev.target).addClass(name);
-        } else if (str == init ) { 
-            str = '-'; 
-            // $(ev.target).removeClass(name);
+
+        let data = gridArr[index];
+        if (data == name) {
+            gridArr[index] = noName;
+        } else if (data == noName) {
+            gridArr[index] = name;
         }
-        
-        ev.target.innerText = str;
-        updateLocalGrid();
+
+        updateLocalGrid( gridArr );
+
         socket.emit('update grid', gridArr);
     }
 }
 
 
 
-function updateLocalGrid() {
-    for ( i=0 ; i<$('.square').length ; i++ ){
-        gridArr[i] = $('.square').eq(i).html();
-    }
+function updateLocalGrid( grid ) {
+    // for ( i=0 ; i<$('.square').length ; i++ ){
+    //     gridArr[i] = $('.square').eq(i).attr('id');
+    // }
+    gridArr = grid;
 }
 
 
 
-function updateGrid( arr ) {
-    arr.forEach( (val, i) => {
-        $('.square').eq(i).html( arr[i] );
+function updateGrid( map, grid ) {
+
+    grid.forEach( (val, i) => {
+        let color = map.get(val);
+
+        $('.square').eq(i).css('background', color );
+
     });
-    updateLocalGrid();
+
+    updateLocalGrid( grid );
 }
 
 
 
-// function ArrToMap( arr, keyStr, valStr ) {
-//     let newMap = new Map();
-//     arr.forEach( obj => {
-//         newMap.set(obj[keyStr], obj[valStr]);
-//     });
-//     return newMap;
-// }
+function ArrToMap( arr, keyStr, valStr ) {
+    let newMap = new Map();
+    arr.forEach( obj => {
+        newMap.set(obj[keyStr], obj[valStr]);
+    });
+    return newMap;
+}
+
+
+
+
+
+function ColorBasedOnName() {
+    // takes map of Name_Color
+    // gets color based on name
+    // returns the color
+
+}
+
+
 
 
 
@@ -328,6 +344,13 @@ $('#room-name').on('focusout', () => {
 // SOCKET EVENTS __________________________________________
 
 
+// socket.on('send thing', (arr, grid) => {
+//     console.log(arr);
+//     console.log(grid);
+//     console.log( ArrToMap(arr, 'name', 'color') );
+// });
+
+
 
 socket.on('change name', newName => {
     name = newName;
@@ -360,8 +383,11 @@ socket.on('update names', arr => {
 
 
 
-socket.on('res grid update', obj => {
-    updateGrid(obj.grid);
+socket.on('res grid update', (arr, grid) => {
+    let map = ArrToMap(arr, 'name', 'color');
+    // console.log(map);
+    // console.log(grid);
+    updateGrid(map, grid);
 });
 
 

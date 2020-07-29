@@ -9,6 +9,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
+const { timingSafeEqual } = require('crypto');
+const { has } = require('underscore');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,10 +31,11 @@ var Name_Room = new Map();
 var Room_GameData = new Map();
 
 const boardDim = 5;
+const noName = 'zzzz'
 
-const nameSuffix = [ ', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
-const roomSuffix = [ ', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-
+const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
+const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
+const colorSet = ['purple', 'green', 'orange', 'yellow', 'blue', 'red', 'white'];
 
 
 
@@ -79,7 +82,15 @@ function hasMapValue( map, item ) { return Array.from( map.values() ).includes( 
 
 
 
-function emptyGrid(num) { return new Array( Math.pow(num, 2) ).fill('-'); }
+function giveUniqColor( map ) {    
+  let num = colorSet.length-1;
+  while ( hasMapValue(map,colorSet[num]) == true ) { num--; }
+  return colorSet[num];
+}
+
+
+
+function emptyGrid(num) { return new Array( Math.pow(num, 2) ).fill(noName); }
 
 
 
@@ -138,6 +149,14 @@ io.on('connection', (socket) => {
   console.log(`----- ${socket.id} connected --------------`);
 
 
+
+  // let thing = new GameData();
+  //   thing.colorMap.set('monk', 'red');
+  //   thing.colorMap.set('joon', 'blue');
+  //   thing.grid = [1,3,5];
+  // socket.emit('send thing', MapToArray(thing.colorMap, 'name', 'color'), thing.grid);
+
+
   
   // _______ DISCONNECT _______________________________________
 
@@ -194,8 +213,8 @@ io.on('connection', (socket) => {
   // WHEN USER CREATES A ROOM
   socket.on('create room', roomName => {
 
-    let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
 
+    let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
     if ( room != roomName ) { socket.emit('change room name', room ); }
 
     let name = ID_Name.get(socket.id);
@@ -203,10 +222,12 @@ io.on('connection', (socket) => {
     socket.join(room);
 
     let obj = new GameData;
-    obj.grid = emptyGrid( boardDim);
-    // Room_GameData.set( room, emptyGrid( boardDim ));
-    Room_GameData.set( room, obj );
 
+    obj.colorMap.set(noName, giveUniqColor(obj.colorMap) );
+    obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
+
+    obj.grid = emptyGrid( boardDim );
+    Room_GameData.set( room, obj );
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -218,7 +239,13 @@ io.on('connection', (socket) => {
   
   // _______ REQ GRID UPDATE __________________________________
 
-  socket.on('req grid update', room => { io.to(room).emit('res grid update', Room_GameData.get(room) ); });
+  socket.on('req grid update', room => {
+    
+    let obj = Room_GameData.get(room);
+    let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
+    let arrOfGrid = obj.grid;
+    io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
+  });
 
 
 
@@ -232,10 +259,14 @@ io.on('connection', (socket) => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
 
-    let obj = new GameData;
+    let obj = Room_GameData.get(room);
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
-    io.to(room).emit('res grid update', Room_GameData.get(room) );
+
+    let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
+    let arrOfGrid = obj.grid;
+
+    io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
   });
 
 
