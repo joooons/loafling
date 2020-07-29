@@ -30,12 +30,12 @@ var ID_Name = new Map();
 var Name_Room = new Map();
 var Room_GameData = new Map();
 
-const boardDim = 5;
+const boardDim = 13;
 const noName = 'zzzz'
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-const colorSet = ['purple', 'green', 'orange', 'yellow', 'blue', '#fd9', 'white'];
+const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'white', 'black', '#FFF0'];
 
 
 

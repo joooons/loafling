@@ -1,7 +1,10 @@
 
-
-
 const socket = io();
+
+
+
+
+
 
 
 
@@ -12,6 +15,8 @@ var room = 'lobby';
 
 const noName = 'zzzz'
 const fadeTime = 500;
+const boardRatio = 1.5;
+const playerLimit = 3;
 
 var gridArr = [];
 
@@ -45,6 +50,9 @@ const board = document.querySelector('#board');
 
 
 
+
+
+
 // INITIAL CONDITIONS ________________________________________
 
 resizeBoard();
@@ -66,16 +74,16 @@ socket.on('board config', dim => { setUpGrid( dim ); });
 
 
 
+
+
 // LOCAL FUNCTIONS ____________________________________________
 
 function resizeBoard() {
     let x = window.innerWidth - 314;
     let y = window.innerHeight - 30;
-
     let board_x, board_y;
-
     let windowRatio = x / y;
-    let boardRatio = 1.5;
+    
 
     if ( windowRatio < boardRatio ) {
         board_x = x;
@@ -84,37 +92,25 @@ function resizeBoard() {
         board_x = y * boardRatio;
         board_y = y;
     }
-
-    // let dim = Math.min(x, y);
+    
+    let dim = board_y - 40;
 
     boardFrame.style.width = board_x + 'px';
     boardFrame.style.height = board_y + 'px';
-
-    let dim = board_y - 40;
     board.style.width = dim + 'px';
     board.style.height = dim + 'px';
-
 }
 
 
 
 function setUpGrid( num ) {
-    let percent = Math.floor( 100 / num );
-    let str = `repeat(${num}, ${percent}% )`;
-    $(board).css('grid-template-columns', str);
-    $(board).css('grid-template-rows', str);
-    for ( i=0 ; i<Math.pow(num, 2) ; i++ ) {
-        let elem = document.createElement('div');
-        elem.setAttribute('class', 'square');
-        addOnclick_Square(elem, i);
-        $(board).append(elem);
-    }
+    addSVGtoBoard(board, num);
 }
 
 
 
 function addOnclick_Square( elem, index ) {
-    elem.onclick = ev => {
+    elem.onclick = () => {
 
         let data = gridArr[index];
         if (data == name) {
@@ -137,12 +133,13 @@ function updateLocalGrid( grid ) {
 
 
 
-function updateGrid( map, grid ) {
-    grid.forEach( (val, i) => {
-        let color = map.get(val);
-        $('.square').eq(i).css('background', color );
+function visualizeGrid( color_map, name_grid ) {
+    name_grid.forEach( ( _name, i) => {
+
+        let color = color_map.get( _name );
+        $('.square').eq(i).css('fill', color );
     });
-    updateLocalGrid( grid );
+    updateLocalGrid( name_grid );
 }
 
 
@@ -154,19 +151,6 @@ function ArrToMap( arr, keyStr, valStr ) {
     });
     return newMap;
 }
-
-
-
-
-
-function ColorBasedOnName() {
-    // takes map of Name_Color
-    // gets color based on name
-    // returns the color
-
-}
-
-
 
 
 
@@ -229,7 +213,7 @@ function updateButtons() {
 
 function addRoomBox( room ) {
     $('#roomSpace').append(`<div id="rb-${room}"></div>`);
-    $(`#rb-${room}`).append(`<b>${room}</b><hr>`);
+    $(`#rb-${room}`).append(`<b>${room}</b><br>`);
     $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
     $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
 }
@@ -246,8 +230,8 @@ function addOnclick_JOIN( roomName ) {
     $(roomName).on('click', () => {
         room = roomName.slice(4);
         let playerNum = $(`#rm-${room} >`).length;
-        console.log(playerNum);
-        if ( playerNum < 2 ) {
+        // console.log(playerNum);
+        if ( playerNum < playerLimit ) {
             socket.emit('join room', room);
             socket.emit('req grid update', room );
             $('#boardFrame').fadeIn(fadeTime);
@@ -411,11 +395,9 @@ socket.on('update names', arr => {
 
 
 
-socket.on('res grid update', (arr, grid) => {
-    let map = ArrToMap(arr, 'name', 'color');
-    // console.log(map);
-    // console.log(grid);
-    updateGrid(map, grid);
+socket.on('res grid update', (arrOfNameColorMap, name_grid) => {
+    let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
+    visualizeGrid(map, name_grid);
 });
 
 
