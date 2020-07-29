@@ -129,7 +129,9 @@ button:hover {
 
 .square {
     background: white;
-    border-radius: 30%;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 1px solid gray;
     margin: 2px;
     display: flex;
     justify-content: center;

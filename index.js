@@ -35,7 +35,7 @@ const noName = 'zzzz'
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-const colorSet = ['purple', 'green', 'orange', 'yellow', 'blue', 'red', 'white'];
+const colorSet = ['purple', 'green', 'orange', 'yellow', 'blue', '#fd9', 'white'];
 
 
 
