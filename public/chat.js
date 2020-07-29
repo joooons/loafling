@@ -110,23 +110,16 @@ function addOnclick_Square( elem, index ) {
 
 
 function updateLocalGrid( grid ) {
-    // for ( i=0 ; i<$('.square').length ; i++ ){
-    //     gridArr[i] = $('.square').eq(i).attr('id');
-    // }
     gridArr = grid;
 }
 
 
 
 function updateGrid( map, grid ) {
-
     grid.forEach( (val, i) => {
         let color = map.get(val);
-
         $('.square').eq(i).css('background', color );
-
     });
-
     updateLocalGrid( grid );
 }
 

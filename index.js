@@ -9,8 +9,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
-const { timingSafeEqual } = require('crypto');
-const { has } = require('underscore');
+// const { timingSafeEqual } = require('crypto');
+// const { has } = require('underscore');
 
 const app = express();
 const server = http.createServer(app);
@@ -213,7 +213,6 @@ io.on('connection', (socket) => {
   // WHEN USER CREATES A ROOM
   socket.on('create room', roomName => {
 
-
     let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
     if ( room != roomName ) { socket.emit('change room name', room ); }
 
@@ -281,18 +280,27 @@ io.on('connection', (socket) => {
     let name = ID_Name.get(socket.id);
     let oldRoom = Name_Room.get(name);
 
+    Name_Room.set(name, room);
+
     socket.leave(oldRoom);
 
-    Name_Room.set(name, room);
-  
-    let bool = hasMapValue(Name_Room, oldRoom);
-
-    if ( !bool ) {
+    if ( room != 'lobby' ) { 
+      socket.join(room); 
+      let obj = Room_GameData.get(room);
+      console.log(obj.colorMap);
+      if ( !obj.colorMap.has(name) ) {
+        console.log('name not on list yet');
+        obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
+        Room_GameData.set( room, obj );
+      }
+    }
+    
+    if ( !hasMapValue(Name_Room, oldRoom) ) {
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
     }
 
-    if ( room != 'lobby' ) { socket.join(room); }
+    
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
 
