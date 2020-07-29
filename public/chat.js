@@ -31,6 +31,7 @@ const pickName = document.querySelector('#pick-name');
 const lobbySpace = document.querySelector('#lobbySpace');
 const roomSpace = document.querySelector('#roomSpace');
 const boardSpace = document.querySelector('#boardSpace');
+const boardFrame = document.querySelector('#boardFrame');
 
 const board = document.querySelector('#board');
 
@@ -50,7 +51,7 @@ resizeBoard();
 
 allowCreateRooms();
 
-$(board).fadeOut(0, () => { $(board).css('visibility', 'visible'); });
+$('#boardFrame').fadeOut(0, () => { $('#boardFrame').css('visibility', 'visible'); });
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
@@ -71,8 +72,11 @@ function resizeBoard() {
     let x = window.innerWidth - 340;
     let y = window.innerHeight - 40;
     let dim = Math.min(x, y);
-    board.style.width = dim + 'px';
-    board.style.height = dim + 'px';
+    boardFrame.style.width = dim + 'px';
+    boardFrame.style.height = dim + 'px';
+    // board.style.width = (0.9*dim) + 'px';
+    // board.style.height = (0.9*dim) + 'px';
+
 }
 
 
@@ -81,6 +85,7 @@ function setUpGrid( num ) {
     let percent = Math.floor( 100 / num );
     let str = `repeat(${num}, ${percent}% )`;
     $(board).css('grid-template-columns', str);
+    $(board).css('grid-template-rows', str);
     for ( i=0 ; i<Math.pow(num, 2) ; i++ ) {
         let elem = document.createElement('div');
         elem.setAttribute('class', 'square');
@@ -223,10 +228,16 @@ function addOnclick_JOIN( roomName ) {
     $(roomName).off('click');
     $(roomName).on('click', () => {
         room = roomName.slice(4);
-        socket.emit('join room', room);
-        socket.emit('req grid update', room );
-        $(board).fadeIn(fadeTime);
-        updateButtons();
+        let playerNum = $(`#rm-${room} >`).length;
+        console.log(playerNum);
+        if ( playerNum < 2 ) {
+            socket.emit('join room', room);
+            socket.emit('req grid update', room );
+            $('#boardFrame').fadeIn(fadeTime);
+            updateButtons();
+        } else {
+            alert('room full');
+        }
     });
 }
 
@@ -239,7 +250,7 @@ function addOnclick_LEAVE( roomName ) {
         room = 'lobby';
         socket.emit('join room', room);
         updateButtons();
-        $(board).fadeOut(fadeTime);
+        $('#boardFrame').fadeOut(fadeTime);
     });
 }
 
@@ -315,7 +326,7 @@ $('#room-name').on('change', () => {
     $('#room-name').hide();
     socket.emit('create room', room);
     socket.emit('req grid update', room );
-    $(board).fadeIn(fadeTime);
+    $('#boardFrame').fadeIn(fadeTime);
 });
 
 
