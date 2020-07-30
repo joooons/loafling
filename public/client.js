@@ -12,13 +12,15 @@ const socket = io();
 
 var name = 'none';
 var room = 'lobby';
+var gridArr = [];
 
-const noName = 'zzzz'
 const fadeTime = 500;
 const boardRatio = 1.5;
-const playerLimit = 3;
 
-var gridArr = [];
+var playerLimit = 3;
+
+var noName = '';
+
 
 
 
@@ -230,7 +232,6 @@ function addOnclick_JOIN( roomName ) {
     $(roomName).on('click', () => {
         room = roomName.slice(4);
         let playerNum = $(`#rm-${room} >`).length;
-        // console.log(playerNum);
         if ( playerNum < playerLimit ) {
             socket.emit('join room', room);
             socket.emit('req grid update', room );
@@ -263,15 +264,11 @@ function updateNames( arrayOfObject ) {
         $('div[id^="rm-"]').eq(i).html('');
     }
     arrayOfObject.forEach( obj => {
-        let str = obj.name;
-
-        let [a, b, c, d] = ['', obj.name, '', ''];
-
+        let [a, b, c ] = ['', obj.name, '', ''];
         if (name == obj.name) {
             a = 'class="me"';
             c = ' (me)';
         }
-
         $(`div[id="rm-${obj.room}"]`).append(`<div ${a}>${b} ${c}</div>`);
     });
 }
@@ -361,6 +358,10 @@ $('#room-name').on('focusout', () => {
 //     console.log(grid);
 //     console.log( ArrToMap(arr, 'name', 'color') );
 // });
+
+socket.on('synchronize variables', data => {
+    noName = data;
+});
 
 
 

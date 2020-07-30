@@ -140,7 +140,8 @@ div[id^="rm-"] {
 
 #board {
     /* background: #0002; */
-    background-image: url('wood.jpg');
+    /* background-image: url('wood.jpg'); */
+    background-image: url('whitepaint.jpg');
     background-size: cover;
 
     /* grid-column: 1/2;

@@ -1,10 +1,34 @@
 
 
-console.log('hello!');
+console.log('elembank.js at your service!');
 
 
-// const stoneColor = "black";
+
+// LOCAL VARIABLES _________________________________________________
+
 const ns = "http://www.w3.org/2000/svg";
+
+
+
+
+
+
+
+
+
+
+// LOCAL FUNCTIONS _________________________________________________
+
+function addSVGtoBoard( elem, num ) {
+    let xDim = 100 * num;
+    let yDim = 100 * num;
+    let svg = document.createElementNS(ns, 'svg');
+        svg.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
+        addGridLines( svg, xDim, yDim, num );
+        addClickableDots(svg, num);
+    $(elem).append(svg);
+}
+
 
 
 function addGridLines( elem, xDim, yDim, num ) {
@@ -18,13 +42,13 @@ function addGridLines( elem, xDim, yDim, num ) {
             $(lineH).attr('stroke-linecap', 'round');
             $(lineH).attr('stroke', '#222');
         let lineV = document.createElementNS(ns, 'line');
-            lineV.setAttributeNS(null, 'y1', 50);
-            lineV.setAttributeNS(null, 'x1', 50 + (100 * i) );
-            lineV.setAttributeNS(null, 'y2', xDim - 50);
-            lineV.setAttributeNS(null, 'x2', 50 + (100 * i) );
-            lineV.setAttributeNS(null, 'stroke-width', '5px');
-            lineV.setAttributeNS(null, 'stroke-linecap', 'round');
-            lineV.setAttributeNS(null, 'stroke', '#222');
+            $(lineV).attr('y1', 50);
+            $(lineV).attr('x1', 50 + (100 * i) );
+            $(lineV).attr('y2', xDim - 50);
+            $(lineV).attr('x2', 50 + (100 * i) );
+            $(lineV).attr('stroke-width', '5px');
+            $(lineV).attr('stroke-linecap', 'round');
+            $(lineV).attr('stroke', '#222');
         $(elem).append(lineH);
         $(elem).append(lineV);
     }
@@ -32,22 +56,17 @@ function addGridLines( elem, xDim, yDim, num ) {
 
 
 
-
-
 function addClickableDots( elem, num) {
     for ( j=0 ; j<num ; j++ ) {
         for ( i=0 ; i<num ; i++ ) {
             let index = (j*num) + i;
-
             let circ = document.createElementNS(ns, 'circle');
                 $(circ).attr('cx', (100*i) + 50 );
                 $(circ).attr('cy', (100*j) + 50 );
                 $(circ).attr('r', 46);
                 $(circ).attr('fill', '#fff0');
                 $(circ).attr('class', 'square');
-
                 addOnclick_Square( circ, index);
-                
             $(elem).append(circ);
         }
     }
@@ -55,12 +74,7 @@ function addClickableDots( elem, num) {
 
 
 
-function addSVGtoBoard( elem, num ) {
-    let xDim = 100 * num;
-    let yDim = 100 * num;
-    let svg = document.createElementNS(ns, 'svg');
-        svg.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
-        addGridLines( svg, xDim, yDim, num );
-        addClickableDots(svg, num);
-    $(elem).append(svg);
-}
+
+
+// _______________________________________________ END OF EVERYTHING
+

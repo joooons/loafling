@@ -30,8 +30,8 @@ var ID_Name = new Map();
 var Name_Room = new Map();
 var Room_GameData = new Map();
 
-const boardDim = 13;
-const noName = 'zzzz'
+const boardDim = 5;
+const noName = 'zz'
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
@@ -148,6 +148,7 @@ io.on('connection', (socket) => {
   
   console.log(`----- ${socket.id} connected --------------`);
 
+  socket.emit('synchronize variables', noName);
 
 
   // let thing = new GameData();
