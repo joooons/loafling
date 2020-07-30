@@ -123,6 +123,8 @@ function addOnclick_Square( elem, index ) {
         }
 
         updateLocalGrid( gridArr );
+        
+        GridArrToGame_Rox();
 
         socket.emit('update grid', gridArr);
     }

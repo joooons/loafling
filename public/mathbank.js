@@ -25,13 +25,16 @@ const Game_Rox = {};
 
 function Rox () {
     this.total = [];
+        // Array of "pos" belonging to player
     this.teams = [];
+        // Array of arrays of "pos" that are contiguous
     this.walls = [];
+        // Array of "pos" that surround "teams"
 }
 
 const NESW = [{x:-1,y:0}, {x:0,y:1}, {x:1,y:0}, {x:0,y:-1}];
 
-
+var teamArray = [];
 
 
 
@@ -53,6 +56,9 @@ function Game_RoxToGridArr() {
 
 
 function GridArrToGame_Rox() {
+
+    console.clear();
+
     let roster = _.uniq(gridArr);
     roster.forEach( name => {
         Game_Rox[name] = new Rox();
@@ -61,9 +67,27 @@ function GridArrToGame_Rox() {
                 Game_Rox[name].total.push(index+1);
             }
         });
-        Game_Rox[name].walls = arrWalls( Game_Rox[name].total );
+
+        let total = Game_Rox[name].total;
+        arrTeams(total);
+        // Game_Rox[name].teams = [...teamArray];
+        Game_Rox[name].teams = teamArray;
+        teamArray = [];
+
+        let walls = [];
+        Game_Rox[name].teams.forEach( team => {
+            walls.push(arrWalls(team));
+        });
+        Game_Rox[name].walls = [...walls];
+        
+        showRox(name);
+        
+
     });
+    
 }
+
+
 
 
 
@@ -89,30 +113,67 @@ function arrNESW(pos) {
 
 
 
-function arrWalls(total) {
+
+
+
+function arrWalls(team) {
     // INPUT: Game_Rox[player].total.
     // OUTPUT: array of positions that surrounds all of the positions
     // ... in Game_Rox[player].total. 
     let arr = [];
-    total.forEach( val => {
+    team.forEach( val => {
         arr = _.union( arr, arrNESW(val) );
     });
-    arr = _.difference(arr, total);
+    arr = _.difference(arr, team);
     sortA(arr);
     return arr;
 }
 
 
 
-function publishToConsole() {
-    console.clear();
-    console.log('%croxTotal', 'font-weight: bold; color: orange;');
-    console.table(roxTotal);
-    console.log('%croxTeams', 'font-weight: bold; color: orange;');
-    console.table(roxTeams);
-    console.log('%croxWalls', 'font-weight: bold; color: orange;');
-    console.table(roxWalls);
-    console.log(' ---------------- ');
+function arrTeams(team) {
+
+    let arrNew = [];
+    let arrOld = [...team];
+
+    if (arrOld.length) {
+        arrNew.push( arrOld.pop() );
+
+        spreadAndPush( arrNew[0] );
+
+        function spreadAndPush(val) {
+            arrNESW(val).forEach( pos => {
+                if ( arrOld.includes(pos) ) {
+                    arrNew.push(pos);
+                    arrOld = _.without( arrOld, pos);
+                    spreadAndPush(pos);
+                }
+            });
+        }
+
+        sortA(arrNew);
+        teamArray.push(arrNew);
+    }
+    
+    if (arrOld.length) {
+        arrTeams(arrOld);
+    }
+}
+
+
+
+
+
+function showRox(name) {
+    // console.clear();
+    console.log(`----------${name}-------------`);
+    console.log('%ctotal', 'font-weight: bold; color: orange;');
+    console.table(Game_Rox[name].total);
+    console.log('%cteams', 'font-weight: bold; color: orange;');
+    console.table(Game_Rox[name].teams);
+    console.log('%cwalls', 'font-weight: bold; color: orange;');
+    console.table(Game_Rox[name].walls);
+    console.log('     ');
 }
 
 
