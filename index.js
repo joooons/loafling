@@ -148,7 +148,7 @@ io.on('connection', (socket) => {
   
   console.log(`----- ${socket.id} connected --------------`);
 
-  socket.emit('synchronize variables', noName);
+  socket.emit('synchronize variables', noName, boardDim);
 
 
   // let thing = new GameData();

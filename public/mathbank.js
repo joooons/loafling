@@ -13,6 +13,8 @@ console.log('mathbank.js at your service!');
     // This is a local single value array of the names in each of the squares.
     // The index of the array corresponds to the position in the board.
 
+// var boardDim = 5;
+    // The length of the side of the board in terms of number of squares.
 
 
 
@@ -21,16 +23,23 @@ console.log('mathbank.js at your service!');
 
 const Game_Rox = {};
 
-
 function Rox () {
     this.total = [];
     this.teams = [];
     this.walls = [];
 }
 
+const NESW = [{x:-1,y:0}, {x:0,y:1}, {x:1,y:0}, {x:0,y:-1}];
 
 
 
+
+
+
+
+
+
+// LOCAL FUNCTIONS (MAIN) ________________________________________
 
 function Game_RoxToGridArr() {
     let roster = _.uniq(gridArr);
@@ -57,27 +66,21 @@ function GridArrToGame_Rox() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function arrNESW(pos) {
+    // NOTE: "pos" is not the same is "index".
+    // The lowest value of pos is 1, not 0.
+    let x = POStoX(pos);
+    let y = POStoY(pos);
+    let arr = [];
+    NESW.forEach( coord => {
+        let xn = x + coord.x;
+        let yn = y + coord.y;
+        let test = ( (xn>0)&&(yn>0)&&(xn<=boardDim)&&(yn<=boardDim) );
+        if (test) arr.push( XYtoPOS(xn, yn) );
+    });
+    sortA(arr);
+    return arr;
+}
 
 
 
@@ -94,11 +97,38 @@ function publishToConsole() {
 
 
 
-// LOCAL MINI FUNCTIONS __________________________________________
 
-function XYtoPOS(x, y, dim) { return x + dim * ( y - 1 ); }
-function POStoX(pos, dim) { return (pos - 1) % dim + 1; }
-function POStoY(pos, dim) { return ( ( pos - POStoX(pos, dim) ) / dim) + 1; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// LOCAL FUNCTIONS (MINI) ________________________________________
+
+function XYtoPOS(x, y) { return x + boardDim * ( y - 1 ); }
+function POStoX(pos) { return (pos - 1) % boardDim + 1; }
+function POStoY(pos) { return ( ( pos - POStoX(pos, boardDim) ) / boardDim) + 1; }
 function sortA(arr) { arr.sort( (a,b) => {return a-b} ); }
 function sortD(arr) { arr.sort( (a,b) => {return b-a} ); }
 

@@ -20,6 +20,7 @@ const boardRatio = 1.5;
 var playerLimit = 3;
 
 var noName = '';
+var boardDim = 0;
 
 
 
@@ -359,8 +360,9 @@ $('#room-name').on('focusout', () => {
 //     console.log( ArrToMap(arr, 'name', 'color') );
 // });
 
-socket.on('synchronize variables', data => {
-    noName = data;
+socket.on('synchronize variables', (blankName, dim) => {
+    noName = blankName;
+    boardDim = dim;
 });
 
 
