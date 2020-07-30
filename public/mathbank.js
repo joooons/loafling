@@ -44,8 +44,8 @@ const NESW = [{x:-1,y:0}, {x:0,y:1}, {x:1,y:0}, {x:0,y:-1}];
 function Game_RoxToGridArr() {
     let roster = _.uniq(gridArr);
     roster.forEach( name => {
-        Game_Rox[name].total.forEach( index => {
-            gridArr[index] = name;
+        Game_Rox[name].total.forEach( pos => {
+            gridArr[pos-1] = name;
         });
     });
 }
@@ -58,17 +58,22 @@ function GridArrToGame_Rox() {
         Game_Rox[name] = new Rox();
         gridArr.forEach( (val, index) => {
             if ( name == val ) {
-                Game_Rox[name].total.push(index);
+                Game_Rox[name].total.push(index+1);
             }
         });
+        Game_Rox[name].walls = arrWalls( Game_Rox[name].total );
     });
 }
 
 
 
 function arrNESW(pos) {
+    // INPUT: number that indicates position on the grid, 
+    // ...counting from left top, moving right.
     // NOTE: "pos" is not the same is "index".
     // The lowest value of pos is 1, not 0.
+    // OUTPUT: array of "pos" values of positions that surround 
+    // ...the original pos, minus whatever is outside the boundaries.
     let x = POStoX(pos);
     let y = POStoY(pos);
     let arr = [];
@@ -78,6 +83,21 @@ function arrNESW(pos) {
         let test = ( (xn>0)&&(yn>0)&&(xn<=boardDim)&&(yn<=boardDim) );
         if (test) arr.push( XYtoPOS(xn, yn) );
     });
+    sortA(arr);
+    return arr;
+}
+
+
+
+function arrWalls(total) {
+    // INPUT: Game_Rox[player].total.
+    // OUTPUT: array of positions that surrounds all of the positions
+    // ... in Game_Rox[player].total. 
+    let arr = [];
+    total.forEach( val => {
+        arr = _.union( arr, arrNESW(val) );
+    });
+    arr = _.difference(arr, total);
     sortA(arr);
     return arr;
 }
