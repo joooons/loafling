@@ -153,9 +153,21 @@ function addPlayer(room, name) {
 
 function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
-  // let arrB = _.without(arr, name);
   Room_PlayerArr.set(room, _.without(arr, name) );
 }
+
+function updatePlayerList(room, arr) {
+  Room_PlayerArr.set(room, arr);
+}
+
+
+// function shiftPlayerList(room, name) {
+//   let arr = Room_PlayerArr.get(room);
+//   do {
+//     arr.push( arr.shift() );
+//   } while ( !name || ( arr[0] == name ) );
+//   Room_PlayerArr.set(room, arr);
+// }
 
 
 
@@ -194,7 +206,12 @@ io.on('connection', (socket) => {
       io.emit('del roombox', room );
       Room_GameData.delete(room);
       Room_PlayerArr.delete(room);
+    } else {
+      io.to(room).emit('update player list', Room_PlayerArr.get(room) );
     }
+
+    
+
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
   
@@ -231,7 +248,6 @@ io.on('connection', (socket) => {
   
   // _______ CREATE ROOM ______________________________________
 
-  // WHEN USER CREATES A ROOM
   socket.on('create room', roomName => {
 
     let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
@@ -258,6 +274,7 @@ io.on('connection', (socket) => {
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
+    io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
   });
 
@@ -303,7 +320,6 @@ io.on('connection', (socket) => {
   
   // _______ JOIN ROOM ________________________________________
 
-
   socket.on('join room', room => {
     
     let name = ID_Name.get(socket.id);
@@ -320,10 +336,11 @@ io.on('connection', (socket) => {
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
+    } else {
+      io.to(oldRoom).emit('update player list', Room_PlayerArr.get(oldRoom) );
     }
-      // remove empty rooms
-
-
+      // remove empty rooms.
+      // if oldroom is not empty, send player list to old room
 
     Name_Room.set(name, room);
     if ( room != 'lobby' ) { 
@@ -338,16 +355,13 @@ io.on('connection', (socket) => {
     }
       // if destination is not lobby, join room and assign color
 
-
     if (room != 'lobby') addPlayer(room, name);
     console.log(`--- ${room} ---`);
     console.log(Room_PlayerArr.get(room));
       // make list of players in this room
 
-    
-
-
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
+    io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
   });
 

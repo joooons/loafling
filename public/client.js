@@ -19,7 +19,10 @@ var gridArr = [];
     // Only for the room that the player is currently connected to.
 
 var playerArr = [];
-    // The array of names of players in the current room, in order of entry.
+    // The local array of names of players in the current room, in order of entry.
+    // Corresponds to Room_PlayerArr map in index.js.
+    // But this one is specific to just the current room.
+    // Also, the order changes to .... actually...
 
 var playerLimit = 3;
 
@@ -263,6 +266,7 @@ function addOnclick_LEAVE( roomName ) {
     $(roomName).on('click', () => {
         room = 'lobby';
         socket.emit('join room', room);
+        playerArr = [];
         updateButtons();
         $('#boardFrame').fadeOut(fadeTime);
     });
@@ -283,6 +287,14 @@ function updateNames( arrayOfObject ) {
 
 
 
+
+function shiftPlayerList(name) {
+    if (playerArr.length < 2) return;
+    let target = ( !name ) ? playerArr[1] : name;
+    do { playerArr.push( playerArr.shift() ); 
+    } while ( playerArr[0] != target );
+    console.log(playerArr);
+}
 
 
 
@@ -400,6 +412,11 @@ socket.on('update names', arr => {
     updateNames( arr );
 });
 
+
+
+socket.on('update player list', arr => {
+    playerArr = arr;
+});
 
 
 
