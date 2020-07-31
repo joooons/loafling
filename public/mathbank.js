@@ -29,11 +29,10 @@ function Rox () {
     this.teams = [];
         // Array of arrays of "pos" that are contiguous
     this.walls = [];
-        // Array of "pos" that surround "teams"
+        // Array of arrays of "pos" that surround each "team"
 }
 
 const NESW = [{x:-1,y:0}, {x:0,y:1}, {x:1,y:0}, {x:0,y:-1}];
-
 var teamArray = [];
 
 
@@ -47,44 +46,29 @@ var teamArray = [];
 function Game_RoxToGridArr() {
     let roster = _.uniq(gridArr);
     roster.forEach( name => {
-        Game_Rox[name].total.forEach( pos => {
-            gridArr[pos-1] = name;
-        });
+        Game_Rox[name].total.forEach( pos => gridArr[pos-1] = name );
     });
 }
 
 
 
 function GridArrToGame_Rox() {
-
     console.clear();
-
     let roster = _.uniq(gridArr);
     roster.forEach( name => {
         Game_Rox[name] = new Rox();
         gridArr.forEach( (val, index) => {
-            if ( name == val ) {
-                Game_Rox[name].total.push(index+1);
-            }
+            if ( name == val ) Game_Rox[name].total.push(index+1);
         });
-
         let total = Game_Rox[name].total;
         arrTeams(total);
-        // Game_Rox[name].teams = [...teamArray];
         Game_Rox[name].teams = teamArray;
         teamArray = [];
-
         let walls = [];
-        Game_Rox[name].teams.forEach( team => {
-            walls.push(arrWalls(team));
-        });
+        Game_Rox[name].teams.forEach( team => walls.push(arrWalls(team)) );
         Game_Rox[name].walls = [...walls];
-        
-        showRox(name);
-        
-
+        if ( name!= noName ) showRox(name);
     });
-    
 }
 
 
@@ -92,12 +76,6 @@ function GridArrToGame_Rox() {
 
 
 function arrNESW(pos) {
-    // INPUT: number that indicates position on the grid, 
-    // ...counting from left top, moving right.
-    // NOTE: "pos" is not the same is "index".
-    // The lowest value of pos is 1, not 0.
-    // OUTPUT: array of "pos" values of positions that surround 
-    // ...the original pos, minus whatever is outside the boundaries.
     let x = POStoX(pos);
     let y = POStoY(pos);
     let arr = [];
@@ -117,13 +95,8 @@ function arrNESW(pos) {
 
 
 function arrWalls(team) {
-    // INPUT: Game_Rox[player].total.
-    // OUTPUT: array of positions that surrounds all of the positions
-    // ... in Game_Rox[player].total. 
     let arr = [];
-    team.forEach( val => {
-        arr = _.union( arr, arrNESW(val) );
-    });
+    team.forEach( val => arr = _.union(arr, arrNESW(val)) );
     arr = _.difference(arr, team);
     sortA(arr);
     return arr;
@@ -132,15 +105,12 @@ function arrWalls(team) {
 
 
 function arrTeams(team) {
-
+    // Before using this function, you need to set teamArray = [];
     let arrNew = [];
     let arrOld = [...team];
-
     if (arrOld.length) {
         arrNew.push( arrOld.pop() );
-
         spreadAndPush( arrNew[0] );
-
         function spreadAndPush(val) {
             arrNESW(val).forEach( pos => {
                 if ( arrOld.includes(pos) ) {
@@ -150,14 +120,10 @@ function arrTeams(team) {
                 }
             });
         }
-
         sortA(arrNew);
         teamArray.push(arrNew);
     }
-    
-    if (arrOld.length) {
-        arrTeams(arrOld);
-    }
+    if (arrOld.length) arrTeams(arrOld);
 }
 
 

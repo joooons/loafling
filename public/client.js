@@ -12,12 +12,20 @@ const socket = io();
 
 var name = 'none';
 var room = 'lobby';
+    // Starting room is always specifically the 'lobby'
+
 var gridArr = [];
+    // The array of names assigned to the board grid.
+    // Only for the room that the player is currently connected to.
+
+var playerArr = [];
+    // The array of names of players in the current room, in order of entry.
+
+var playerLimit = 3;
+
 
 const fadeTime = 500;
 const boardRatio = 1.5;
-
-var playerLimit = 3;
 
 var noName = '';
 var boardDim = 0;
@@ -134,6 +142,7 @@ function addOnclick_Square( elem, index ) {
 
 function updateLocalGrid( grid ) {
     gridArr = grid;
+    GridArrToGame_Rox();
 }
 
 
@@ -263,15 +272,10 @@ function addOnclick_LEAVE( roomName ) {
 
 function updateNames( arrayOfObject ) {
     let num = $('div[id^="rm-"]').length;
-    for ( i=0 ; i<num ; i++ ) {
-        $('div[id^="rm-"]').eq(i).html('');
-    }
+    for ( i=0 ; i<num ; i++ ) { $('div[id^="rm-"]').eq(i).html(''); }
     arrayOfObject.forEach( obj => {
-        let [a, b, c ] = ['', obj.name, '', ''];
-        if (name == obj.name) {
-            a = 'class="me"';
-            c = ' (me)';
-        }
+        let [a, b, c ] = ['', obj.name, ''];
+        if (name == obj.name) [a,c] = [ 'class="me"', ' (me)'];
         $(`div[id="rm-${obj.room}"]`).append(`<div ${a}>${b} ${c}</div>`);
     });
 }

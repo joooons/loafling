@@ -29,16 +29,18 @@ const io = socketIO(server);
 var ID_Name = new Map();
 var Name_Room = new Map();
 var Room_GameData = new Map();
+var Room_PlayerArr = new Map();
+  // Room_PlayerArr is map of players for each room, in order of entry
 
-const boardDim = 5;
-const noName = 'zz'
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'white', 'black', '#FFF0'];
+  // For iterating through variations to avoid duplicates.
 
-
-
+const boardDim = 5;
+const noName = 'zz'
+  // variables to synchronize to client
 
 
 
@@ -48,12 +50,16 @@ const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'white', 'black', '
 
 // ______________________________________ LOCAL VARIABLES (END)
 
-// OBJECT CONSTRUCTOR__________________________________________
+// OBJECT CONSTRUCTOR _________________________________________
 
 function GameData() {
     this.colorMap = new Map();
+      // Map of NAME to COLOR assigned to that name in this room.
     this.grid = [];
+      // Array of NAME associated with that index-position on board.
 }
+
+
 
 
 
@@ -133,7 +139,23 @@ function avoidDuplicate( map, root, suffix ) {
 
 
 
+function startPlayerList(room) {
+  Room_PlayerArr.set(room, []);
+}
 
+
+
+function addPlayer(room, name) {
+  Room_PlayerArr.get(room).push(name);
+}
+
+
+
+function delPlayer(room, name) {
+  let arr = Room_PlayerArr.get(room);
+  // let arrB = _.without(arr, name);
+  Room_PlayerArr.set(room, _.without(arr, name) );
+}
 
 
 
@@ -147,15 +169,7 @@ function avoidDuplicate( map, root, suffix ) {
 io.on('connection', (socket) => {
   
   console.log(`----- ${socket.id} connected --------------`);
-
   socket.emit('synchronize variables', noName, boardDim);
-
-
-  // let thing = new GameData();
-  //   thing.colorMap.set('monk', 'red');
-  //   thing.colorMap.set('joon', 'blue');
-  //   thing.grid = [1,3,5];
-  // socket.emit('send thing', MapToArray(thing.colorMap, 'name', 'color'), thing.grid);
 
 
   
@@ -163,7 +177,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     let name = ID_Name.get(socket.id);
-    let oldRoom = Name_Room.get(name);
+    let room = Name_Room.get(name);
 
     Name_Room.delete(name);
     ID_Name.delete(socket.id);
@@ -171,9 +185,15 @@ io.on('connection', (socket) => {
     console.log(`( user: ${name} ) disconnected...`);
     console.log(`${ID_Name.size} users still connected`);
 
-    if ( !hasMapValue(Name_Room, oldRoom) ) {
-      io.emit('del roombox', oldRoom );
-      Room_GameData.delete(oldRoom);
+    delPlayer(room, name);
+    console.log(`--- ${room} ---`);
+    console.log(Room_PlayerArr.get(room));
+      // remove player from playerlist
+
+    if ( !hasMapValue(Name_Room, room) ) {
+      io.emit('del roombox', room );
+      Room_GameData.delete(room);
+      Room_PlayerArr.delete(room);
     }
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -216,18 +236,25 @@ io.on('connection', (socket) => {
 
     let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
     if ( room != roomName ) { socket.emit('change room name', room ); }
+      // Assign a unique name.
 
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
     socket.join(room);
+      // be the first to join
+
+    startPlayerList(room);
+    addPlayer(room, name);
+    console.log(`--- ${room} ---`);
+    console.log(Room_PlayerArr.get(room));
+      // make list of players in this room
 
     let obj = new GameData;
-
     obj.colorMap.set(noName, giveUniqColor(obj.colorMap) );
     obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
-
     obj.grid = emptyGrid( boardDim );
     Room_GameData.set( room, obj );
+      // Initialize Room_GameData map, and assign colors.
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -278,34 +305,49 @@ io.on('connection', (socket) => {
 
 
   socket.on('join room', room => {
+    
     let name = ID_Name.get(socket.id);
     let oldRoom = Name_Room.get(name);
+    socket.leave(oldRoom);
+      // Leave old room
+
+    if (oldRoom != 'lobby') delPlayer(oldRoom, name);
+    console.log(`--- ${oldRoom} ---`);
+    console.log(Room_PlayerArr.get(oldRoom));
+      // remove player from playerlist
+
+    if ( !hasMapValue(Name_Room, oldRoom) ) {
+      io.emit('del roombox', oldRoom );
+      Room_GameData.delete(oldRoom);
+      Room_PlayerArr.delete(oldRoom);
+    }
+      // remove empty rooms
+
+
 
     Name_Room.set(name, room);
-
-    socket.leave(oldRoom);
-
     if ( room != 'lobby' ) { 
       socket.join(room); 
       let obj = Room_GameData.get(room);
-      console.log(obj.colorMap);
+      // console.log(obj.colorMap);
       if ( !obj.colorMap.has(name) ) {
-        console.log('name not on list yet');
+        // console.log('name not on list yet');
         obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
         Room_GameData.set( room, obj );
       }
     }
-    
-    if ( !hasMapValue(Name_Room, oldRoom) ) {
-      io.emit('del roombox', oldRoom );
-      Room_GameData.delete(oldRoom);
-    }
+      // if destination is not lobby, join room and assign color
+
+
+    if (room != 'lobby') addPlayer(room, name);
+    console.log(`--- ${room} ---`);
+    console.log(Room_PlayerArr.get(room));
+      // make list of players in this room
 
     
+
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
-
-    displayName_Room('update names');
 
   });
 
