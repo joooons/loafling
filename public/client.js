@@ -24,14 +24,16 @@ var playerArr = [];
     // But this one is specific to just the current room.
     // Also, the order changes to .... actually...
 
-var playerLimit = 3;
 
 
+const playerLimit = 3;
 const fadeTime = 500;
 const boardRatio = 1.5;
 
-var noName = '';
-var boardDim = 0;
+
+
+var noName;
+var boardDim;
 
 
 
@@ -289,11 +291,12 @@ function updateNames( arrayOfObject ) {
 
 
 function shiftPlayerList(name) {
+    if ( !playerArr.includes(name) && name ) return console.log('name not on list');
     if (playerArr.length < 2) return;
     let target = ( !name ) ? playerArr[1] : name;
     do { playerArr.push( playerArr.shift() ); 
     } while ( playerArr[0] != target );
-    console.log(playerArr);
+    socket.emit('update player list', room, playerArr );
 }
 
 
@@ -328,7 +331,7 @@ pickName.onchange = () => {
 
 
 
-
+// Creating a room
 $('#room-name').on('change', () => {
     let reg = /[\s\"\']/;
     if ( reg.test( $('#room-name').val() ) ) {
@@ -411,6 +414,9 @@ socket.on('update names', arr => {
 
 socket.on('update player list', arr => {
     playerArr = arr;
+    console.log('playerArr updated: ', playerArr);
+    let str = `<div>${arr[0]}'s turn!</div>`;
+    $('#players').html(str);
 });
 
 

@@ -22,6 +22,7 @@ const io = socketIO(server);
 
 
 
+
 // ________________________________________ INITIAL SETUP (END)
 
 // LOCAL VARIABLES ____________________________________________
@@ -32,7 +33,6 @@ var Room_GameData = new Map();
 var Room_PlayerArr = new Map();
   // Room_PlayerArr is map of players for each room, in order of entry
 
-
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'white', 'black', '#FFF0'];
@@ -41,6 +41,9 @@ const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'white', 'black', '
 const boardDim = 5;
 const noName = 'zz'
   // variables to synchronize to client
+
+
+
 
 
 
@@ -58,6 +61,8 @@ function GameData() {
     this.grid = [];
       // Array of NAME associated with that index-position on board.
 }
+
+
 
 
 
@@ -169,6 +174,8 @@ function updatePlayerList(room, arr) {
 
 
 
+
+
 // ______________________________________ LOCAL FUNCTIONS (END)
 
 // THE SOCKET.IO ENVIRONMENT __________________________________
@@ -196,7 +203,6 @@ io.on('connection', (socket) => {
       // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, room) ) {
-      console.log('inside disconnect - if { }');
       io.emit('del roombox', room );
       Room_GameData.delete(room);
       Room_PlayerArr.delete(room);
@@ -206,7 +212,7 @@ io.on('connection', (socket) => {
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
   
-  });
+  });   // _______ DISCONNECT (END) _______________________________________
 
 
 
@@ -231,7 +237,7 @@ io.on('connection', (socket) => {
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     
-  });
+  });   // _______ NEW USER (END) _________________________________________
 
 
 
@@ -265,7 +271,7 @@ io.on('connection', (socket) => {
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
-  });
+  });   // _______ CREATE ROOM (END) ______________________________________
 
 
 
@@ -278,7 +284,8 @@ io.on('connection', (socket) => {
     let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
     let arrOfGrid = obj.grid;
     io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
-  });
+
+  });   // _______ REQ GRID UPDATE (END) __________________________________
 
 
 
@@ -300,7 +307,8 @@ io.on('connection', (socket) => {
     let arrOfGrid = obj.grid;
 
     io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
-  });
+
+  });   // _______ UPDATE GRID (END) ______________________________________
 
 
 
@@ -323,7 +331,6 @@ io.on('connection', (socket) => {
       // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, oldRoom) ) {
-      console.log('inside join room - if { }');
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
@@ -350,7 +357,20 @@ io.on('connection', (socket) => {
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
-  });
+  });   // _______ JOIN ROOM (END) ________________________________________
+
+
+
+
+  // _______ UPDATE PLAYER LIST ________________________________________
+
+  socket.on('update player list', (room,playerArr) => {
+    Room_PlayerArr.set(room, playerArr);
+    io.to(room).emit('update player list', playerArr );
+
+  });   // _______ UPDATE PLAYER LIST (END) ______________________________________
+
+
 
 
 
