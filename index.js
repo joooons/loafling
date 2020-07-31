@@ -161,13 +161,8 @@ function updatePlayerList(room, arr) {
 }
 
 
-// function shiftPlayerList(room, name) {
-//   let arr = Room_PlayerArr.get(room);
-//   do {
-//     arr.push( arr.shift() );
-//   } while ( !name || ( arr[0] == name ) );
-//   Room_PlayerArr.set(room, arr);
-// }
+
+
 
 
 
@@ -180,7 +175,7 @@ function updatePlayerList(room, arr) {
 
 io.on('connection', (socket) => {
   
-  console.log(`----- ${socket.id} connected --------------`);
+  console.log(`--------- ${socket.id} connected ----------`);
   socket.emit('synchronize variables', noName, boardDim);
 
 
@@ -198,20 +193,16 @@ io.on('connection', (socket) => {
     console.log(`${ID_Name.size} users still connected`);
 
     delPlayer(room, name);
-    console.log(`--- ${room} ---`);
-    console.log(Room_PlayerArr.get(room));
       // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, room) ) {
+      console.log('inside disconnect - if { }');
       io.emit('del roombox', room );
       Room_GameData.delete(room);
       Room_PlayerArr.delete(room);
     } else {
       io.to(room).emit('update player list', Room_PlayerArr.get(room) );
     }
-
-    
-
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
   
@@ -261,8 +252,6 @@ io.on('connection', (socket) => {
 
     startPlayerList(room);
     addPlayer(room, name);
-    console.log(`--- ${room} ---`);
-    console.log(Room_PlayerArr.get(room));
       // make list of players in this room
 
     let obj = new GameData;
@@ -324,15 +313,17 @@ io.on('connection', (socket) => {
     
     let name = ID_Name.get(socket.id);
     let oldRoom = Name_Room.get(name);
+      // save data for use in this function
+
+    Name_Room.set(name, room);
     socket.leave(oldRoom);
-      // Leave old room
+      // Leave old room. It's important to do this before what follows.
 
     if (oldRoom != 'lobby') delPlayer(oldRoom, name);
-    console.log(`--- ${oldRoom} ---`);
-    console.log(Room_PlayerArr.get(oldRoom));
       // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, oldRoom) ) {
+      console.log('inside join room - if { }');
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
@@ -342,13 +333,11 @@ io.on('connection', (socket) => {
       // remove empty rooms.
       // if oldroom is not empty, send player list to old room
 
-    Name_Room.set(name, room);
+    
     if ( room != 'lobby' ) { 
       socket.join(room); 
       let obj = Room_GameData.get(room);
-      // console.log(obj.colorMap);
       if ( !obj.colorMap.has(name) ) {
-        // console.log('name not on list yet');
         obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
         Room_GameData.set( room, obj );
       }
@@ -356,8 +345,6 @@ io.on('connection', (socket) => {
       // if destination is not lobby, join room and assign color
 
     if (room != 'lobby') addPlayer(room, name);
-    console.log(`--- ${room} ---`);
-    console.log(Room_PlayerArr.get(room));
       // make list of players in this room
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -368,6 +355,7 @@ io.on('connection', (socket) => {
 
 
 });   // END OF IO.ON() ______________________________________
+
 
 
 

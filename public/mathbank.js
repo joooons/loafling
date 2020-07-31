@@ -53,7 +53,7 @@ function Game_RoxToGridArr() {
 
 
 function GridArrToGame_Rox() {
-    console.clear();
+    // console.clear();
     let roster = _.uniq(gridArr);
     roster.forEach( name => {
         Game_Rox[name] = new Rox();
@@ -132,14 +132,15 @@ function arrTeams(team) {
 
 function showRox(name) {
     // console.clear();
-    console.log(`----------${name}-------------`);
-    console.log('%ctotal', 'font-weight: bold; color: orange;');
-    console.table(Game_Rox[name].total);
-    console.log('%cteams', 'font-weight: bold; color: orange;');
-    console.table(Game_Rox[name].teams);
-    console.log('%cwalls', 'font-weight: bold; color: orange;');
-    console.table(Game_Rox[name].walls);
-    console.log('     ');
+    console.log('---- showRox() disabled ----');
+    // console.log(`----------${name}-------------`);
+    // console.log('%ctotal', 'font-weight: bold; color: orange;');
+    // console.table(Game_Rox[name].total);
+    // console.log('%cteams', 'font-weight: bold; color: orange;');
+    // console.table(Game_Rox[name].teams);
+    // console.log('%cwalls', 'font-weight: bold; color: orange;');
+    // console.table(Game_Rox[name].walls);
+    // console.log('     ');
 }
 
 

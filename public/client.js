@@ -372,11 +372,6 @@ $('#room-name').on('focusout', () => {
 // SOCKET EVENTS __________________________________________
 
 
-// socket.on('send thing', (arr, grid) => {
-//     console.log(arr);
-//     console.log(grid);
-//     console.log( ArrToMap(arr, 'name', 'color') );
-// });
 
 socket.on('synchronize variables', (blankName, dim) => {
     noName = blankName;
