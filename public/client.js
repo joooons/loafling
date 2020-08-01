@@ -215,6 +215,8 @@ function calculateAttack(indexValue) {
             let killList = [];
             wallIndex.forEach( i => {
                 let count = 0;
+                let teams = Game_Rox[victim].teams;
+                let team = teams[i];
                 let walls = Game_Rox[victim].walls;
                 let wall = walls[i];
                 wall.forEach( posValue => {
@@ -225,7 +227,7 @@ function calculateAttack(indexValue) {
 
                 if ( count == walls[i].length ) {
                     console.log(`${victim} team ${i} is surrounded!`);
-                    scoreObj[name] += count;
+                    scoreObj[name] += team.length;
                     killList.push(i);
                 }                
             });
