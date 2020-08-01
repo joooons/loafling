@@ -24,6 +24,9 @@ var playerArr = [];
     // But this one is specific to just the current room.
     // Also, the order changes to .... actually...
 
+var scoreObj = {};
+    // The local object that contains the score of all players in the room.
+    // Associated with Room_Score object in index.js
 
 
 const playerLimit = 3;
@@ -99,7 +102,6 @@ function resizeBoard() {
     let y = window.innerHeight - 30;
     let board_x, board_y;
     let windowRatio = x / y;
-    
 
     if ( windowRatio < boardRatio ) {
         board_x = x;
@@ -119,6 +121,37 @@ function resizeBoard() {
 
 
 
+
+function createRoom() {
+    let reg = /[\s\"\']/;
+    if ( reg.test( $('#room-name').val() ) ) {
+        $('#room-name').attr('placeholder', 'no spaces!');
+        $('#room-name').val('');
+        return;    
+    }
+    room = $('#room-name').val();
+
+    
+
+    $('#room-name').val('');
+    $('#room-name').attr('placeholder', 'room name');
+    $('#room-plus').show();
+    $('#room-name').hide();
+
+    
+
+    socket.emit('create room', room);
+    socket.emit('req grid update', room );
+
+    scoreObj[name] = 0;
+    socket.emit('update score', room, scoreObj);
+    
+    $('#boardFrame').fadeIn(fadeTime);
+}
+
+
+
+
 function setUpGrid( num ) {
     addSVGtoBoard(board, num);
 }
@@ -129,15 +162,24 @@ function addOnclick_Square( elem, index ) {
     elem.onclick = () => {
 
         let data = gridArr[index];
-        if (data == name) {
-            gridArr[index] = noName;
-        } else if (data == noName) {
-            gridArr[index] = name;
-        }
+        if (data == name) { gridArr[index] = noName; } 
+        else if (data == noName) { gridArr[index] = name; }
 
         updateLocalGrid( gridArr );
-        
+
+        // THIS is where you insert the SCORE KEEPING LOGIC!!!
+        scoreObj[name]++;
+        socket.emit('update score', room, scoreObj );
+
         GridArrToGame_Rox();
+
+        shiftPlayerList(name);
+            // In case you played out of turn, ensure the order is correct.
+            // THEN, do the ATTACK CALCULATIONS HERE!!!
+        shiftPlayerList();
+            // Let the next player take the next turn.
+
+
 
         socket.emit('update grid', gridArr);
     }
@@ -250,7 +292,12 @@ function addOnclick_JOIN( roomName ) {
         room = roomName.slice(4);
         let playerNum = $(`#rm-${room} >`).length;
         if ( playerNum < playerLimit ) {
+
             socket.emit('join room', room);
+
+            scoreObj[name] = 0;
+            socket.emit('update score', room, scoreObj);
+
             socket.emit('req grid update', room );
             $('#boardFrame').fadeIn(fadeTime);
             updateButtons();
@@ -269,6 +316,7 @@ function addOnclick_LEAVE( roomName ) {
         room = 'lobby';
         socket.emit('join room', room);
         playerArr = [];
+        scoreObj = {};
         updateButtons();
         $('#boardFrame').fadeOut(fadeTime);
     });
@@ -331,22 +379,23 @@ pickName.onchange = () => {
 
 
 
-// Creating a room
+// _____ CREATE A ROOM ___________________________________
 $('#room-name').on('change', () => {
-    let reg = /[\s\"\']/;
-    if ( reg.test( $('#room-name').val() ) ) {
-        $('#room-name').attr('placeholder', 'no spaces!');
-        $('#room-name').val('');
-        return;    
-    }
-    room = $('#room-name').val();
-    $('#room-name').val('');
-    $('#room-name').attr('placeholder', 'room name');
-    $('#room-plus').show();
-    $('#room-name').hide();
-    socket.emit('create room', room);
-    socket.emit('req grid update', room );
-    $('#boardFrame').fadeIn(fadeTime);
+    createRoom();
+    // let reg = /[\s\"\']/;
+    // if ( reg.test( $('#room-name').val() ) ) {
+    //     $('#room-name').attr('placeholder', 'no spaces!');
+    //     $('#room-name').val('');
+    //     return;    
+    // }
+    // room = $('#room-name').val();
+    // $('#room-name').val('');
+    // $('#room-name').attr('placeholder', 'room name');
+    // $('#room-plus').show();
+    // $('#room-name').hide();
+    // socket.emit('create room', room);
+    // socket.emit('req grid update', room );
+    // $('#boardFrame').fadeIn(fadeTime);
 });
 
 
@@ -416,7 +465,7 @@ socket.on('update player list', arr => {
     playerArr = arr;
     console.log('playerArr updated: ', playerArr);
     let str = `<div>${arr[0]}'s turn!</div>`;
-    $('#players').html(str);
+    $('#turn').html(str);
 });
 
 
@@ -428,6 +477,19 @@ socket.on('res grid update', (arrOfNameColorMap, name_grid) => {
 });
 
 
+
+
+socket.on('update score', obj => {
+
+    console.log('client received update score emit');
+
+    scoreObj = obj;
+    let str = '';
+    Object.keys(obj).forEach( key => {
+        str += `<div>${key}: ${obj[key]}</div>`
+    });
+    $('#players').html(str);
+});
 
 
 

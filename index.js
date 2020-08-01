@@ -31,7 +31,7 @@ var ID_Name = new Map();
 var Name_Room = new Map();
 var Room_GameData = new Map();
 var Room_PlayerArr = new Map();
-  // Room_PlayerArr is map of players for each room, in order of entry
+var Room_Score = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
@@ -206,6 +206,7 @@ io.on('connection', (socket) => {
       io.emit('del roombox', room );
       Room_GameData.delete(room);
       Room_PlayerArr.delete(room);
+      Room_Score.delete(room);
     } else {
       io.to(room).emit('update player list', Room_PlayerArr.get(room) );
     }
@@ -274,6 +275,36 @@ io.on('connection', (socket) => {
   });   // _______ CREATE ROOM (END) ______________________________________
 
 
+  // _________ UPDATE SCORE ____________________________________________
+
+  socket.on('update score', (room, scoreObj) => {
+    console.log('right after update score event is called...');
+    console.log(Room_Score);
+
+
+    if ( !Room_Score.has(room) ) { 
+      Room_Score.set(room, scoreObj); 
+      // something wrong herereererer!!!!!
+      console.log('this is when room wasnt originally on Room Score.');
+      console.log(Room_Score);
+
+    } else {
+      Object.keys(scoreObj).forEach( name => {
+        Room_Score.get(room)[name] = scoreObj[name];
+        console.log('this is when room existed already');
+        console.log(Room_Score);
+      });
+    }
+
+    let obj = Room_Score.get(room);
+    console.log(obj);
+    io.to(room).emit('update score', Room_Score.get(room) );
+  });   // _________ UPDATE SCORE (END) ____________________________________________
+
+
+
+
+
 
   
   // _______ REQ GRID UPDATE __________________________________
@@ -334,6 +365,7 @@ io.on('connection', (socket) => {
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
+      Room_Score.delete(oldRoom);
     } else {
       io.to(oldRoom).emit('update player list', Room_PlayerArr.get(oldRoom) );
     }
@@ -369,6 +401,10 @@ io.on('connection', (socket) => {
     io.to(room).emit('update player list', playerArr );
 
   });   // _______ UPDATE PLAYER LIST (END) ______________________________________
+
+
+
+
 
 
 
