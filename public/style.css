@@ -125,7 +125,8 @@ div[id^="rm-"] {
 
 
 #boardFrame {
-    border: 1px solid green;
+    /* border: 1px solid green; */
+    background: #0002;
     padding: 3px;
     display: grid;
     grid-template-columns: auto auto;

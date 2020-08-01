@@ -131,21 +131,17 @@ function createRoom() {
     }
     room = $('#room-name').val();
 
-    
-
     $('#room-name').val('');
     $('#room-name').attr('placeholder', 'room name');
     $('#room-plus').show();
     $('#room-name').hide();
-
-    
 
     socket.emit('create room', room);
     socket.emit('req grid update', room );
 
     scoreObj[name] = 0;
     socket.emit('update score', room, scoreObj);
-    
+
     $('#boardFrame').fadeIn(fadeTime);
 }
 
@@ -196,7 +192,6 @@ function updateLocalGrid( grid ) {
 
 function visualizeGrid( color_map, name_grid ) {
     name_grid.forEach( ( _name, i) => {
-
         let color = color_map.get( _name );
         $('.square').eq(i).css('fill', color );
     });
@@ -378,24 +373,8 @@ pickName.onchange = () => {
 
 
 
-
-// _____ CREATE A ROOM ___________________________________
 $('#room-name').on('change', () => {
     createRoom();
-    // let reg = /[\s\"\']/;
-    // if ( reg.test( $('#room-name').val() ) ) {
-    //     $('#room-name').attr('placeholder', 'no spaces!');
-    //     $('#room-name').val('');
-    //     return;    
-    // }
-    // room = $('#room-name').val();
-    // $('#room-name').val('');
-    // $('#room-name').attr('placeholder', 'room name');
-    // $('#room-plus').show();
-    // $('#room-name').hide();
-    // socket.emit('create room', room);
-    // socket.emit('req grid update', room );
-    // $('#boardFrame').fadeIn(fadeTime);
 });
 
 
@@ -473,6 +452,17 @@ socket.on('update player list', arr => {
 
 socket.on('res grid update', (arrOfNameColorMap, name_grid) => {
     let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
+
+    // insert something hererererer....
+    map.forEach( (val, key) => {
+        let elem = $(`#color-${key}`);
+        $(elem).css('color', val);
+        // $(elem).css('border-radius', '50%' );
+        // $(elem).css('width', '40px' );
+        
+    });
+
+
     visualizeGrid(map, name_grid);
 });
 
@@ -486,7 +476,7 @@ socket.on('update score', obj => {
     scoreObj = obj;
     let str = '';
     Object.keys(obj).forEach( key => {
-        str += `<div>${key}: ${obj[key]}</div>`
+        str += `<div><span id="color-${key}">&#11044;</span> ${key}: ${obj[key]}</div>`
     });
     $('#players').html(str);
 });
