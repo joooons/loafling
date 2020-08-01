@@ -178,12 +178,12 @@ function addOnclick_Square( elem, index ) {
  
 
 
-function calculateAttack(index) {
+function calculateAttack(indexValue) {
 
     if (playerArr.length < 2) return;
     console.log('--- attack!!! ---');
 
-    let pos = index + 1;
+    let pos = indexValue + 1;
     let wallIndex = [];
     
     let roster = [...playerArr];
@@ -200,10 +200,11 @@ function calculateAttack(index) {
 
     roster.forEach( victim => {
         if ( Game_Rox[victim] ) {
+
             let walls = Game_Rox[victim].walls;
-            walls.forEach( (wall,index) => {
+            walls.forEach( (wall,i) => {
                 if (wall.includes(pos)) {
-                    wallIndex.push(index);
+                    wallIndex.push(i);
                     console.log(`--${victim}--`);
                     console.log('pos ', pos);
                     console.table(walls);
@@ -211,26 +212,38 @@ function calculateAttack(index) {
                 }
             });
 
-
-            wallIndex.forEach( index => {
+            let killList = [];
+            wallIndex.forEach( i => {
                 let count = 0;
                 let walls = Game_Rox[victim].walls;
-                let wall = walls[index];
+                let wall = walls[i];
                 wall.forEach( posValue => {
                     if ( _.without(roster, victim).includes( gridArr[posValue-1]) ) {
                         count++;
                     }
                 });
-                
-                if ( count == walls[index].length ) {
-                    console.log(`${victim} team ${index} is surrounded!`);
-                }
-                
+
+                if ( count == walls[i].length ) {
+                    console.log(`${victim} team ${i} is surrounded!`);
+                    scoreObj[name] += count;
+                    killList.push(i);
+                }                
             });
 
-        }
+            killList.forEach( i => {
+                let teams = Game_Rox[victim].teams;
+                let team = teams[i];
+                team.forEach( posValue => {
+                    let index = posValue -1;
+                    gridArr[index] = noName;
+                });
+            });
 
-        wallIndex = [];     // reset
+
+            GridArrToGame_Rox();
+            wallIndex = [];     // reset
+
+        }
         
     });
     
