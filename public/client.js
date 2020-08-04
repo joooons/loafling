@@ -185,69 +185,83 @@ function calculateAttack(indexValue) {
 
     let pos = indexValue + 1;
     let wallIndex = [];
+    let attackSucceeded = false;
     
     let roster = [...playerArr];
         // Temporary list of players, starting with first victim.
         // Includes player who attacked.
 
     console.clear();
-    // console.log('---new atk---');
-    // console.log('roster ', roster);
 
-    // roster.forEach( name1 => {
-    //     console.log( _.without(roster, name1) );
-    // });
 
     roster.forEach( victim => {
-        if ( Game_Rox[victim] ) {
+        if ( !Game_Rox[victim] ) return;
+        if ( victim == name ) return;
 
-            let walls = Game_Rox[victim].walls;
-            walls.forEach( (wall,i) => {
-                if (wall.includes(pos)) {
-                    wallIndex.push(i);
-                    console.log(`--${victim}--`);
-                    console.log('pos ', pos);
-                    console.table(walls);
-                    console.table('wallIndex ', wallIndex);
-                }
+        let walls = Game_Rox[victim].walls;
+        let killList = [];
+
+        walls.forEach( (wall,i) => { if (wall.includes(pos)) wallIndex.push(i); });
+        
+        wallIndex.forEach( i => {
+            let count = 0;
+            let team = Game_Rox[victim].teams[i];
+            let wall = walls[i];
+            wall.forEach( posValue => {
+                if (_.without(roster, victim).includes( gridArr[posValue-1])) count++;
             });
+            if ( count == walls[i].length ) {
+                scoreObj[name] += team.length;
+                attackSucceeded = true;
+                killList.push(i);
+            }                
+        });
 
-            let killList = [];
-            wallIndex.forEach( i => {
-                let count = 0;
-                let teams = Game_Rox[victim].teams;
-                let team = teams[i];
-                let walls = Game_Rox[victim].walls;
-                let wall = walls[i];
-                wall.forEach( posValue => {
-                    if ( _.without(roster, victim).includes( gridArr[posValue-1]) ) {
-                        count++;
-                    }
-                });
-
-                if ( count == walls[i].length ) {
-                    console.log(`${victim} team ${i} is surrounded!`);
-                    scoreObj[name] += team.length;
-                    killList.push(i);
-                }                
+        killList.forEach( i => {
+            let teams = Game_Rox[victim].teams;
+            let team = teams[i];
+            team.forEach( posValue => {
+                let index = posValue -1;
+                gridArr[index] = noName;
             });
+        });
 
-            killList.forEach( i => {
-                let teams = Game_Rox[victim].teams;
-                let team = teams[i];
-                team.forEach( posValue => {
-                    let index = posValue -1;
-                    gridArr[index] = noName;
-                });
-            });
+        GridArrToGame_Rox();
+        wallIndex = [];
 
+    });     // END of roster.forEach( victim => {...} 
 
+    if ( !attackSucceeded ) {
+        
+        let teams = Game_Rox[name].teams;
+        let index = 9999;
+
+        teams.forEach( (team,i) => { if (team.includes(pos)) index = i; });
+        console.log('index is', index);
+
+        // console.log('team index is', index);
+        // console.table(teams);
+        
+        let count = 0;
+        let wall = Game_Rox[name].walls[index];
+
+        wall.forEach( val => {
+            if (_.without(roster, name).includes( gridArr[val-1])) count++;
+        });
+
+        // console.log('count is', count);
+        // console.log('wall length is', wall.length);
+
+        if (count == wall.length) {
+            gridArr[pos-1] = noName;
             GridArrToGame_Rox();
-            wallIndex = [];     // reset
-
+            shiftPlayerList(name);
         }
         
-    });
+    }
+
+
+
     
 }
 
