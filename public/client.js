@@ -161,15 +161,13 @@ function addOnclick_Square( elem, index ) {
         GridArrToGame_Rox();
 
         shiftPlayerList(name);
-            // in case I play out of turn, this brings it to my turn
         shiftPlayerList();
-            // next player in line is the first victim.
+            // First, reset order. Then go to next player.
 
         if ( gridArr[index] == name ) {
             calculateAttack(index);
             changeScore();
         }
-        
 
         socket.emit('update grid', gridArr);
     }
@@ -237,10 +235,6 @@ function calculateAttack(indexValue) {
         let index = 9999;
 
         teams.forEach( (team,i) => { if (team.includes(pos)) index = i; });
-        console.log('index is', index);
-
-        // console.log('team index is', index);
-        // console.table(teams);
         
         let count = 0;
         let wall = Game_Rox[name].walls[index];
@@ -249,8 +243,6 @@ function calculateAttack(indexValue) {
             if (_.without(roster, name).includes( gridArr[val-1])) count++;
         });
 
-        // console.log('count is', count);
-        // console.log('wall length is', wall.length);
 
         if (count == wall.length) {
             gridArr[pos-1] = noName;
@@ -258,7 +250,7 @@ function calculateAttack(indexValue) {
             shiftPlayerList(name);
         }
         
-    }
+    }       // END of if ( !attackSucceeded ) {...}
 
 
 
@@ -398,7 +390,12 @@ function addOnclick_LEAVE( roomName ) {
     $(roomName).html('LEAVE');
     $(roomName).off('click');
     $(roomName).on('click', () => {
+        oldRoom = room;
         room = 'lobby';
+        
+        scoreObj[name] = -1;        // -1 designated as sign of leaving.
+        socket.emit('update score', oldRoom, scoreObj);
+
         socket.emit('join room', room);
         playerArr = [];
         scoreObj = {};
@@ -518,10 +515,10 @@ socket.on('update names', arr => {
 });
 
 
-socket.on('update player list', arr => {
-    playerArr = arr;
-    // console.log('playerArr updated: ', playerArr);
-    let str = `<div>${arr[0]}'s turn!</div>`;
+socket.on('update player list', updatedPlayerList => {
+
+    playerArr = updatedPlayerList;
+    let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
     $('#turn').html(str);
 });
 
@@ -536,7 +533,7 @@ socket.on('res grid update', (arrOfNameColorMap, name_grid) => {
 
 
 socket.on('update score', obj => {
-    scoreObj = obj;
+    scoreObj = obj;    
     let str = '';
     Object.keys(obj).forEach( key => {
         str += `<div><span id="color-${key}">&#11044;</span> ${key}: ${obj[key]}</div>`

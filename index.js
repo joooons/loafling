@@ -167,6 +167,35 @@ function updatePlayerList(room, arr) {
 
 
 
+function updateScore(room, scoreObj) {
+
+  console.log('-------');
+  console.log('-------');
+  console.log('existing Room_Score: ', Room_Score);
+  console.log('incoming scoreObj:   ', scoreObj);
+  console.log('    ');
+
+  if ( !Room_Score.has(room) ) { 
+    Room_Score.set(room, scoreObj); 
+    console.log('new room, new map...');
+    console.log('final Room_Score: ', Room_Score);
+  } else {
+    let obj = Room_Score.get(room);
+    Object.keys(scoreObj).forEach( name => {
+      obj[name] = scoreObj[name];
+      if (obj[name] == -1) {
+        delete obj[name];
+      }
+    });
+    Room_Score.set(room, obj);
+    console.log('existing room...');
+    console.log('final Room_Score: ', Room_Score);
+  }
+  
+  io.to(room).emit('update score', Room_Score.get(room) );
+}
+
+
 
 
 
@@ -278,28 +307,9 @@ io.on('connection', (socket) => {
   // _________ UPDATE SCORE ____________________________________________
 
   socket.on('update score', (room, scoreObj) => {
-    console.log('right after update score event is called...');
-    console.log(Room_Score);
-
-
-    if ( !Room_Score.has(room) ) { 
-      Room_Score.set(room, scoreObj); 
-      // something wrong herereererer!!!!!
-      console.log('this is when room wasnt originally on Room Score.');
-      console.log(Room_Score);
-
-    } else {
-      Object.keys(scoreObj).forEach( name => {
-        Room_Score.get(room)[name] = scoreObj[name];
-        console.log('this is when room existed already');
-        console.log(Room_Score);
-      });
-    }
-
-    let obj = Room_Score.get(room);
-    console.log(obj);
-    io.to(room).emit('update score', Room_Score.get(room) );
+    updateScore(room, scoreObj);
   });   // _________ UPDATE SCORE (END) ____________________________________________
+
 
 
 
