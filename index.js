@@ -205,6 +205,10 @@ function updateScore(room, scoreObj) {
 
 
 
+
+
+
+
 // ______________________________________ LOCAL FUNCTIONS (END)
 
 // THE SOCKET.IO ENVIRONMENT __________________________________
@@ -228,6 +232,10 @@ io.on('connection', (socket) => {
     console.log(`( user: ${name} ) disconnected...`);
     console.log(`${ID_Name.size} users still connected`);
 
+    let scoreObj = {};
+    scoreObj[name] = -1;
+    updateScore(room, scoreObj);
+    
     delPlayer(room, name);
       // remove player from playerlist
 
