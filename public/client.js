@@ -134,11 +134,12 @@ function createRoom() {
     $('#room-plus').show();
     $('#room-name').hide();
 
-    socket.emit('create room', room);
-    socket.emit('req grid update', room );
+    emit.createRoom(room);
+
+    emit.updateClientGrid(room);
 
     scoreObj[name] = 0;
-    socket.emit('update score', room, scoreObj);
+    emit.updateScore(room, scoreObj);
 
     $('#boardFrame').fadeIn(fadeTime);
 }
@@ -169,7 +170,7 @@ function addOnclick_Square( elem, index ) {
             changeScore();
         }
 
-        socket.emit('update grid', gridArr);
+        emit.updateServerGrid(gridArr);
     }
 }
 
@@ -264,8 +265,7 @@ function changeScore() {
     // It can't be this simple...
     
     // scoreObj[name]++;
-
-    socket.emit('update score', room, scoreObj );
+    emit.updateScore(room, scoreObj);
 }
 
 
@@ -371,12 +371,14 @@ function addOnclick_JOIN( roomName ) {
         let playerNum = $(`#rm-${room} >`).length;
         if ( playerNum < playerLimit ) {
 
-            socket.emit('join room', room);
+            emit.joinRoom(room);
+
     
             scoreObj[name] = 0;
-            socket.emit('update score', room, scoreObj);
+            emit.updateScore(room, scoreObj);
 
-            socket.emit('req grid update', room );
+            emit.updateClientGrid(room);
+
             $('#boardFrame').fadeIn(fadeTime);
             updateButtons();
         } else {
@@ -394,9 +396,10 @@ function addOnclick_LEAVE( roomName ) {
         room = 'lobby';
         
         scoreObj[name] = -1;        // -1 designated as sign of leaving.
-        socket.emit('update score', oldRoom, scoreObj);
+        emit.updateScore(room, scoreObj)
 
-        socket.emit('join room', room);
+        emit.joinRoom(room);
+
         playerArr = [];
         scoreObj = {};
         updateButtons();
@@ -422,7 +425,9 @@ function shiftPlayerList(name) {
     let target = ( !name ) ? playerArr[1] : name;
     do { playerArr.push( playerArr.shift() ); 
     } while ( playerArr[0] != target );
-    socket.emit('update player list', room, playerArr );
+
+    emit.updatePlayerList(room, playerArr);
+
 }
 
 
@@ -449,7 +454,8 @@ pickName.onchange = () => {
     name = pickName.value;
     pickName.value = '';
     modal.style.display = "none";
-    socket.emit('new user', name);
+    emit.newUser(name);
+
 }
 
 
@@ -479,9 +485,24 @@ $('#room-name').on('focusout', () => {
 
 // ___________________________________ EVENT HANDLERS (END)
 
-// SOCKET EVENTS __________________________________________
+// SOCKET EMIT EVENTS _____________________________________
+
+var emit = {
+    newUser : (name) => { socket.emit('new user', name); },
+    createRoom : (room) => { socket.emit('create room', room); },
+    joinRoom : (room) => { socket.emit('join room', room); },
+    updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
+    updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
+    updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
+    updateServerGrid : (gridArr) => { socket.emit('update grid on server', gridArr); }    
+    
+}
 
 
+
+// _______________________________ SOCKET EMIT EVENTS (END)
+
+// SOCKET ON EVENTS _______________________________________
 
 socket.on('synchronize variables', (blankName, dim) => {
     noName = blankName;
@@ -523,7 +544,7 @@ socket.on('update player list', updatedPlayerList => {
 });
 
 
-socket.on('res grid update', (arrOfNameColorMap, name_grid) => {
+socket.on('update grid', (arrOfNameColorMap, name_grid) => {
     let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
     map.forEach( (val, key) => {
         $(`#color-${key}`).css('color', val);
@@ -542,11 +563,6 @@ socket.on('update score', obj => {
 });
 
 
-
-
-
-
-
-// ______________________________________ SOCKET EVENTS (END)
+// ___________________________________ SOCKET ON EVENTS (END)
 
 // __________________________________________EVERYTHING (END)

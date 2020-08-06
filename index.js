@@ -325,16 +325,16 @@ io.on('connection', (socket) => {
 
 
   
-  // _______ REQ GRID UPDATE __________________________________
+  // _______ UPDATE GRID ON CLIENT ______________________________________
 
-  socket.on('req grid update', room => {
+  socket.on('update grid on client', room => {
     
     let obj = Room_GameData.get(room);
     let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
     let arrOfGrid = obj.grid;
-    io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
+    io.to(room).emit('update grid', arrOfMap, arrOfGrid ); 
 
-  });   // _______ REQ GRID UPDATE (END) __________________________________
+  });   // ___________ UPDATE GRID ON CLIENT (END) __________________________________
 
 
 
@@ -342,9 +342,9 @@ io.on('connection', (socket) => {
 
 
   
-  // _______ UPDATE GRID ______________________________________
+  // _______ UPDATE GRID ON SERVER ______________________________________
 
-  socket.on('update grid', gridArr => {
+  socket.on('update grid on server', gridArr => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
 
@@ -355,9 +355,9 @@ io.on('connection', (socket) => {
     let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
     let arrOfGrid = obj.grid;
 
-    io.to(room).emit('res grid update', arrOfMap, arrOfGrid ); 
+    io.to(room).emit('update grid', arrOfMap, arrOfGrid ); 
 
-  });   // _______ UPDATE GRID (END) ______________________________________
+  });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
 
 
