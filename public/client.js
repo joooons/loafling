@@ -32,6 +32,9 @@ var scoreObj = {};
     // The local object that contains the score of all players in the room.
     // Associated with Room_Score object in index.js
 
+var colorObj = {};
+
+
 
 const playerLimit = 4;
 const fadeTime = 500;
@@ -175,7 +178,6 @@ function setUpGrid( num ) {
 }
 
 
-
 function addOnclick_Square( elem, index ) {
     elem.onclick = () => {
 
@@ -198,8 +200,6 @@ function addOnclick_Square( elem, index ) {
         emit.updateServerGrid(gridArr);
     }
 }
-
- 
 
 
 function calculateAttack(indexValue) {
@@ -284,7 +284,6 @@ function calculateAttack(indexValue) {
 }
 
 
-
 function changeScore() {
     // However way you calculate the score.
     // It can't be this simple...
@@ -294,20 +293,15 @@ function changeScore() {
 }
 
 
-
-
-
-
-
 function updateLocalGrid( grid ) {
     gridArr = grid;
     GridArrToGame_Rox();
 }
 
 
-function visualizeGrid( color_map, name_grid ) {
+function visualizeGrid( colorObject, name_grid ) {
     name_grid.forEach( ( _name, i) => {
-        let color = color_map.get( _name );
+        let color = colorObject[_name];
         $('.square').eq(i).css('fill', color );
     });
     updateLocalGrid( name_grid );
@@ -458,6 +452,21 @@ function shiftPlayerList(name) {
 
 
 
+function showScoreAndColor(num) {
+    let arr = new Array(num).fill(0);
+    
+    let str = '';
+    arr.forEach( (v,i) => {
+        str += `<div><span id="color-${i}">&#11044;</span> player ${i}: ${v}</div>`
+    });
+    $('#players').html(str);
+
+
+
+}
+
+
+
 
 
 
@@ -590,6 +599,13 @@ socket.on('update names', arr => {
 });
 
 
+socket.on('update color', arr => {
+    let array = arr;
+    console.log(arr);
+    
+});
+
+
 socket.on('update player list', updatedPlayerList => {
 
     playerArr = updatedPlayerList;
@@ -598,12 +614,18 @@ socket.on('update player list', updatedPlayerList => {
 });
 
 
-socket.on('update grid', (arrOfNameColorMap, name_grid) => {
-    let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
-    map.forEach( (val, key) => {
-        $(`#color-${key}`).css('color', val);
-    });
-    visualizeGrid(map, name_grid);
+socket.on('update grid', (colorObject, name_grid) => {
+    // let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
+    colorObj = colorObject;
+    console.log('this is inside socket.on update grid');
+    console.log('colorObj is...');
+    console.log(colorObj);
+
+    // map.forEach( (val, key) => {
+    //     $(`#color-${key}`).css('color', val);
+    // });
+
+    visualizeGrid(colorObj, name_grid);
 });
 
 

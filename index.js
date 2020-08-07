@@ -9,6 +9,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
+// const { mapObject } = require('underscore');
 // const { timingSafeEqual } = require('crypto');
 // const { has } = require('underscore');
 
@@ -74,10 +75,10 @@ const noName = 'zz'
 // OBJECT CONSTRUCTOR _________________________________________
 
 function GameData() {
-    this.colorMap = new Map();
-      // Map of NAME to COLOR assigned to that name in this room.
+    this.colorObj = {};
+      // Object : { 'joon' : black, 'monk': red, etc... }
     this.grid = [];
-      // Array of NAME associated with that index-position on board.
+      // Array : [ 'noName', 'joon', 'noName', 'monk', etc... ]
 }
 
 
@@ -114,13 +115,26 @@ function MapToArray( map, keyStr, valStr ) {
 
 
 
-function hasMapValue( map, item ) { return Array.from( map.values() ).includes( item ); }
+function hasMapValue( map, item ) { 
+  return Array.from( map.values() ).includes( item ); 
+}
 
 
 
-function giveUniqColor( map ) {    
+function hasObjValue( obj, item ) {
+  return Object.values(obj).includes(item);
+}
+
+function hasObjKey( obj, key ) {
+  return Object.keys(obj).includes(key);
+}
+
+
+// function giveUniqColor( map ) {   
+function giveUniqColor( obj ) {   
   let num = colorSet.length-1;
-  while ( hasMapValue(map,colorSet[num]) == true ) { num--; }
+  // while ( hasMapValue(map,colorSet[num]) == true ) { num--; }
+  while ( hasObjValue(obj,colorSet[num]) == true ) { num--; }
   return colorSet[num];
 }
 
@@ -362,14 +376,18 @@ io.on('connection', (socket) => {
       // make list of players in this room
 
     let obj = new GameData;
-    obj.colorMap.set(noName, giveUniqColor(obj.colorMap) );
-    obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
+    obj.colorObj[noName] = giveUniqColor(obj.colorObj);
+    obj.colorObj[name] = giveUniqColor(obj.colorObj);
     obj.grid = emptyGrid( boardDim );
     Room_GameData.set( room, obj );
-      // Initialize Room_GameData map, and assign colors.
+      // Initialize Room_GameData map...
+      // ...and assign colors.
+
+    
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
+    io.to(room).emit('update color', obj.colorObj );
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
   });   // _______ CREATE ROOM (END) ______________________________________
@@ -412,9 +430,8 @@ io.on('connection', (socket) => {
   socket.on('update grid on client', room => {
     
     let obj = Room_GameData.get(room);
-    let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
     let arrOfGrid = obj.grid;
-    io.to(room).emit('update grid', arrOfMap, arrOfGrid ); 
+    io.to(room).emit('update grid', obj.colorObj, arrOfGrid ); 
 
   });   // ___________ UPDATE GRID ON CLIENT (END) __________________________________
 
@@ -437,15 +454,12 @@ io.on('connection', (socket) => {
   socket.on('update grid on server', gridArr => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
-
     let obj = Room_GameData.get(room);
+
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
 
-    let arrOfMap = MapToArray( obj.colorMap, 'name', 'color');
-    let arrOfGrid = obj.grid;
-
-    io.to(room).emit('update grid', arrOfMap, arrOfGrid ); 
+    io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
 
   });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
@@ -495,10 +509,14 @@ io.on('connection', (socket) => {
     if ( room != 'lobby' ) { 
       socket.join(room); 
       let obj = Room_GameData.get(room);
-      if ( !obj.colorMap.has(name) ) {
-        obj.colorMap.set(name, giveUniqColor(obj.colorMap) );
+
+      
+
+      if ( !hasObjKey(obj.colorObj, name) ) {
+        obj.colorObj[name] = giveUniqColor(obj.colorObj);
         Room_GameData.set( room, obj );
       }
+
     }
       // if destination is not lobby, join room and assign color
 
