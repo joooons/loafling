@@ -452,16 +452,21 @@ function shiftPlayerList(name) {
 
 
 
-function showScoreAndColor(num) {
-    let arr = new Array(num).fill(0);
-    
+function showScoreboard(obj) {
+
+    console.clear();
+    console.log(playerArr);
+    console.log(scoreObj);
+    console.log(colorObj);
+
+    scoreObj = obj;    
+
     let str = '';
-    arr.forEach( (v,i) => {
-        str += `<div><span id="color-${i}">&#11044;</span> player ${i}: ${v}</div>`
+    playerArr.forEach( player => {
+        str += `<div><span style="color: ${colorObj[player]}">&#11044;</span>`;
+        str += ` ${player}: ${scoreObj[player]}</div>`;
     });
     $('#players').html(str);
-
-
 
 }
 
@@ -611,31 +616,21 @@ socket.on('update player list', updatedPlayerList => {
     playerArr = updatedPlayerList;
     let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
     $('#turn').html(str);
+    showScoreboard(scoreObj);
 });
 
 
 socket.on('update grid', (colorObject, name_grid) => {
-    // let map = ArrToMap(arrOfNameColorMap, 'name', 'color');
     colorObj = colorObject;
-    console.log('this is inside socket.on update grid');
-    console.log('colorObj is...');
-    console.log(colorObj);
-
-    // map.forEach( (val, key) => {
-    //     $(`#color-${key}`).css('color', val);
-    // });
-
+    showScoreboard(scoreObj);
     visualizeGrid(colorObj, name_grid);
 });
 
 
 socket.on('update score', obj => {
-    scoreObj = obj;    
-    let str = '';
-    Object.keys(obj).forEach( key => {
-        str += `<div><span id="color-${key}">&#11044;</span> ${key}: ${obj[key]}</div>`
-    });
-    $('#players').html(str);
+
+    showScoreboard(obj);
+
 });
 
 
