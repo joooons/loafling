@@ -5,8 +5,12 @@ const socket = io();
 
 
 
-
-
+//  MM        MMMM      MMMM      MMMM    MM            MM      MM    MMMM    MMMMMM    
+//  MM      MM    MM  MM    MM  MM    MM  MM            MM      MM  MM    MM  MM    MM  
+//  MM      MM    MM  MM        MMMMMMMM  MM            MM      MM  MMMMMMMM  MMMMMM    
+//  MM      MM    MM  MM        MM    MM  MM            MM      MM  MM    MM  MM    MM  
+//  MM      MM    MM  MM    MM  MM    MM  MM              MM  MM    MM    MM  MM    MM  
+//  MMMMMM    MMMM      MMMM    MM    MM  MMMMMM            MM      MM    MM  MM    MM  
 
 // LOCAL VARIABLES ________________________________________
 
@@ -47,6 +51,15 @@ var boardDim;
 
 
 
+
+
+//  MMMMMM      MMMM    MM      MM        MMMMMMMM  MM      MMMMMMMM  MM      MM  
+//  MM    MM  MM    MM  MMMM  MMMM        MM        MM      MM        MMMM  MMMM  
+//  MM    MM  MM    MM  MM  MM  MM        MMMMMMMM  MM      MMMMMMMM  MM  MM  MM  
+//  MM    MM  MM    MM  MM      MM        MM        MM      MM        MM      MM  
+//  MM    MM  MM    MM  MM      MM        MM        MM      MM        MM      MM  
+//  MMMMMM      MMMM    MM      MM        MMMMMMMM  MMMMMM  MMMMMMMM  MM      MM  
+
 // DOM ELEMENTS ___________________________________________
 
 const modal = document.querySelector('#modal');
@@ -70,7 +83,12 @@ const board = document.querySelector('#board');
 
 
 
-
+//  MMMMMM  MM    MM  MMMMMM  MMMMMM          MMMM      MMMM    MM    MM  MMMMMM    MMMMMM    MMMM    MM    MM  
+//    MM    MMMM  MM    MM      MM          MM    MM  MM    MM  MMMM  MM  MM    MM    MM    MM    MM  MM    MM  
+//    MM    MM  MMMM    MM      MM          MM        MM    MM  MM  MMMM  MM    MM    MM      MM      MMMMMMMM  
+//    MM    MM    MM    MM      MM          MM        MM    MM  MM    MM  MM    MM    MM        MM    MM    MM  
+//    MM    MM    MM    MM      MM          MM    MM  MM    MM  MM    MM  MM    MM    MM    MM    MM  MM    MM  
+//  MMMMMM  MM    MM  MMMMMM    MM            MMMM      MMMM    MM    MM  MMMMMM    MMMMMM    MMMM    MM    MM  
 
 // INITIAL CONDITIONS ________________________________________
 
@@ -94,6 +112,13 @@ socket.on('board config', dim => { setUpGrid( dim ); });
 
 
 
+
+//  MMMMMMMM  MM    MM  MM    MM    MMMM    MMMMMM  MMMMMM    MMMM    MM    MM    MMMM    
+//  MM        MM    MM  MMMM  MM  MM    MM    MM      MM    MM    MM  MMMM  MM  MM    MM  
+//  MMMMMMMM  MM    MM  MM  MMMM  MM          MM      MM    MM    MM  MM  MMMM    MM      
+//  MM        MM    MM  MM    MM  MM          MM      MM    MM    MM  MM    MM      MM    
+//  MM        MM    MM  MM    MM  MM    MM    MM      MM    MM    MM  MM    MM  MM    MM  
+//  MM          MMMM    MM    MM    MMMM      MM    MMMMMM    MMMM    MM    MM    MMMM    
 
 // LOCAL FUNCTIONS ____________________________________________
 
@@ -445,6 +470,13 @@ function shiftPlayerList(name) {
 
 // _________________________________ LOCAL FUNCTIONS (END)
 
+//  MMMMMMMM  MM      MM  MMMMMMMM  MM    MM  MMMMMM    MMMM    
+//  MM        MM      MM  MM        MMMM  MM    MM    MM    MM  
+//  MMMMMMMM  MM      MM  MMMMMMMM  MM  MMMM    MM      MM      
+//  MM        MM      MM  MM        MM    MM    MM        MM    
+//  MM          MM  MM    MM        MM    MM    MM    MM    MM  
+//  MMMMMMMM      MM      MMMMMMMM  MM    MM    MM      MMMM    
+
 // EVENT HANDLERS ________________________________________
 
 window.onresize = () => { resizeBoard(); }
@@ -485,6 +517,13 @@ $('#room-name').on('focusout', () => {
 
 // ___________________________________ EVENT HANDLERS (END)
 
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM  MMMMMM        MMMMMMMM  MM      MM  MMMMMM  MMMMMM  
+//  MM    MM  MM    MM  MM    MM  MM  MM    MM          MM          MM        MMMM  MMMM    MM      MM    
+//    MM      MM    MM  MM        MMMM      MMMMMMMM    MM          MMMMMMMM  MM  MM  MM    MM      MM    
+//      MM    MM    MM  MM        MM  MM    MM          MM          MM        MM      MM    MM      MM    
+//  MM    MM  MM    MM  MM    MM  MM    MM  MM          MM          MM        MM      MM    MM      MM    
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM    MM          MMMMMMMM  MM      MM  MMMMMM    MM    
+
 // SOCKET EMIT EVENTS _____________________________________
 
 var emit = {
@@ -500,7 +539,22 @@ var emit = {
 
 
 
+
+
+
+
+
+
+
+
 // _______________________________ SOCKET EMIT EVENTS (END)
+
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM  MMMMMM          MMMM    MM    MM  
+//  MM    MM  MM    MM  MM    MM  MM  MM    MM          MM          MM    MM  MMMM  MM  
+//    MM      MM    MM  MM        MMMM      MMMMMMMM    MM          MM    MM  MM  MMMM  
+//      MM    MM    MM  MM        MM  MM    MM          MM          MM    MM  MM    MM  
+//  MM    MM  MM    MM  MM    MM  MM    MM  MM          MM          MM    MM  MM    MM  
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM    MM            MMMM    MM    MM  
 
 // SOCKET ON EVENTS _______________________________________
 

@@ -23,7 +23,18 @@ const io = socketIO(server);
 
 
 
+
+
+
+
 // ________________________________________ INITIAL SETUP (END)
+
+//  MM      MM    MMMM    MMMMMM    MMMMMM    MMMM    MMMMMM    MM      MMMMMMMM    MMMM    
+//  MM      MM  MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM        MM    MM  
+//  MM      MM  MMMMMMMM  MMMMMM      MM    MMMMMMMM  MMMMMM    MM      MMMMMMMM    MM      
+//  MM      MM  MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM            MM    
+//    MM  MM    MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM        MM    MM  
+//      MM      MM    MM  MM    MM  MMMMMM  MM    MM  MMMMMM    MMMMMM  MMMMMMMM    MMMM    
 
 // LOCAL VARIABLES ____________________________________________
 
@@ -53,6 +64,13 @@ const noName = 'zz'
 
 // ______________________________________ LOCAL VARIABLES (END)
 
+//    MMMM    MMMMMM    MMMMMM  MMMMMMMM    MMMM    MMMMMM    MMMM    
+//  MM    MM  MM    MM      MM  MM        MM    MM    MM    MM    MM  
+//  MM    MM  MMMMMM        MM  MMMMMMMM  MM          MM      MM      
+//  MM    MM  MM    MM      MM  MM        MM          MM        MM    
+//  MM    MM  MM    MM      MM  MM        MM    MM    MM    MM    MM  
+//    MMMM    MMMMMM    MMMM    MMMMMMMM    MMMM      MM      MMMM    
+
 // OBJECT CONSTRUCTOR _________________________________________
 
 function GameData() {
@@ -73,6 +91,13 @@ function GameData() {
 
 
 // ___________________________________ OBJECT CONSTRUCTOR (END)
+
+//  MMMMMMMM  MM    MM  MM    MM    MMMM    MMMMMM  MMMMMM    MMMM    MM    MM    MMMM    
+//  MM        MM    MM  MMMM  MM  MM    MM    MM      MM    MM    MM  MMMM  MM  MM    MM  
+//  MMMMMMMM  MM    MM  MM  MMMM  MM          MM      MM    MM    MM  MM  MMMM    MM      
+//  MM        MM    MM  MM    MM  MM          MM      MM    MM    MM  MM    MM      MM    
+//  MM        MM    MM  MM    MM  MM    MM    MM      MM    MM    MM  MM    MM  MM    MM  
+//  MM          MMMM    MM    MM    MMMM      MM    MMMMMM    MMMM    MM    MM    MMMM    
 
 // LOCAL FUNCTIONS ____________________________________________
 
@@ -211,6 +236,13 @@ function updateScore(room, scoreObj) {
 
 // ______________________________________ LOCAL FUNCTIONS (END)
 
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM  MMMMMM  
+//  MM    MM  MM    MM  MM    MM  MM  MM    MM          MM    
+//    MM      MM    MM  MM        MMMM      MMMMMMMM    MM    
+//      MM    MM    MM  MM        MM  MM    MM          MM    
+//  MM    MM  MM    MM  MM    MM  MM    MM  MM          MM    
+//    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM    MM    
+
 // THE SOCKET.IO ENVIRONMENT __________________________________
 
 io.on('connection', (socket) => {
@@ -219,6 +251,18 @@ io.on('connection', (socket) => {
   socket.emit('synchronize variables', noName, boardDim);
 
 
+
+
+
+
+
+
+//  MMMMMM    MMMMMM    MMMM      MMMM      MMMM    MM    MM  MM    MM  MMMMMMMM    MMMM    MMMMMM  
+//  MM    MM    MM    MM    MM  MM    MM  MM    MM  MMMM  MM  MMMM  MM  MM        MM    MM    MM    
+//  MM    MM    MM      MM      MM        MM    MM  MM  MMMM  MM  MMMM  MMMMMMMM  MM          MM    
+//  MM    MM    MM        MM    MM        MM    MM  MM    MM  MM    MM  MM        MM          MM    
+//  MM    MM    MM    MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM        MM    MM    MM    
+//  MMMMMM    MMMMMM    MMMM      MMMM      MMMM    MM    MM  MM    MM  MMMMMMMM    MMMM      MM    
   
   // _______ DISCONNECT _______________________________________
 
@@ -255,6 +299,16 @@ io.on('connection', (socket) => {
 
 
 
+
+
+
+//  MM    MM  MMMMMMMM  MM      MM      MM    MM    MMMM    MMMMMMMM  MMMMMM    
+//  MMMM  MM  MM        MM      MM      MM    MM  MM    MM  MM        MM    MM  
+//  MM  MMMM  MMMMMMMM  MM      MM      MM    MM    MM      MMMMMMMM  MMMMMM    
+//  MM    MM  MM        MM  MM  MM      MM    MM      MM    MM        MM    MM  
+//  MM    MM  MM        MM  MM  MM      MM    MM  MM    MM  MM        MM    MM  
+//  MM    MM  MMMMMMMM    MM  MM          MMMM      MMMM    MMMMMMMM  MM    MM  
+
   
   // _______ NEW USER _________________________________________
 
@@ -280,7 +334,16 @@ io.on('connection', (socket) => {
 
 
 
-  
+
+
+
+//    MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM      MMMMMM      MMMM      MMMM    MM      MM  
+//  MM    MM  MM    MM  MM        MM    MM    MM    MM            MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//  MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM      MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//  MM        MM    MM  MM        MM    MM    MM    MM            MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MM    MM  MM        MM    MM    MM    MM            MM    MM  MM    MM  MM    MM  MM      MM  
+//    MMMM    MM    MM  MMMMMMMM  MM    MM    MM    MMMMMMMM      MM    MM    MMMM      MMMM    MM      MM  
+
   // _______ CREATE ROOM ______________________________________
 
   socket.on('create room', roomName => {
@@ -312,6 +375,18 @@ io.on('connection', (socket) => {
   });   // _______ CREATE ROOM (END) ______________________________________
 
 
+
+
+
+
+
+//  MM    MM  MMMMMM    MMMMMM      MMMM    MMMMMM  MMMMMMMM          MMMM      MMMM      MMMM    MMMMMM    MMMMMMMM  
+//  MM    MM  MM    MM  MM    MM  MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM    MM  MM        
+//  MM    MM  MM    MM  MM    MM  MMMMMMMM    MM    MMMMMMMM          MM      MM        MM    MM  MMMMMM    MMMMMMMM  
+//  MM    MM  MMMMMM    MM    MM  MM    MM    MM    MM                  MM    MM        MM    MM  MM    MM  MM        
+//  MM    MM  MM        MM    MM  MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM    MM  MM        
+//    MMMM    MM        MMMMMM    MM    MM    MM    MMMMMMMM          MMMM      MMMM      MMMM    MM    MM  MMMMMMMM
+
   // _________ UPDATE SCORE ____________________________________________
 
   socket.on('update score', (room, scoreObj) => {
@@ -324,6 +399,13 @@ io.on('connection', (socket) => {
 
 
 
+
+//    MMMM    MM      MMMMMM  MMMMMMMM  MM    MM  MMMMMM          MMMM    MMMMMM    MMMMMM  MMMMMM    
+//  MM    MM  MM        MM    MM        MMMM  MM    MM          MM    MM  MM    MM    MM    MM    MM  
+//  MM        MM        MM    MMMMMMMM  MM  MMMM    MM          MM        MMMMMM      MM    MM    MM  
+//  MM        MM        MM    MM        MM    MM    MM          MM  MMMM  MM    MM    MM    MM    MM  
+//  MM    MM  MM        MM    MM        MM    MM    MM          MM    MM  MM    MM    MM    MM    MM  
+//    MMMM    MMMMMM  MMMMMM  MMMMMMMM  MM    MM    MM            MMMM    MM    MM  MMMMMM  MMMMMM    
   
   // _______ UPDATE GRID ON CLIENT ______________________________________
 
@@ -341,6 +423,14 @@ io.on('connection', (socket) => {
 
 
 
+
+
+//    MMMM    MMMMMMMM  MMMMMM    MM      MM  MMMMMMMM  MMMMMM            MMMM    MMMMMM    MMMMMM  MMMMMM    
+//  MM    MM  MM        MM    MM  MM      MM  MM        MM    MM        MM    MM  MM    MM    MM    MM    MM  
+//    MM      MMMMMMMM  MMMMMM    MM      MM  MMMMMMMM  MMMMMM          MM        MMMMMM      MM    MM    MM  
+//      MM    MM        MM    MM  MM      MM  MM        MM    MM        MM  MMMM  MM    MM    MM    MM    MM  
+//  MM    MM  MM        MM    MM    MM  MM    MM        MM    MM        MM    MM  MM    MM    MM    MM    MM  
+//    MMMM    MMMMMMMM  MM    MM      MM      MMMMMMMM  MM    MM          MMMM    MM    MM  MMMMMM  MMMMMM    
   
   // _______ UPDATE GRID ON SERVER ______________________________________
 
@@ -363,7 +453,18 @@ io.on('connection', (socket) => {
 
 
 
-  
+
+
+
+
+
+//  MMMMMM    MMMM    MMMMMM  MM    MM        MMMMMM      MMMM      MMMM    MM      MM  
+//      MM  MM    MM    MM    MMMM  MM        MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//      MM  MM    MM    MM    MM  MMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//      MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//      MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//  MMMM      MMMM    MMMMMM  MM    MM        MM    MM    MMMM      MMMM    MM      MM  
+
   // _______ JOIN ROOM ________________________________________
 
   socket.on('join room', room => {
@@ -412,6 +513,16 @@ io.on('connection', (socket) => {
 
 
 
+
+
+
+//  MM    MM  MMMMMM    MMMMMM      MMMM    MMMMMM  MMMMMMMM        MMMMMM    MM        MMMM    MM      MM  MMMMMMMM  MMMMMM    
+//  MM    MM  MM    MM  MM    MM  MM    MM    MM    MM              MM    MM  MM      MM    MM    MM  MM    MM        MM    MM  
+//  MM    MM  MM    MM  MM    MM  MMMMMMMM    MM    MMMMMMMM        MM    MM  MM      MMMMMMMM      MM      MMMMMMMM  MMMMMM    
+//  MM    MM  MMMMMM    MM    MM  MM    MM    MM    MM              MMMMMM    MM      MM    MM      MM      MM        MM    MM  
+//  MM    MM  MM        MM    MM  MM    MM    MM    MM              MM        MM      MM    MM      MM      MM        MM    MM  
+//    MMMM    MM        MMMMMM    MM    MM    MM    MMMMMMMM        MM        MMMMMM  MM    MM      MM      MMMMMMMM  MM    MM  
+
   // _______ UPDATE PLAYER LIST ________________________________________
 
   socket.on('update player list', (room,playerArr) => {
@@ -441,6 +552,13 @@ io.on('connection', (socket) => {
 
 
 // ____________________________ THE SOCKET.IO ENVIRONMENT (END)
+
+//  MM      MMMMMM    MMMM    MMMMMM  MMMMMMMM  MM    MM  
+//  MM        MM    MM    MM    MM    MM        MMMM  MM  
+//  MM        MM      MM        MM    MMMMMMMM  MM  MMMM  
+//  MM        MM        MM      MM    MM        MM    MM  
+//  MM        MM    MM    MM    MM    MM        MM    MM  
+//  MMMMMM  MMMMMM    MMMM      MM    MMMMMMMM  MM    MM  
 
 // START LISTENING TO PORT ____________________________________
 
