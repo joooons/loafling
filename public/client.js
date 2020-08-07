@@ -17,6 +17,14 @@ const socket = io();
 var name = 'none';
 var room = 'lobby';
     // Starting room is always specifically the 'lobby'
+var stage =  {};
+    stage['stat'] = 'battle';
+    stage['flip'] = function() {
+        stage.stat = ( stage.stat == 'count' ) ? 'battle' : 'count';
+    }
+
+
+    // 'battle' or 'count'
 
 var gridArr = [];
     // The array of names assigned to the board grid.
@@ -178,12 +186,21 @@ function setUpGrid( num ) {
 }
 
 
-function addOnclick_Square( elem, index ) {
-    elem.onclick = () => {
+function addOnclick_putStone( elem, index ) {
+    
+    elem.onclick = () => { 
+        if ( stage.stat == 'battle' ) {
+            putStone(index); 
+        } else {
+            countStone(index);
+        }
+        
+    }
 
-        let data = gridArr[index];
-        if (data == name) { gridArr[index] = noName; } 
-        else if (data == noName) { gridArr[index] = name; }
+    function putStone(index) {
+        let stone = gridArr[index];
+        if (stone == name) { gridArr[index] = noName; } 
+        else if (stone == noName) { gridArr[index] = name; }
 
         updateLocalGrid( gridArr );
         GridArrToGame_Rox();
@@ -199,7 +216,31 @@ function addOnclick_Square( elem, index ) {
 
         emit.updateServerGrid(gridArr);
     }
+
+    function countStone(index) {
+        let stone = gridArr[index];
+        if ( stone == name ) return;
+        if ( stone == noName ) return;
+        console.log( stone );
+
+        scoreObj[name]++;
+        gridArr[index] = noName;
+
+        updateLocalGrid( gridArr );
+        GridArrToGame_Rox();
+        changeScore();
+        emit.updateServerGrid(gridArr);
+
+    }
+
 }
+
+
+
+
+
+
+
 
 
 function calculateAttack(indexValue) {

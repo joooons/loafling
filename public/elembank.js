@@ -66,7 +66,7 @@ function addClickableDots( elem, num) {
                 $(circ).attr('r', 46);
                 $(circ).attr('fill', '#fff0');
                 $(circ).attr('class', 'square');
-                addOnclick_Square( circ, index);
+                addOnclick_putStone( circ, index);
             $(elem).append(circ);
         }
     }

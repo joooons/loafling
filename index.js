@@ -50,7 +50,7 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'yellow', 'black', '#FFF0'];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 3;
+const boardDim = 6;
 const noName = 'zz'
   // variables to synchronize to client
 
