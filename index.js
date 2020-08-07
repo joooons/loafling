@@ -50,7 +50,7 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'yellow', 'black', '#FFF0'];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 5;
+const boardDim = 3;
 const noName = 'zz'
   // variables to synchronize to client
 
@@ -294,8 +294,25 @@ io.on('connection', (socket) => {
     scoreObj[name] = -1;
     updateScore(room, scoreObj);
     
+
+
+
+    
     delPlayer(room, name);
-      // remove player from playerlist
+
+    if ( Room_GameData.get(room) ) {
+      let obj = Room_GameData.get(room);
+      obj.grid.filter( v => { return ( v == name ); })
+      .forEach( val => { val = noName; });
+      Room_GameData.get(room).grid = obj.grid;
+      io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
+    }
+    
+
+
+
+
+
 
     if ( !hasMapValue(Name_Room, room) ) {
       io.emit('del roombox', room );
@@ -430,8 +447,8 @@ io.on('connection', (socket) => {
   socket.on('update grid on client', room => {
     
     let obj = Room_GameData.get(room);
-    let arrOfGrid = obj.grid;
-    io.to(room).emit('update grid', obj.colorObj, arrOfGrid ); 
+    // let arrOfGrid = obj.grid;
+    io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
 
   });   // ___________ UPDATE GRID ON CLIENT (END) __________________________________
 
@@ -491,7 +508,16 @@ io.on('connection', (socket) => {
     socket.leave(oldRoom);
       // Leave old room. It's important to do this before what follows.
 
-    if (oldRoom != 'lobby') delPlayer(oldRoom, name);
+    if (oldRoom != 'lobby') {
+      console.log('---- leaving room -----');
+      delPlayer(oldRoom, name);
+      let obj = Room_GameData.get(oldRoom);
+      obj.grid.forEach( (v,i) => {
+        if ( v == name ) obj.grid[i] = noName;
+      });
+      Room_GameData.get(oldRoom).grid = obj.grid;
+      io.to(oldRoom).emit('update grid', obj.colorObj, obj.grid ); 
+    }
       // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, oldRoom) ) {
