@@ -47,12 +47,13 @@ var Room_Score = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', '#FF0', 'black', '#FFF0'];
+var colorSet = randomizeColorset();
   // For iterating through variations to avoid duplicates.
 
 const boardDim = 6;
 const noName = 'zz'
   // variables to synchronize to client
+
 
 
 
@@ -115,29 +116,31 @@ function MapToArray( map, keyStr, valStr ) {
 
 
 
-function hasMapValue( map, item ) { 
-  return Array.from( map.values() ).includes( item ); 
-}
+function hasMapValue( map, item ) { return Array.from( map.values() ).includes( item ); }
+
+function hasObjValue( obj, item ) { return Object.values(obj).includes(item); }
+
+function hasObjKey( obj, key ) { return Object.keys(obj).includes(key); }
 
 
-
-function hasObjValue( obj, item ) {
-  return Object.values(obj).includes(item);
-}
-
-function hasObjKey( obj, key ) {
-  return Object.keys(obj).includes(key);
-}
-
-
-// function giveUniqColor( map ) {   
 function giveUniqColor( obj ) {   
   let num = colorSet.length-1;
-  // while ( hasMapValue(map,colorSet[num]) == true ) { num--; }
   while ( hasObjValue(obj,colorSet[num]) == true ) { num--; }
   return colorSet[num];
 }
 
+
+function randomizeColorset() {
+  let arr = [];
+  let alphanum = ['0', '6', '9', 'c', 'f'];
+  while ( arr.length < 100 ) {
+    let str = '#';
+    while ( str.length < 4 ) { str += alphanum[Math.floor( Math.random() * 5 )]; }
+    if ( !arr.includes(str) ) arr.push(str);
+  }
+  arr.push('#fff0');
+  return arr;
+}
 
 
 function emptyGrid(num) { return new Array( Math.pow(num, 2) ).fill(noName); }

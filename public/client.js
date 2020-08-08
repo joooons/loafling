@@ -27,7 +27,7 @@ var boardDim;
 
 const config = {};
     config.dim = 6;
-    config.strict = true;
+    config.strict = false;
     config.playerLimit = 2;
 
 
@@ -513,12 +513,23 @@ function showScoreboard(obj) {
     let tempArr = [...playerArr];
     do { tempArr.push( tempArr.shift() ); 
     } while ( tempArr[0] != name );
+    
     let str = '';
+
+    $('#players').html('');
+
     tempArr.forEach( player => {
-        str += `<div><span style="color: ${colorObj[player]}">&#11044;</span>`;
-        str += ` ${player}: ${scoreObj[player]}</div>`;
+        let str = '';
+        if (player == playerArr[0]) str = '&#8594;';
+        $('#players').append(`<div>${str}</div>`);
+        $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
+        str = `${player}`;
+        if ( player == name ) str = `<b>${player}</b>`;
+        $('#players').append(`<div>${str}</div>`);
+        $('#players').append(`<div>&nbsp;&nbsp;&nbsp;${scoreObj[player]}</div>`);
     });
-    $('#players').html(str);
+    
+    // $('#players').html(str);
 }
 
 
