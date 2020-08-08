@@ -209,6 +209,7 @@ function addOnclick_putStone( elem, index ) {
         let stone = gridArr[index];
 
         if (config.strict) {
+            if (playerArr.length == 1) return;
             if (playerArr[0] != name ) return;
             if (stone == name) return;
         }
