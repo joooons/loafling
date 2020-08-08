@@ -9,9 +9,6 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const _ = require('underscore');
-// const { mapObject } = require('underscore');
-// const { timingSafeEqual } = require('crypto');
-// const { has } = require('underscore');
 
 const app = express();
 const server = http.createServer(app);
@@ -114,8 +111,6 @@ function MapToArray( map, keyStr, valStr ) {
   return arr;
 }
 
-
-
 function hasMapValue( map, item ) { return Array.from( map.values() ).includes( item ); }
 
 function hasObjValue( obj, item ) { return Object.values(obj).includes(item); }
@@ -146,23 +141,11 @@ function randomizeColorset() {
 function emptyGrid(num) { return new Array( Math.pow(num, 2) ).fill(noName); }
 
 
-
 function mapUniqValArr( map ) {
   let arr = [];
   map.forEach( val => { arr.push(val); });
   return _.uniq(arr);
 }
-
-
-
-function displayName_Room( text ) {
-  console.log('         ');
-  console.log(`--- Name_Room @ ( ${text} ) ---`)
-  Name_Room.forEach( (val, key) => {
-    console.log('   ', key, val);
-  });
-}
-
 
 
 function avoidDuplicate( map, root, suffix ) {
@@ -185,11 +168,9 @@ function avoidDuplicate( map, root, suffix ) {
 }
 
 
-
 function startPlayerList(room) {
   Room_PlayerArr.set(room, []);
 }
-
 
 
 function addPlayer(room, name) {
@@ -197,25 +178,13 @@ function addPlayer(room, name) {
 }
 
 
-
 function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
   Room_PlayerArr.set(room, _.without(arr, name) );
 }
 
-function updatePlayerList(room, arr) {
-  Room_PlayerArr.set(room, arr);
-}
-
-
 
 function updateScore(room, scoreObj) {
-
-  console.log('-------');
-  console.log('-------');
-  console.log('existing Room_Score: ', Room_Score);
-  console.log('incoming scoreObj:   ', scoreObj);
-  console.log('    ');
 
   if ( !Room_Score.has(room) ) { 
     Room_Score.set(room, scoreObj); 
@@ -225,9 +194,7 @@ function updateScore(room, scoreObj) {
     let obj = Room_Score.get(room);
     Object.keys(scoreObj).forEach( name => {
       obj[name] = scoreObj[name];
-      if (obj[name] == -1) {
-        delete obj[name];
-      }
+      if (obj[name] == -9999) delete obj[name];
     });
     Room_Score.set(room, obj);
     console.log('existing room...');
@@ -297,25 +264,14 @@ io.on('connection', (socket) => {
     scoreObj[name] = -1;
     updateScore(room, scoreObj);
     
-
-
-
-    
     delPlayer(room, name);
 
     if ( Room_GameData.get(room) ) {
       let obj = Room_GameData.get(room);
-      obj.grid.forEach( (v,i) => {
-        if ( v == name ) obj.grid[i] = noName;
-      });
+      obj.grid.forEach( (v,i) => { if ( v == name ) obj.grid[i] = noName; });
       Room_GameData.get(room).grid = obj.grid;
       io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
     }
-
-
-
-
-
 
     if ( !hasMapValue(Name_Room, room) ) {
       io.emit('del roombox', room );
@@ -342,7 +298,6 @@ io.on('connection', (socket) => {
 //  MM    MM  MM        MM  MM  MM      MM    MM      MM    MM        MM    MM  
 //  MM    MM  MM        MM  MM  MM      MM    MM  MM    MM  MM        MM    MM  
 //  MM    MM  MMMMMMMM    MM  MM          MMMM      MMMM    MMMMMMMM  MM    MM  
-
   
   // _______ NEW USER _________________________________________
 
@@ -403,8 +358,6 @@ io.on('connection', (socket) => {
       // Initialize Room_GameData map...
       // ...and assign colors.
 
-    
-
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     io.to(room).emit('update color', obj.colorObj );
@@ -448,11 +401,8 @@ io.on('connection', (socket) => {
   // _______ UPDATE GRID ON CLIENT ______________________________________
 
   socket.on('update grid on client', room => {
-    
     let obj = Room_GameData.get(room);
-    // let arrOfGrid = obj.grid;
     io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
-
   });   // ___________ UPDATE GRID ON CLIENT (END) __________________________________
 
 
@@ -475,12 +425,9 @@ io.on('connection', (socket) => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
     let obj = Room_GameData.get(room);
-
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
-
     io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
-
   });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
 
@@ -534,23 +481,17 @@ io.on('connection', (socket) => {
       // remove empty rooms.
       // if oldroom is not empty, send player list to old room
 
-    
     if ( room != 'lobby' ) { 
       socket.join(room); 
       let obj = Room_GameData.get(room);
-
-      
 
       if ( !hasObjKey(obj.colorObj, name) ) {
         obj.colorObj[name] = giveUniqColor(obj.colorObj);
         Room_GameData.set( room, obj );
       }
-
+      addPlayer(room, name);
     }
       // if destination is not lobby, join room and assign color
-
-    if (room != 'lobby') addPlayer(room, name);
-      // make list of players in this room
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );

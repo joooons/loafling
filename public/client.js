@@ -253,13 +253,6 @@ function addOnclick_putStone( elem, index ) {
 }
 
 
-
-
-
-
-
-
-
 function calculateAttack(indexValue) {
 
     if (playerArr.length < 2) return;
@@ -273,8 +266,7 @@ function calculateAttack(indexValue) {
         // Temporary list of players, starting with first victim.
         // Includes player who attacked.
 
-    console.clear();
-
+    // console.clear();
 
     roster.forEach( victim => {
         if ( !Game_Rox[victim] ) return;
@@ -335,8 +327,6 @@ function calculateAttack(indexValue) {
         }
         
     }       // END of if ( !attackSucceeded ) {...}
-
-
 
     
 }
@@ -472,7 +462,7 @@ function addOnclick_LEAVE( roomName ) {
         oldRoom = room;
         room = 'lobby';
         
-        scoreObj[name] = -1;        // -1 designated as sign of leaving.
+        scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
         emit.updateScore(room, scoreObj)
 
         emit.joinRoom(room);
@@ -504,8 +494,6 @@ function shiftPlayerList(name) {
     } while ( playerArr[0] != target );
     emit.updatePlayerList(room, playerArr);
 }
-
-
 
 
 function showScoreboard(obj) {
