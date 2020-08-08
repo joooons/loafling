@@ -44,11 +44,11 @@ var Room_Score = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-var colorSet = randomizeColorset();
+var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
 const boardDim = 6;
-const noName = 'zz'
+const noName = 'zz';
   // variables to synchronize to client
 
 
@@ -351,6 +351,7 @@ io.on('connection', (socket) => {
       // make list of players in this room
 
     let obj = new GameData;
+    colorSet = randomizeColorset();
     obj.colorObj[noName] = giveUniqColor(obj.colorObj);
     obj.colorObj[name] = giveUniqColor(obj.colorObj);
     obj.grid = emptyGrid( boardDim );
