@@ -8,7 +8,7 @@ console.log('elembank.js at your service!');
 
 const ns = "http://www.w3.org/2000/svg";
 
-
+var svgElem;
 
 
 
@@ -22,11 +22,13 @@ const ns = "http://www.w3.org/2000/svg";
 function addSVGtoBoard( elem, num ) {
     let xDim = 100 * num;
     let yDim = 100 * num;
-    let svg = document.createElementNS(ns, 'svg');
-        svg.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
-        addGridLines( svg, xDim, yDim, num );
-        addClickableDots(svg, num);
-    $(elem).append(svg);
+    // let svg = document.createElementNS(ns, 'svg');
+    //     svg.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
+    svgElem = document.createElementNS(ns, 'svg');
+        svgElem.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
+        addGridLines( svgElem, xDim, yDim, num );
+        addClickableDots(svgElem, num);
+    $(elem).append(svgElem);
 }
 
 
@@ -73,6 +75,20 @@ function addClickableDots( elem, num) {
 }
 
 
+function addTallySquare( elem ) {
+    let x = $(elem).attr('cx') - 23;
+    let y = $(elem).attr('cy') - 23;
+    console.log(x,y);
+    let rect = document.createElementNS(ns, 'rect');
+        $(rect).attr('x', x);
+        $(rect).attr('y', y);
+        $(rect).attr('width', 46);
+        $(rect).attr('height', 46 );
+        $(rect).attr('stroke-width', '6px');
+        $(rect).attr('stroke', '#0003');
+        $(rect).attr('fill', '#fff1');
+    $(svgElem).append(rect);
+}
 
 
 

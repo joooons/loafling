@@ -199,6 +199,7 @@ function addOnclick_putStone( elem, index ) {
     elem.onclick = () => { 
         if ( stage.stat == 'battle' ) {
             putStone(index); 
+            addTallySquare( elem );
         } else {
             countStone(index);
         }
