@@ -47,7 +47,7 @@ var Room_Score = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
-const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', 'yellow', 'black', '#FFF0'];
+const colorSet = ['violet', 'chartreuse', 'skyblue', 'pink', '#FF0', 'black', '#FFF0'];
   // For iterating through variations to avoid duplicates.
 
 const boardDim = 6;

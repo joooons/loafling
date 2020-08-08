@@ -50,6 +50,7 @@ var playerArr = [];
     // But this one is specific to just the current room.
     // Also, the order changes to .... actually...
 
+
 var scoreObj = {};
     // The local object that contains the score of all players in the room.
     // Associated with Room_Score object in index.js
@@ -496,35 +497,28 @@ function updateNames( arrayOfObject ) {
 
 
 function shiftPlayerList(name) {
-    if ( !playerArr.includes(name) && name ) return console.log('name not on list');
+    if ( !playerArr.includes(name) && name ) return;
     if (playerArr.length < 2) return;
     let target = ( !name ) ? playerArr[1] : name;
     do { playerArr.push( playerArr.shift() ); 
     } while ( playerArr[0] != target );
-
     emit.updatePlayerList(room, playerArr);
-
 }
 
 
 
 
 function showScoreboard(obj) {
-
-    console.clear();
-    console.log(playerArr);
-    console.log(scoreObj);
-    console.log(colorObj);
-
-    scoreObj = obj;    
-
+    scoreObj = obj;
+    let tempArr = [...playerArr];
+    do { tempArr.push( tempArr.shift() ); 
+    } while ( tempArr[0] != name );
     let str = '';
-    playerArr.forEach( player => {
+    tempArr.forEach( player => {
         str += `<div><span style="color: ${colorObj[player]}">&#11044;</span>`;
         str += ` ${player}: ${scoreObj[player]}</div>`;
     });
     $('#players').html(str);
-
 }
 
 
@@ -685,9 +679,7 @@ socket.on('update grid', (colorObject, name_grid) => {
 
 
 socket.on('update score', obj => {
-
     showScoreboard(obj);
-
 });
 
 
