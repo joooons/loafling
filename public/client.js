@@ -17,6 +17,20 @@ const socket = io();
 var name = 'none';
 var room = 'lobby';
     // Starting room is always specifically the 'lobby'
+
+const playerLimit = 4;
+const fadeTime = 500;
+const boardRatio = 1.5;
+
+var noName;
+var boardDim;
+
+const config = {};
+    config.dim = 6;
+    config.strict = true;
+    config.playerLimit = 2;
+
+
 var stage =  {};
     stage['stat'] = 'battle';
     stage['flip'] = function() {
@@ -44,14 +58,7 @@ var colorObj = {};
 
 
 
-const playerLimit = 4;
-const fadeTime = 500;
-const boardRatio = 1.5;
 
-
-
-var noName;
-var boardDim;
 
 
 
@@ -198,9 +205,17 @@ function addOnclick_putStone( elem, index ) {
     }
 
     function putStone(index) {
+
         let stone = gridArr[index];
-        if (stone == name) { gridArr[index] = noName; } 
+
+        if (config.strict) {
+            if (playerArr[0] != name ) return;
+            if (stone == name) return;
+        }
+
+        if (stone == name) { gridArr[index] = noName; }
         else if (stone == noName) { gridArr[index] = name; }
+        else { return; }
 
         updateLocalGrid( gridArr );
         GridArrToGame_Rox();

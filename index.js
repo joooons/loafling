@@ -302,12 +302,12 @@ io.on('connection', (socket) => {
 
     if ( Room_GameData.get(room) ) {
       let obj = Room_GameData.get(room);
-      obj.grid.filter( v => { return ( v == name ); })
-      .forEach( val => { val = noName; });
+      obj.grid.forEach( (v,i) => {
+        if ( v == name ) obj.grid[i] = noName;
+      });
       Room_GameData.get(room).grid = obj.grid;
       io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
     }
-    
 
 
 
