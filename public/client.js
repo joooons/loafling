@@ -272,6 +272,9 @@ function shiftPlayerList(name) {
 
 
 function resetConfig() {
+    
+    revertStoneCSS();
+
     passCount = 0;
     
     config.dim = 6;
@@ -286,8 +289,8 @@ function resetConfig() {
     gridArr = [];
     playerArr = [];
     colorObj = {};
+
     
-    revertStoneCSS();
 
     $('#message').html('prepare to die');
 
@@ -350,8 +353,7 @@ function createRoom() {
     $('#room-name').hide();
 
     resetConfig();
-    // passCount = 0;
-    // scoreObj[name] = 0;
+    $('#message').html('waiting for second player');
 
     emit.createRoom(room);
 
@@ -655,6 +657,7 @@ function updateNames( arrayOfObject ) {
 }
 
 function revertStoneCSS() {
+    
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
         $('.square').eq(i).css('fill', "#fff0" );
@@ -662,6 +665,8 @@ function revertStoneCSS() {
         $('.square').eq(i).css('r', 46);
     });
 }
+
+
 
 
 
@@ -809,6 +814,11 @@ socket.on('update color', arr => {
 
 
 socket.on('update player list', updatedPlayerList => {
+    let num1 = playerArr.length;
+    let num2 = updatedPlayerList.length;
+    if ( num1==1 && num2==2 ) {
+        $('#message').html('second player joined. begin game.');
+    }
 
     playerArr = updatedPlayerList;
     let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
