@@ -152,16 +152,21 @@ function resizeBoard() {
     let y = window.innerHeight - 30;
     let board_x, board_y;
     let windowRatio = x / y;
+    let xLimit = 200;
+    let yLimit = 200;
 
     if ( windowRatio < boardRatio ) {
-        board_x = x;
-        board_y = x / boardRatio;
+        // When window is too skinny
+        board_x = Math.max(xLimit,x);
+        board_y = Math.max(xLimit,x) / boardRatio;
     } else {
-        board_x = y * boardRatio;
-        board_y = y;
+        // When window is too wide
+        board_x = Math.max(yLimit,y) * boardRatio;
+        board_y = Math.max(yLimit,y);
     }
     
     let dim = board_y - 40;
+    
 
     boardFrame.style.width = board_x + 'px';
     boardFrame.style.height = board_y + 'px';
@@ -323,7 +328,7 @@ function calculateAttack(indexValue) {
     if ( !attackSucceeded ) {
         
         let teams = Game_Rox[name].teams;
-        let index = 9999;
+        let index = 9999;           // arbitrary number 
 
         teams.forEach( (team,i) => { if (team.includes(pos)) index = i; });
         
