@@ -188,8 +188,8 @@ function updateScore(room, scoreObj) {
 
   if ( !Room_Score.has(room) ) { 
     Room_Score.set(room, scoreObj); 
-    console.log('new room, new map...');
-    console.log('final Room_Score: ', Room_Score);
+    // console.log('new room, new map...');
+    // console.log('final Room_Score: ', Room_Score);
   } else {
     let obj = Room_Score.get(room);
     Object.keys(scoreObj).forEach( name => {
@@ -197,8 +197,8 @@ function updateScore(room, scoreObj) {
       if (obj[name] == -9999) delete obj[name];
     });
     Room_Score.set(room, obj);
-    console.log('existing room...');
-    console.log('final Room_Score: ', Room_Score);
+    // console.log('existing room...');
+    // console.log('final Room_Score: ', Room_Score);
   }
   
   io.to(room).emit('update score', Room_Score.get(room) );
@@ -522,6 +522,26 @@ io.on('connection', (socket) => {
 
 
 
+
+
+
+
+
+//  MM    MM  MMMMMM    MMMMMM      MMMM    MMMMMM  MMMMMMMM        MMMMMM      MMMM      MMMM      MMMM    
+//  MM    MM  MM    MM  MM    MM  MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM    MM  
+//  MM    MM  MM    MM  MM    MM  MMMMMMMM    MM    MMMMMMMM        MM    MM  MMMMMMMM    MM        MM      
+//  MM    MM  MMMMMM    MM    MM  MM    MM    MM    MM              MMMMMM    MM    MM      MM        MM    
+//  MM    MM  MM        MM    MM  MM    MM    MM    MM              MM        MM    MM  MM    MM  MM    MM  
+//    MMMM    MM        MMMMMM    MM    MM    MM    MMMMMMMM        MM        MM    MM    MMMM      MMMM    
+
+    // _______ UPDATE PASS ___________________________________________________
+
+    socket.on('update pass', (room, passCount) => {
+      console.log('----passcount----');
+      console.log(passCount);
+      io.to(room).emit('update pass', passCount );
+  
+    });   // _______ UPDATE PASS (END) ______________________________________
 
 
 

@@ -464,6 +464,8 @@ function addOnclick_putStone( elem, index ) {
         switch(stage.stat) {
             case 'fight':
                 putStone(index); 
+                // passCount = 0;
+                emit.pass(room, passCount=0);
             break;
             case 'clean':
                 countStone(index);
@@ -667,11 +669,15 @@ $('#room-name').on('focusout', () => {
 });
 
 $('#pass').on('click', () => {
+    if ( stage.stat != 'fight') return;
     if ( playerArr[0] != name ) {
         $('#message').html('nacho turn');
         return;
     }
-        $('#message').html('pass!');
+    passCount++;
+    console.log('passCount is', passCount);
+    emit.pass(room, passCount);
+    $('#message').html('pass!');
     shiftPlayerList();
 })
 
@@ -703,7 +709,8 @@ var emit = {
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
-    updateServerGrid : (gridArr) => { socket.emit('update grid on server', gridArr); }    
+    updateServerGrid : (gridArr) => { socket.emit('update grid on server', gridArr); },
+    pass : (room, passCount) => { socket.emit('update pass', room, passCount )} 
     
 }
 
@@ -786,6 +793,17 @@ socket.on('update grid', (colorObject, name_grid) => {
 socket.on('update score', obj => {
     showScoreboard(obj);
 });
+
+
+socket.on('update pass', count => {
+    passCount = count;
+    // console.log('count is', count);
+    if ( passCount == 0 ) return;
+    console.log('this many people passed', passCount);
+    if ( passCount == playerArr.length ) stage.clean();
+})
+
+
 
 
 // ___________________________________ SOCKET ON EVENTS (END)
