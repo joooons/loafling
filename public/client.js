@@ -377,7 +377,7 @@ function createRoom() {
 }
 
 function allowCreateRooms() {
-    $('#room-plus').html('<b>+</b>');
+    $('#room-plus').html('<b>CREATE ROOM</b>');
     $('#room-plus').show();
     $('#room-plus').css('cursor', 'pointer');
     $('#room-name').hide(fadeTime);
@@ -401,16 +401,17 @@ function allButtonsJoin() {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id');
         addOnclick_JOIN(`#${str}`);
+        $(`div[id^="rb-"]`).show();
     }
 }
 
 function onlyThisButtonLeave( room ) {
     let num = $(`button[id^="bt-"]`).length;
-    for ( i=0 ; i<num ; i++ ) {
-        $(`button[id^="bt-"]`).eq(i).hide();
-    }
+    for ( i=0 ; i<num ; i++ ) { $(`button[id^="bt-"]`).eq(i).hide(); }
+    for ( i=0 ; i<num ; i++ ) { $(`div[id^="rb-"]`).eq(i).hide(); }
     addOnclick_LEAVE(`#bt-${room}`);
     $(`#bt-${room}`).show();
+    $(`div[id^="rb-${room}"]`).show();
 }
 
 function updateButtons() {
@@ -434,6 +435,21 @@ function delRoomBox( room ) {
     $(`#rb-${room}`).remove();
 }
 
+// function flattenRooms( thisRoom = room ) {
+//     // Flatten all rooms EXCEPT the current "room"
+//     let len = $('#roomSpace > div').length;
+//     for ( i=1 ; i<len ; i++ ){
+//         let roomName = $('#roomSpace > div').eq(i).attr('id');
+//         let str = roomName.slice(3);
+//         if ( !(str == thisRoom) ) $('#roomSpace > div').eq(i).fadeOut(fadeTime);
+//     }
+// }
+
+// function unflattenRooms() {
+//     // Unflatten all flattened rooms.
+//     let len = $('#roomSpace > div').length;
+//     for ( i=1 ; i<len ; i++ ){ $('#roomSpace > div').eq(i).fadeIn(fadeTime); }
+// }
 
 
 
