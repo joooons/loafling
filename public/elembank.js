@@ -75,12 +75,6 @@ function addClickableDots( elem, num) {
 }
 
 
-function addTallySquare( elem ) {
-    $(elem).attr('r', 20);
-    $(elem).attr('stroke', '#fff');
-    $(elem).attr('stroke-width', '3');
-}
-
 
 
 // _______________________________________________ END OF EVERYTHING

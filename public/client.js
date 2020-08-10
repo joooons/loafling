@@ -32,16 +32,19 @@ config.playerLimit = 2;
 
 
 var stage =  {};
-    stage['stat'] = 'fight';
-    stage['fight'] = () => { stage.stat = 'fight'; }
-    stage['clean'] = () => { stage.stat = 'clean'; }
-    stage['count'] = () => { stage.stat = 'count'; }
+stage['stat'] = 'fight';
+stage['fight'] = () => { stage.stat = 'fight'; }
+stage['clean'] = () => { stage.stat = 'clean'; }
+stage['count'] = () => { stage.stat = 'count'; }
     
 
 
 var gridArr = [];
     // The array of names assigned to the board grid.
     // Only for the room that the player is currently connected to.
+
+var countArr = [];
+    // Like gridArr, except this is array of empty spaces owned by each player.
 
 var playerArr = [];
     // The local array of names of players in the current room, in order of entry.
@@ -196,13 +199,19 @@ function setUpGrid( num ) {
 function addOnclick_putStone( elem, index ) {
     
     elem.onclick = () => { 
-        if ( stage.stat == 'fight' ) {
-            putStone(index); 
-            // addTallySquare( elem );
-        } else {
-            countStone(index);
-        }
-        
+        switch(stage.stat) {
+            case 'fight':
+                putStone(index); 
+            break;
+            case 'clean':
+                countStone(index);
+            break;
+            case 'count':
+                showCountArr();
+            break;
+            default:
+                console.log('this option does not exist');
+        }        
     }
 
     function putStone(index) {
@@ -240,7 +249,7 @@ function addOnclick_putStone( elem, index ) {
         if ( stone == noName ) return;
         console.log( stone );
 
-        scoreObj[name]++;
+        scoreObj[stone]--;
         gridArr[index] = noName;
 
         updateLocalGrid( gridArr );
@@ -265,8 +274,6 @@ function calculateAttack(indexValue) {
     let roster = [...playerArr];
         // Temporary list of players, starting with first victim.
         // Includes player who attacked.
-
-    // console.clear();
 
     roster.forEach( victim => {
         if ( !Game_Rox[victim] ) return;
@@ -328,7 +335,6 @@ function calculateAttack(indexValue) {
         
     }       // END of if ( !attackSucceeded ) {...}
 
-    
 }
 
 
@@ -339,6 +345,26 @@ function changeScore() {
     // scoreObj[name]++;
     emit.updateScore(room, scoreObj);
 }
+
+
+
+function showCountArr() {
+    console.log('its doing something');
+    
+    countArr = [...gridArr];
+
+    countArr.forEach( (_name, i) => {
+        if ( _name == noName ) return;
+        $('.square').eq(i).css('fill', "#fff0" );
+        $('.square').eq(i).css('stroke', colorObj[_name]);
+        $('.square').eq(i).css('stroke-width', '4');
+        $('.square').eq(i).css('stroke-linecap', 'round');
+        $('.square').eq(i).css('stroke-dasharray', '10 13');
+        $('.square').eq(i).css('r', '40');
+    });
+}
+
+
 
 
 function updateLocalGrid( grid ) {
