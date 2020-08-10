@@ -26,19 +26,18 @@ var noName;
 var boardDim;
 
 const config = {};
-    config.dim = 6;
-    config.strict = false;
-    config.playerLimit = 2;
+config.dim = 6;
+config.strict = false;
+config.playerLimit = 2;
 
 
 var stage =  {};
-    stage['stat'] = 'battle';
-    stage['flip'] = function() {
-        stage.stat = ( stage.stat == 'count' ) ? 'battle' : 'count';
-    }
+    stage['stat'] = 'fight';
+    stage['fight'] = () => { stage.stat = 'fight'; }
+    stage['clean'] = () => { stage.stat = 'clean'; }
+    stage['count'] = () => { stage.stat = 'count'; }
+    
 
-
-    // 'battle' or 'count'
 
 var gridArr = [];
     // The array of names assigned to the board grid.
@@ -197,9 +196,9 @@ function setUpGrid( num ) {
 function addOnclick_putStone( elem, index ) {
     
     elem.onclick = () => { 
-        if ( stage.stat == 'battle' ) {
+        if ( stage.stat == 'fight' ) {
             putStone(index); 
-            addTallySquare( elem );
+            // addTallySquare( elem );
         } else {
             countStone(index);
         }
