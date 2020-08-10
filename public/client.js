@@ -16,7 +16,7 @@ const socket = io();
 
 var name = 'none';
 var room = 'lobby';
-    // Starting room is always specifically the 'lobby'
+var passCount = 0;
 
 const playerLimit = 4;
 const fadeTime = 500;
@@ -27,7 +27,7 @@ var boardDim;
 
 const config = {};
 config.dim = 6;
-config.strict = false;
+config.strict = true;
 config.playerLimit = 2;
     // IF config is set to "strict"...
     // You cannot play alone.
@@ -56,12 +56,12 @@ var playerArr = [];
     // But this one is specific to just the current room.
     // Also, the order changes to .... actually...
 
-
 var scoreObj = {};
     // The local object that contains the score of all players in the room.
     // Associated with Room_Score object in index.js
 
 var colorObj = {};
+    // Object with { name:color, name:color .... }
 
 
 
@@ -666,7 +666,14 @@ $('#room-name').on('focusout', () => {
     updateButtons();
 });
 
-
+$('#pass').on('click', () => {
+    if ( playerArr[0] != name ) {
+        $('#message').html('nacho turn');
+        return;
+    }
+        $('#message').html('pass!');
+    shiftPlayerList();
+})
 
 
 
