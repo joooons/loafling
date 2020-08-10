@@ -349,9 +349,8 @@ function changeScore() {
 
 
 function showCountArr() {
-    console.log('its doing something');
     
-    countArr = [...gridArr];
+    identifyHouse();
 
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
@@ -362,7 +361,30 @@ function showCountArr() {
         $('.square').eq(i).css('stroke-dasharray', '10 13');
         $('.square').eq(i).css('r', '40');
     });
+
+    function identifyHouse() {
+        let teams = Game_Rox[noName].teams;
+        let walls = Game_Rox[noName].walls;
+        countArr = new Array( Math.pow(boardDim, 2) ).fill(noName);
+        walls.forEach( (wall,i) => {
+            let enemies = [];
+            wall.forEach( pos => {
+                let index = pos - 1;
+                let enemy = gridArr[index];
+                if ( !enemies.includes(enemy) ) enemies.push(enemy);
+            });
+            if ( enemies.length == 1 ) {
+                teams[i].forEach( pos => {
+                    let index = pos - 1;
+                    countArr[index] = enemies[0];
+                });
+            }
+        });
+    }
+
 }
+
+
 
 
 

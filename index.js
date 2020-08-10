@@ -47,7 +47,7 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 6;
+const boardDim = 5;
 const noName = 'zz';
   // variables to synchronize to client
 
