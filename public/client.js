@@ -29,6 +29,10 @@ const config = {};
 config.dim = 6;
 config.strict = false;
 config.playerLimit = 2;
+    // IF config is set to "strict"...
+    // You cannot play alone.
+    // You cannot play out of turn.
+    // You cannot remove your own stone.
 
 
 var stage =  {};
@@ -219,6 +223,10 @@ function addOnclick_putStone( elem, index ) {
         let stone = gridArr[index];
 
         if (config.strict) {
+            // IF config is set to strict...
+            // You cannot play alone.
+            // You cannot play out of turn.
+            // You cannot remove your own stone.
             if (playerArr.length == 1) return;
             if (playerArr[0] != name ) return;
             if (stone == name) return;
@@ -386,6 +394,20 @@ function showCountArr() {
 
 
 
+function revertStoneCSS() {
+    countArr.forEach( (_name, i) => {
+        if ( _name == noName ) return;
+        $('.square').eq(i).css('fill', "#fff0" );
+
+        // $('.square').eq(i).css('stroke', colorObj[_name]);
+        $('.square').eq(i).css('stroke-width', 0);
+        // $('.square').eq(i).css('stroke-linecap', 'round');
+        // $('.square').eq(i).css('stroke-dasharray', '1');
+
+        $('.square').eq(i).css('r', 46);
+    });
+}
+
 
 
 
@@ -486,6 +508,9 @@ function addOnclick_JOIN( roomName ) {
         let playerNum = $(`#rm-${room} >`).length;
         if ( playerNum < playerLimit ) {
 
+            revertStoneCSS();
+            countArr = [];
+            
             emit.joinRoom(room);
 
     
