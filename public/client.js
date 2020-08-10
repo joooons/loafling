@@ -271,7 +271,27 @@ function shiftPlayerList(name) {
 }
 
 
+function resetConfig() {
+    passCount = 0;
+    
+    config.dim = 6;
+    config.strict = true;
+    config.playerLimit = 2;
+    
+    stage.fight();    
+    
+    countArr = [];
+    scoreObj[name] = 0;
 
+    gridArr = [];
+    playerArr = [];
+    colorObj = {};
+    
+    revertStoneCSS();
+
+    $('#message').html('prepare to die');
+
+}
 
 
 
@@ -302,7 +322,7 @@ function resizeBoard() {
         board_y = Math.max(yLimit,y);
     }
     
-    let dim = board_y - 40;
+    let dim = board_y - 50;
     
 
     boardFrame.style.width = board_x + 'px';
@@ -329,11 +349,15 @@ function createRoom() {
     $('#room-plus').show();
     $('#room-name').hide();
 
+    resetConfig();
+    // passCount = 0;
+    // scoreObj[name] = 0;
+
     emit.createRoom(room);
 
     emit.updateClientGrid(room);
 
-    scoreObj[name] = 0;
+    
     emit.updateScore(room, scoreObj);
 
     $('#boardFrame').fadeIn(fadeTime);
@@ -432,6 +456,7 @@ function addOnclick_LEAVE( roomName ) {
 }
 
 function addOnclick_JOIN( roomName ) {
+    $('#message').html('');
     $(roomName).html('JOIN');
     $(roomName).off('click');
     $(roomName).on('click', () => {
@@ -439,13 +464,17 @@ function addOnclick_JOIN( roomName ) {
         let playerNum = $(`#rm-${room} >`).length;
         if ( playerNum < playerLimit ) {
 
-            revertStoneCSS();
-            countArr = [];
-            
-            emit.joinRoom(room);
+            resetConfig();
+            // revertStoneCSS();
+            // countArr = [];
+            // passCount = 0;
+            // scoreObj[name] = 0;
 
+            emit.pass(room, passCount);
     
-            scoreObj[name] = 0;
+            emit.joinRoom(room);
+    
+            
             emit.updateScore(room, scoreObj);
 
             emit.updateClientGrid(room);
@@ -464,8 +493,6 @@ function addOnclick_putStone( elem, index ) {
         switch(stage.stat) {
             case 'fight':
                 putStone(index); 
-                // passCount = 0;
-                emit.pass(room, passCount=0);
             break;
             case 'clean':
                 countStone(index);
@@ -488,9 +515,15 @@ function addOnclick_putStone( elem, index ) {
             // You cannot play out of turn.
             // You cannot remove your own stone.
             if (playerArr.length == 1) return;
-            if (playerArr[0] != name ) return;
+            if (playerArr[0] != name ) {
+                $('#message').html('nacho turn');
+                return;
+            }
             if (stone == name) return;
         }
+
+        emit.pass(room, passCount=0);
+        $('#message').html('');
 
         if (stone == name) { gridArr[index] = noName; }
         else if (stone == noName) { gridArr[index] = name; }
@@ -669,7 +702,8 @@ $('#room-name').on('focusout', () => {
 });
 
 $('#pass').on('click', () => {
-    if ( stage.stat != 'fight') return;
+    if ( playerArr.length < 2 ) return;
+    if ( stage.stat == 'count') return;
     if ( playerArr[0] != name ) {
         $('#message').html('nacho turn');
         return;
@@ -679,7 +713,7 @@ $('#pass').on('click', () => {
     emit.pass(room, passCount);
     $('#message').html('pass!');
     shiftPlayerList();
-})
+});
 
 
 
@@ -797,10 +831,24 @@ socket.on('update score', obj => {
 
 socket.on('update pass', count => {
     passCount = count;
-    // console.log('count is', count);
     if ( passCount == 0 ) return;
-    console.log('this many people passed', passCount);
-    if ( passCount == playerArr.length ) stage.clean();
+    // console.log('this many people passed', passCount);
+    if ( passCount == playerArr.length ) {
+
+        if (stage.stat == 'fight') {
+            stage.clean();
+            passCount = 0;
+            emit.pass(room, passCount);
+            $('#message').html('All players passed. Remove dead stones. ');
+        } else if (stage.stat == 'clean' ) {
+            stage.count();
+            passCount = 0;
+            emit.pass(room, passCount);
+            $('#message').html('Game has ended. Go home. ');
+        }
+
+        
+    }
 })
 
 
