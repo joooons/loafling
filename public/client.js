@@ -270,31 +270,42 @@ function shiftPlayerList(name) {
     emit.updatePlayerList(room, playerArr);
 }
 
-
 function resetConfig() {
-    
     revertStoneCSS();
-
     passCount = 0;
-    
     config.dim = 6;
     config.strict = false;
     config.playerLimit = 2;
-    
     stage.fight();    
-    
     countArr = [];
     scoreObj[name] = 0;
-
     gridArr = [];
     playerArr = [];
     colorObj = {};
-
-    
-
-    $('#message').html('prepare to die');
-
+    $('#message').html('en garde!');
 }
+
+function findWinner() {
+    let max = 0;
+    let winners = [];
+    let strArr = [];
+    let str = '';
+    Object.values(scoreObj).forEach( num => { max = Math.max( max, num ); });
+    Object.keys(scoreObj).forEach( nombre => { if ( scoreObj[nombre] == max ) winners.push(nombre); });
+    winners.forEach( (nombre,i) => { if (nombre == name) winners[i] = 'you'; });
+    winners.forEach( (nombre,i) => { strArr[i] = `${nombre}, `; });
+    strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
+    if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
+    strArr.forEach( nombre => { str += nombre; });    
+    $('#message').html(`${str} won!`);
+}
+
+
+
+
+
+
+
 
 
 
@@ -639,6 +650,8 @@ function showCountArr() {
         changeScore();
     }
 
+    findWinner();
+
 }
 
 function visualizeGrid( colorObject, name_grid ) {
@@ -858,9 +871,7 @@ socket.on('update pass', count => {
             passCount = 0;
             emit.pass(room, passCount);
             showCountArr();
-            $('#message').html('Game has ended. Go home. ');
         }
-
         
     }
 })
