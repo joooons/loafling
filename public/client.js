@@ -27,7 +27,7 @@ var boardDim;
 
 const config = {};
 config.dim = 6;
-config.strict = true;
+config.strict = false;
 config.playerLimit = 2;
     // IF config is set to "strict"...
     // You cannot play alone.
@@ -278,7 +278,7 @@ function resetConfig() {
     passCount = 0;
     
     config.dim = 6;
-    config.strict = true;
+    config.strict = false;
     config.playerLimit = 2;
     
     stage.fight();    
@@ -500,7 +500,8 @@ function addOnclick_putStone( elem, index ) {
                 countStone(index);
             break;
             case 'count':
-                showCountArr();
+                // showCountArr();
+                console.log('nothing to do here');
             break;
             default:
                 console.log('this option does not exist');
@@ -631,9 +632,11 @@ function showCountArr() {
                 teams[i].forEach( pos => {
                     let index = pos - 1;
                     countArr[index] = enemies[0];
+                    scoreObj[enemies[0]]++;
                 });
             }
         });
+        changeScore();
     }
 
 }
@@ -854,6 +857,7 @@ socket.on('update pass', count => {
             stage.count();
             passCount = 0;
             emit.pass(room, passCount);
+            showCountArr();
             $('#message').html('Game has ended. Go home. ');
         }
 
