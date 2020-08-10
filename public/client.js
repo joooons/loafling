@@ -425,7 +425,7 @@ function updateButtons() {
 }
 
 function addRoomBox( room ) {
-    $('#roomSpace').append(`<div id="rb-${room}"></div>`);
+    $('#create-room').after(`<div id="rb-${room}"></div>`);
     $(`#rb-${room}`).append(`<b>${room}</b><br>`);
     $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
     $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
@@ -435,21 +435,7 @@ function delRoomBox( room ) {
     $(`#rb-${room}`).remove();
 }
 
-// function flattenRooms( thisRoom = room ) {
-//     // Flatten all rooms EXCEPT the current "room"
-//     let len = $('#roomSpace > div').length;
-//     for ( i=1 ; i<len ; i++ ){
-//         let roomName = $('#roomSpace > div').eq(i).attr('id');
-//         let str = roomName.slice(3);
-//         if ( !(str == thisRoom) ) $('#roomSpace > div').eq(i).fadeOut(fadeTime);
-//     }
-// }
 
-// function unflattenRooms() {
-//     // Unflatten all flattened rooms.
-//     let len = $('#roomSpace > div').length;
-//     for ( i=1 ; i<len ; i++ ){ $('#roomSpace > div').eq(i).fadeIn(fadeTime); }
-// }
 
 
 
