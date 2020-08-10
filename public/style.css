@@ -1,5 +1,12 @@
 
 
+/* MM      MM    MMMM    MMMMMM    MMMMMM    MMMM    MMMMMM    MM      MMMMMMMM    MMMM     */
+/* MM      MM  MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM        MM    MM   */
+/* MM      MM  MMMMMMMM  MMMMMM      MM    MMMMMMMM  MMMMMM    MM      MMMMMMMM    MM       */
+/* MM      MM  MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM            MM     */
+/*   MM  MM    MM    MM  MM    MM    MM    MM    MM  MM    MM  MM      MM        MM    MM   */
+/*     MM      MM    MM  MM    MM  MMMMMM  MM    MM  MMMMMM    MMMMMM  MMMMMMMM    MMMM     */
+
 /************ VARIABLES ****************/
 :root {
     --col1: 100px;
@@ -11,6 +18,14 @@
 
 
 
+
+
+/*   MMMM    MM        MMMM    MMMMMM      MMMM    MM       */
+/* MM    MM  MM      MM    MM  MM    MM  MM    MM  MM       */
+/* MM        MM      MM    MM  MMMMMM    MMMMMMMM  MM       */
+/* MM  MMMM  MM      MM    MM  MM    MM  MM    MM  MM       */
+/* MM    MM  MM      MM    MM  MM    MM  MM    MM  MM       */
+/*   MMMM    MMMMMM    MMMM    MMMMMM    MM    MM  MMMMMM   */
 
 /****************** GLOBAL **********************/
 
@@ -51,6 +66,15 @@ button:hover {
 
 
 
+
+
+/*    MMMM      MMMM    MM    MM  MMMMMM    MMMM    MMMMMM  MM    MM  MMMMMMMM  MMMMMM     */
+/*  MM    MM  MM    MM  MMMM  MM    MM    MM    MM    MM    MMMM  MM  MM        MM    MM   */
+/*  MM        MM    MM  MM  MMMM    MM    MMMMMMMM    MM    MM  MMMM  MMMMMMMM  MMMMMM     */
+/*  MM        MM    MM  MM    MM    MM    MM    MM    MM    MM    MM  MM        MM    MM   */
+/*  MM    MM  MM    MM  MM    MM    MM    MM    MM    MM    MM    MM  MM        MM    MM   */
+/*    MMMM      MMMM    MM    MM    MM    MM    MM  MMMMMM  MM    MM  MMMMMMMM  MM    MM   */
+
 /********************** CONTAINER ********************/
 
 #container {
@@ -72,6 +96,18 @@ button:hover {
 }
 
 
+
+
+
+
+
+/* MM        MMMM    MMMMMM    MMMMMM    MM      MM          MMMM    MMMMMM      MMMM      MMMM    MMMMMMMM   */
+/* MM      MM    MM  MM    MM  MM    MM    MM  MM          MM    MM  MM    MM  MM    MM  MM    MM  MM         */
+/* MM      MM    MM  MMMMMM    MMMMMM        MM              MM      MM    MM  MMMMMMMM  MM        MMMMMMMM   */
+/* MM      MM    MM  MM    MM  MM    MM      MM                MM    MMMMMM    MM    MM  MM        MM         */
+/* MM      MM    MM  MM    MM  MM    MM      MM            MM    MM  MM        MM    MM  MM    MM  MM         */
+/* MMMMMM    MMMM    MMMMMM    MMMMMM        MM              MMMM    MM        MM    MM    MMMM    MMMMMMMM   */
+
 /* ***************** LOBBY SPACE ******************** */
 
 #lobbySpace {
@@ -80,6 +116,17 @@ button:hover {
 
 
 
+
+
+
+
+
+/* MMMMMM      MMMM      MMMM    MM      MM          MMMM    MMMMMM      MMMM      MMMM    MMMMMMMM   */
+/* MM    MM  MM    MM  MM    MM  MMMM  MMMM        MM    MM  MM    MM  MM    MM  MM    MM  MM         */
+/* MMMMMM    MM    MM  MM    MM  MM  MM  MM          MM      MM    MM  MMMMMMMM  MM        MMMMMMMM   */
+/* MM    MM  MM    MM  MM    MM  MM      MM            MM    MMMMMM    MM    MM  MM        MM         */
+/* MM    MM  MM    MM  MM    MM  MM      MM        MM    MM  MM        MM    MM  MM    MM  MM         */
+/* MM    MM    MMMM      MMMM    MM      MM          MMMM    MM        MM    MM    MMMM    MMMMMMMM   */
 
 /* ******************* ROOM SPACE ***************** */
 
@@ -113,8 +160,25 @@ div[id^="rm-"] {
 }
 
 
-/* ************* BOARD SPACE ************ */
 
+
+
+
+
+
+
+
+
+
+
+/* MMMMMM      MMMM      MMMM    MMMMMM    MMMMMM            MMMM    MMMMMM      MMMM      MMMM    MMMMMMMM   */
+/* MM    MM  MM    MM  MM    MM  MM    MM  MM    MM        MM    MM  MM    MM  MM    MM  MM    MM  MM         */
+/* MMMMMM    MM    MM  MMMMMMMM  MMMMMM    MM    MM          MM      MM    MM  MMMMMMMM  MM        MMMMMMMM   */
+/* MM    MM  MM    MM  MM    MM  MM    MM  MM    MM            MM    MMMMMM    MM    MM  MM        MM         */
+/* MM    MM  MM    MM  MM    MM  MM    MM  MM    MM        MM    MM  MM        MM    MM  MM    MM  MM         */
+/* MMMMMM      MMMM    MM    MM  MM    MM  MMMMMM            MMMM    MM        MM    MM    MMMM    MMMMMMMM   */
+
+/* ************* BOARD SPACE ************ */
 
 #boardSpace {
     /* position: relative; */
@@ -132,7 +196,7 @@ div[id^="rm-"] {
     border-radius: 5px;
     display: grid;
     grid-template-columns: auto auto;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto 100px auto;
     visibility: hidden;
 }
 
@@ -142,6 +206,7 @@ div[id^="rm-"] {
 }
 
 #board {
+    grid-row: 2/4;
     /* background: #0002; */
     /* background-image: url('wood.jpg'); */
     background-image: url('whitepaint.jpg');
@@ -184,9 +249,20 @@ div[id^="rm-"] {
     align-content: start;
 }
 
+#tally {
+    background: red;
+}
 
 
 
+
+
+/* MM      MM    MMMM    MMMMMM      MMMM    MM       */
+/* MMMM  MMMM  MM    MM  MM    MM  MM    MM  MM       */
+/* MM  MM  MM  MM    MM  MM    MM  MMMMMMMM  MM       */
+/* MM      MM  MM    MM  MM    MM  MM    MM  MM       */
+/* MM      MM  MM    MM  MM    MM  MM    MM  MM       */
+/* MM      MM    MMMM    MMMMMM    MM    MM  MMMMMM   */
 
 /* ************* MODAL ************ */
 
@@ -224,6 +300,15 @@ div[id^="rm-"] {
 
 
 
+
+
+
+/*   MMMM    MMMMMM  MM    MM  MMMMMMMM  MMMMMM     */
+/* MM    MM    MM    MM    MM  MM        MM    MM   */
+/* MM    MM    MM    MMMMMMMM  MMMMMMMM  MMMMMM     */
+/* MM    MM    MM    MM    MM  MM        MM    MM   */
+/* MM    MM    MM    MM    MM  MM        MM    MM   */
+/*   MMMM      MM    MM    MM  MMMMMMMM  MM    MM   */
 
 .gone {
     /* display: none; */
