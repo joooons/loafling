@@ -147,133 +147,23 @@ socket.on('board config', dim => { setUpGrid( dim ); });
 
 // LOCAL FUNCTIONS ____________________________________________
 
-function resizeBoard() {
-    let x = window.innerWidth - 240;
-    let y = window.innerHeight - 30;
-    let board_x, board_y;
-    let windowRatio = x / y;
-    let xLimit = 200;
-    let yLimit = 200;
-
-    if ( windowRatio < boardRatio ) {
-        // When window is too skinny
-        board_x = Math.max(xLimit,x);
-        board_y = Math.max(xLimit,x) / boardRatio;
-    } else {
-        // When window is too wide
-        board_x = Math.max(yLimit,y) * boardRatio;
-        board_y = Math.max(yLimit,y);
-    }
-    
-    let dim = board_y - 40;
-    
-
-    boardFrame.style.width = board_x + 'px';
-    boardFrame.style.height = board_y + 'px';
-    board.style.width = dim + 'px';
-    board.style.height = dim + 'px';
-}
 
 
-function createRoom() {
-    let reg = /[\s\"\']/;
-    if ( reg.test( $('#room-name').val() ) ) {
-        $('#room-name').attr('placeholder', 'no spaces!');
-        $('#room-name').val('');
-        return;    
-    }
-    room = $('#room-name').val();
-
-    $('#room-name').val('');
-    $('#room-name').attr('placeholder', 'room name');
-    $('#room-plus').show();
-    $('#room-name').hide();
-
-    emit.createRoom(room);
-
-    emit.updateClientGrid(room);
-
-    scoreObj[name] = 0;
-    emit.updateScore(room, scoreObj);
-
-    $('#boardFrame').fadeIn(fadeTime);
-}
 
 
-function setUpGrid( num ) {
-    addSVGtoBoard(board, num);
-}
 
 
-function addOnclick_putStone( elem, index ) {
-    
-    elem.onclick = () => { 
-        switch(stage.stat) {
-            case 'fight':
-                putStone(index); 
-            break;
-            case 'clean':
-                countStone(index);
-            break;
-            case 'count':
-                showCountArr();
-            break;
-            default:
-                console.log('this option does not exist');
-        }        
-    }
 
-    function putStone(index) {
 
-        let stone = gridArr[index];
 
-        if (config.strict) {
-            // IF config is set to strict...
-            // You cannot play alone.
-            // You cannot play out of turn.
-            // You cannot remove your own stone.
-            if (playerArr.length == 1) return;
-            if (playerArr[0] != name ) return;
-            if (stone == name) return;
-        }
 
-        if (stone == name) { gridArr[index] = noName; }
-        else if (stone == noName) { gridArr[index] = name; }
-        else { return; }
 
-        updateLocalGrid( gridArr );
-        GridArrToGame_Rox();
-
-        shiftPlayerList(name);
-        shiftPlayerList();
-            // First, reset order. Then go to next player.
-
-        if ( gridArr[index] == name ) {
-            calculateAttack(index);
-            changeScore();
-        }
-
-        emit.updateServerGrid(gridArr);
-    }
-
-    function countStone(index) {
-        let stone = gridArr[index];
-        if ( stone == name ) return;
-        if ( stone == noName ) return;
-        console.log( stone );
-
-        scoreObj[stone]--;
-        gridArr[index] = noName;
-
-        updateLocalGrid( gridArr );
-        GridArrToGame_Rox();
-        changeScore();
-        emit.updateServerGrid(gridArr);
-
-    }
-
-}
-
+//        MM      MM    MMMM    MMMMMM  MM    MM  
+//        MMMM  MMMM  MM    MM    MM    MM    MM  
+//        MM  MM  MM  MMMMMMMM    MM    MMMMMMMM  
+//        MM      MM  MM    MM    MM    MM    MM  
+//        MM      MM  MM    MM    MM    MM    MM  
+//        MM      MM  MM    MM    MM    MM    MM  
 
 function calculateAttack(indexValue) {
 
@@ -350,7 +240,6 @@ function calculateAttack(indexValue) {
 
 }
 
-
 function changeScore() {
     // However way you calculate the score.
     // It can't be this simple...
@@ -359,7 +248,322 @@ function changeScore() {
     emit.updateScore(room, scoreObj);
 }
 
+function updateLocalGrid( grid ) {
+    gridArr = grid;
+    GridArrToGame_Rox();
+}
 
+function ArrToMap( arr, keyStr, valStr ) {
+    let newMap = new Map();
+    arr.forEach( obj => {
+        newMap.set(obj[keyStr], obj[valStr]);
+    });
+    return newMap;
+}
+
+function shiftPlayerList(name) {
+    if ( !playerArr.includes(name) && name ) return;
+    if (playerArr.length < 2) return;
+    let target = ( !name ) ? playerArr[1] : name;
+    do { playerArr.push( playerArr.shift() ); 
+    } while ( playerArr[0] != target );
+    emit.updatePlayerList(room, playerArr);
+}
+
+
+
+
+
+
+
+//        MMMMMM      MMMM    MM      MM        MM      MM    MMMM    MM      MM  MMMMMM  
+//        MM    MM  MM    MM  MMMM  MMMM        MMMM  MMMM  MM    MM  MMMM  MMMM    MM    
+//        MM    MM  MM    MM  MM  MM  MM        MM  MM  MM  MM        MM  MM  MM    MM    
+//        MM    MM  MM    MM  MM      MM        MM      MM  MM  MMMM  MM      MM    MM    
+//        MM    MM  MM    MM  MM      MM        MM      MM  MM    MM  MM      MM    MM    
+//        MMMMMM      MMMM    MM      MM        MM      MM    MMMM    MM      MM    MM    
+
+
+function resizeBoard() {
+    let x = window.innerWidth - 240;
+    let y = window.innerHeight - 30;
+    let board_x, board_y;
+    let windowRatio = x / y;
+    let xLimit = 200;
+    let yLimit = 200;
+
+    if ( windowRatio < boardRatio ) {
+        // When window is too skinny
+        board_x = Math.max(xLimit,x);
+        board_y = Math.max(xLimit,x) / boardRatio;
+    } else {
+        // When window is too wide
+        board_x = Math.max(yLimit,y) * boardRatio;
+        board_y = Math.max(yLimit,y);
+    }
+    
+    let dim = board_y - 40;
+    
+
+    boardFrame.style.width = board_x + 'px';
+    boardFrame.style.height = board_y + 'px';
+    board.style.width = dim + 'px';
+    board.style.height = dim + 'px';
+}
+
+function setUpGrid( num ) {
+    addSVGtoBoard(board, num);
+}
+
+function createRoom() {
+    let reg = /[\s\"\']/;
+    if ( reg.test( $('#room-name').val() ) ) {
+        $('#room-name').attr('placeholder', 'no spaces!');
+        $('#room-name').val('');
+        return;    
+    }
+    room = $('#room-name').val();
+
+    $('#room-name').val('');
+    $('#room-name').attr('placeholder', 'room name');
+    $('#room-plus').show();
+    $('#room-name').hide();
+
+    emit.createRoom(room);
+
+    emit.updateClientGrid(room);
+
+    scoreObj[name] = 0;
+    emit.updateScore(room, scoreObj);
+
+    $('#boardFrame').fadeIn(fadeTime);
+}
+
+function allowCreateRooms() {
+    $('#room-plus').html('<b>+</b>');
+    $('#room-plus').show();
+    $('#room-plus').css('cursor', 'pointer');
+    $('#room-name').hide(fadeTime);
+    $('#room-plus').on('click', () => {
+        $('#room-plus').hide();
+        $('#room-name').show(fadeTime);
+        $('#room-name').focus();
+        onlyThisButtonLeave('--------');
+    });
+}
+
+function denyCreateRooms() {
+    $('#room-plus').html('<b>x</b>');
+    $('#room-plus').css('cursor', 'default');
+    $('#room-plus').off('click');
+}
+
+function allButtonsJoin() {
+    let num = $(`button[id^="bt-"]`).length;
+    for ( i=0 ; i<num ; i++ ) {
+        $(`button[id^="bt-"]`).eq(i).show();
+        let str = $(`button[id^="bt-"]`).eq(i).attr('id');
+        addOnclick_JOIN(`#${str}`);
+    }
+}
+
+function onlyThisButtonLeave( room ) {
+    let num = $(`button[id^="bt-"]`).length;
+    for ( i=0 ; i<num ; i++ ) {
+        $(`button[id^="bt-"]`).eq(i).hide();
+    }
+    addOnclick_LEAVE(`#bt-${room}`);
+    $(`#bt-${room}`).show();
+}
+
+function updateButtons() {
+    if ( room == 'lobby' ) {
+        allowCreateRooms();
+        allButtonsJoin();
+    } else {
+        denyCreateRooms();
+        onlyThisButtonLeave(room);
+    }
+}
+
+function addRoomBox( room ) {
+    $('#roomSpace').append(`<div id="rb-${room}"></div>`);
+    $(`#rb-${room}`).append(`<b>${room}</b><br>`);
+    $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
+    $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
+}
+
+function delRoomBox( room ) {
+    $(`#rb-${room}`).remove();
+}
+
+
+
+
+
+
+
+//          MMMM    MMMMMM    MMMMMM            MMMM    MM    MM    MMMM    MM      MMMMMM    MMMM    MM    MM  
+//        MM    MM  MM    MM  MM    MM        MM    MM  MMMM  MM  MM    MM  MM        MM    MM    MM  MM  MM    
+//        MMMMMMMM  MM    MM  MM    MM        MM    MM  MM  MMMM  MM        MM        MM    MM        MMMM      
+//        MM    MM  MM    MM  MM    MM        MM    MM  MM    MM  MM        MM        MM    MM        MM  MM    
+//        MM    MM  MM    MM  MM    MM        MM    MM  MM    MM  MM    MM  MM        MM    MM    MM  MM    MM  
+//        MM    MM  MMMMMM    MMMMMM            MMMM    MM    MM    MMMM    MMMMMM  MMMMMM    MMMM    MM    MM  
+
+
+
+function addOnclick_LEAVE( roomName ) {
+    $(roomName).html('LEAVE');
+    $(roomName).off('click');
+    $(roomName).on('click', () => {
+        oldRoom = room;
+        room = 'lobby';
+        
+        scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
+        emit.updateScore(room, scoreObj)
+
+        emit.joinRoom(room);
+
+        playerArr = [];
+        scoreObj = {};
+        updateButtons();
+        $('#boardFrame').fadeOut(fadeTime);
+    });
+}
+
+function addOnclick_JOIN( roomName ) {
+    $(roomName).html('JOIN');
+    $(roomName).off('click');
+    $(roomName).on('click', () => {
+        room = roomName.slice(4);
+        let playerNum = $(`#rm-${room} >`).length;
+        if ( playerNum < playerLimit ) {
+
+            revertStoneCSS();
+            countArr = [];
+            
+            emit.joinRoom(room);
+
+    
+            scoreObj[name] = 0;
+            emit.updateScore(room, scoreObj);
+
+            emit.updateClientGrid(room);
+
+            $('#boardFrame').fadeIn(fadeTime);
+            updateButtons();
+        } else {
+            alert('room full');
+        }
+    });
+}
+
+function addOnclick_putStone( elem, index ) {
+    
+    elem.onclick = () => { 
+        switch(stage.stat) {
+            case 'fight':
+                putStone(index); 
+            break;
+            case 'clean':
+                countStone(index);
+            break;
+            case 'count':
+                showCountArr();
+            break;
+            default:
+                console.log('this option does not exist');
+        }        
+    }
+
+    function putStone(index) {
+
+        let stone = gridArr[index];
+
+        if (config.strict) {
+            // IF config is set to strict...
+            // You cannot play alone.
+            // You cannot play out of turn.
+            // You cannot remove your own stone.
+            if (playerArr.length == 1) return;
+            if (playerArr[0] != name ) return;
+            if (stone == name) return;
+        }
+
+        if (stone == name) { gridArr[index] = noName; }
+        else if (stone == noName) { gridArr[index] = name; }
+        else { return; }
+
+        updateLocalGrid( gridArr );
+        GridArrToGame_Rox();
+
+        shiftPlayerList(name);
+        shiftPlayerList();
+            // First, reset order. Then go to next player.
+
+        if ( gridArr[index] == name ) {
+            calculateAttack(index);
+            changeScore();
+        }
+
+        emit.updateServerGrid(gridArr);
+    }
+
+    function countStone(index) {
+        let stone = gridArr[index];
+        if ( stone == name ) return;
+        if ( stone == noName ) return;
+        console.log( stone );
+
+        scoreObj[stone]--;
+        gridArr[index] = noName;
+
+        updateLocalGrid( gridArr );
+        GridArrToGame_Rox();
+        changeScore();
+        emit.updateServerGrid(gridArr);
+
+    }
+
+}
+
+
+
+
+
+
+
+
+//          MMMM    MM    MM    MMMM    MM      MM  
+//        MM    MM  MM    MM  MM    MM  MM      MM  
+//          MM      MMMMMMMM  MM    MM  MM      MM  
+//            MM    MM    MM  MM    MM  MM  MM  MM  
+//        MM    MM  MM    MM  MM    MM  MM  MM  MM  
+//          MMMM    MM    MM    MMMM      MM  MM    
+
+function showScoreboard(obj) {
+    scoreObj = obj;
+    let tempArr = [...playerArr];
+    do { tempArr.push( tempArr.shift() ); 
+    } while ( tempArr[0] != name );
+    
+    let str = '';
+
+    $('#players').html('');
+
+    tempArr.forEach( player => {
+        let str = '';
+        if (player == playerArr[0]) str = '&#8594;';
+        $('#players').append(`<div>${str}</div>`);
+        $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
+        str = `${player}`;
+        if ( player == name ) str = `<b>${player}</b>`;
+        $('#players').append(`<div>${str}</div>`);
+        $('#players').append(`<div>&nbsp;&nbsp;&nbsp;${scoreObj[player]}</div>`);
+    });
+    
+    // $('#players').html(str);
+}
 
 function showCountArr() {
     
@@ -397,31 +601,6 @@ function showCountArr() {
 
 }
 
-
-
-function revertStoneCSS() {
-    countArr.forEach( (_name, i) => {
-        if ( _name == noName ) return;
-        $('.square').eq(i).css('fill', "#fff0" );
-
-        // $('.square').eq(i).css('stroke', colorObj[_name]);
-        $('.square').eq(i).css('stroke-width', 0);
-        // $('.square').eq(i).css('stroke-linecap', 'round');
-        // $('.square').eq(i).css('stroke-dasharray', '1');
-
-        $('.square').eq(i).css('r', 46);
-    });
-}
-
-
-
-
-function updateLocalGrid( grid ) {
-    gridArr = grid;
-    GridArrToGame_Rox();
-}
-
-
 function visualizeGrid( colorObject, name_grid ) {
     name_grid.forEach( ( _name, i) => {
         let color = colorObject[_name];
@@ -429,129 +608,6 @@ function visualizeGrid( colorObject, name_grid ) {
     });
     updateLocalGrid( name_grid );
 }
-
-
-function ArrToMap( arr, keyStr, valStr ) {
-    let newMap = new Map();
-    arr.forEach( obj => {
-        newMap.set(obj[keyStr], obj[valStr]);
-    });
-    return newMap;
-}
-
-
-function allowCreateRooms() {
-    $('#room-plus').html('<b>+</b>');
-    $('#room-plus').show();
-    $('#room-plus').css('cursor', 'pointer');
-    $('#room-name').hide(fadeTime);
-    $('#room-plus').on('click', () => {
-        $('#room-plus').hide();
-        $('#room-name').show(fadeTime);
-        $('#room-name').focus();
-        onlyThisButtonLeave('--------');
-    });
-}
-
-
-function denyCreateRooms() {
-    $('#room-plus').html('<b>x</b>');
-    $('#room-plus').css('cursor', 'default');
-    $('#room-plus').off('click');
-}
-
-
-function allButtonsJoin() {
-    let num = $(`button[id^="bt-"]`).length;
-    for ( i=0 ; i<num ; i++ ) {
-        $(`button[id^="bt-"]`).eq(i).show();
-        let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        addOnclick_JOIN(`#${str}`);
-    }
-}
-
-
-function onlyThisButtonLeave( room ) {
-    let num = $(`button[id^="bt-"]`).length;
-    for ( i=0 ; i<num ; i++ ) {
-        $(`button[id^="bt-"]`).eq(i).hide();
-    }
-    addOnclick_LEAVE(`#bt-${room}`);
-    $(`#bt-${room}`).show();
-}
-
-
-function updateButtons() {
-    if ( room == 'lobby' ) {
-        allowCreateRooms();
-        allButtonsJoin();
-    } else {
-        denyCreateRooms();
-        onlyThisButtonLeave(room);
-    }
-}
-
-
-function addRoomBox( room ) {
-    $('#roomSpace').append(`<div id="rb-${room}"></div>`);
-    $(`#rb-${room}`).append(`<b>${room}</b><br>`);
-    $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
-    $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
-}
-
-
-function delRoomBox( room ) {
-    $(`#rb-${room}`).remove();
-}
-
-
-function addOnclick_JOIN( roomName ) {
-    $(roomName).html('JOIN');
-    $(roomName).off('click');
-    $(roomName).on('click', () => {
-        room = roomName.slice(4);
-        let playerNum = $(`#rm-${room} >`).length;
-        if ( playerNum < playerLimit ) {
-
-            revertStoneCSS();
-            countArr = [];
-            
-            emit.joinRoom(room);
-
-    
-            scoreObj[name] = 0;
-            emit.updateScore(room, scoreObj);
-
-            emit.updateClientGrid(room);
-
-            $('#boardFrame').fadeIn(fadeTime);
-            updateButtons();
-        } else {
-            alert('room full');
-        }
-    });
-}
-
-
-function addOnclick_LEAVE( roomName ) {
-    $(roomName).html('LEAVE');
-    $(roomName).off('click');
-    $(roomName).on('click', () => {
-        oldRoom = room;
-        room = 'lobby';
-        
-        scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
-        emit.updateScore(room, scoreObj)
-
-        emit.joinRoom(room);
-
-        playerArr = [];
-        scoreObj = {};
-        updateButtons();
-        $('#boardFrame').fadeOut(fadeTime);
-    });
-}
-
 
 function updateNames( arrayOfObject ) {
     let num = $('div[id^="rm-"]').length;
@@ -563,46 +619,14 @@ function updateNames( arrayOfObject ) {
     });
 }
 
-
-function shiftPlayerList(name) {
-    if ( !playerArr.includes(name) && name ) return;
-    if (playerArr.length < 2) return;
-    let target = ( !name ) ? playerArr[1] : name;
-    do { playerArr.push( playerArr.shift() ); 
-    } while ( playerArr[0] != target );
-    emit.updatePlayerList(room, playerArr);
-}
-
-
-function showScoreboard(obj) {
-    scoreObj = obj;
-    let tempArr = [...playerArr];
-    do { tempArr.push( tempArr.shift() ); 
-    } while ( tempArr[0] != name );
-    
-    let str = '';
-
-    $('#players').html('');
-
-    tempArr.forEach( player => {
-        let str = '';
-        if (player == playerArr[0]) str = '&#8594;';
-        $('#players').append(`<div>${str}</div>`);
-        $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
-        str = `${player}`;
-        if ( player == name ) str = `<b>${player}</b>`;
-        $('#players').append(`<div>${str}</div>`);
-        $('#players').append(`<div>&nbsp;&nbsp;&nbsp;${scoreObj[player]}</div>`);
+function revertStoneCSS() {
+    countArr.forEach( (_name, i) => {
+        if ( _name == noName ) return;
+        $('.square').eq(i).css('fill', "#fff0" );
+        $('.square').eq(i).css('stroke-width', 0);
+        $('.square').eq(i).css('r', 46);
     });
-    
-    // $('#players').html(str);
 }
-
-
-
-
-
-
 
 
 
@@ -623,7 +647,6 @@ function showScoreboard(obj) {
 
 window.onresize = () => { resizeBoard(); }
 
-
 pickName.onchange = () => {
     name = pickName.value;
     pickName.value = '';
@@ -632,11 +655,9 @@ pickName.onchange = () => {
 
 }
 
-
 $('#room-name').on('change', () => {
     createRoom();
 });
-
 
 $('#room-name').on('focusout', () => {    
     $('#room-plus').show();
