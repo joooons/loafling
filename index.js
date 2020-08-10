@@ -537,10 +537,7 @@ io.on('connection', (socket) => {
     // _______ UPDATE PASS ___________________________________________________
 
     socket.on('update pass', (room, passCount) => {
-      console.log('----passcount----');
-      console.log(passCount);
       io.to(room).emit('update pass', passCount );
-  
     });   // _______ UPDATE PASS (END) ______________________________________
 
 

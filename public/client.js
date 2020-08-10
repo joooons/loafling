@@ -282,7 +282,7 @@ function resetConfig() {
     gridArr = [];
     playerArr = [];
     colorObj = {};
-    $('#message').html('en garde!');
+    say('en garde!');
 }
 
 function findWinner() {
@@ -296,8 +296,8 @@ function findWinner() {
     winners.forEach( (nombre,i) => { strArr[i] = `${nombre}, `; });
     strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
     if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
-    strArr.forEach( nombre => { str += nombre; });    
-    $('#message').html(`${str} won!`);
+    strArr.forEach( nombre => { str += nombre; });
+    say(`${str} won!`);
 }
 
 
@@ -364,7 +364,7 @@ function createRoom() {
     $('#room-name').hide();
 
     resetConfig();
-    $('#message').html('waiting for second player');
+    say('waiting for second player');
 
     emit.createRoom(room);
 
@@ -469,7 +469,7 @@ function addOnclick_LEAVE( roomName ) {
 }
 
 function addOnclick_JOIN( roomName ) {
-    $('#message').html('');
+    say('');
     $(roomName).html('JOIN');
     $(roomName).off('click');
     $(roomName).on('click', () => {
@@ -530,14 +530,14 @@ function addOnclick_putStone( elem, index ) {
             // You cannot remove your own stone.
             if (playerArr.length == 1) return;
             if (playerArr[0] != name ) {
-                $('#message').html('nacho turn');
+                say('nacho turn');
                 return;
             }
             if (stone == name) return;
         }
 
         emit.pass(room, passCount=0);
-        $('#message').html('');
+        say('');
 
         if (stone == name) { gridArr[index] = noName; }
         else if (stone == noName) { gridArr[index] = name; }
@@ -682,6 +682,9 @@ function revertStoneCSS() {
     });
 }
 
+function say(str) {
+    $('#message').html(str);
+}
 
 
 
@@ -726,13 +729,13 @@ $('#pass').on('click', () => {
     if ( playerArr.length < 2 ) return;
     if ( stage.stat == 'count') return;
     if ( playerArr[0] != name ) {
-        $('#message').html('nacho turn');
+        say('nacho turn');
         return;
     }
     passCount++;
     console.log('passCount is', passCount);
     emit.pass(room, passCount);
-    $('#message').html('pass!');
+    say('pass!');
     shiftPlayerList();
 });
 
@@ -832,10 +835,7 @@ socket.on('update color', arr => {
 socket.on('update player list', updatedPlayerList => {
     let num1 = playerArr.length;
     let num2 = updatedPlayerList.length;
-    if ( num1==1 && num2==2 ) {
-        $('#message').html('second player joined. begin game.');
-    }
-
+    if ( num1==1 && num2==2 ) { say('second player joined. you can start anytime') }
     playerArr = updatedPlayerList;
     let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
     $('#turn').html(str);
@@ -858,14 +858,12 @@ socket.on('update score', obj => {
 socket.on('update pass', count => {
     passCount = count;
     if ( passCount == 0 ) return;
-    // console.log('this many people passed', passCount);
     if ( passCount == playerArr.length ) {
-
         if (stage.stat == 'fight') {
             stage.clean();
             passCount = 0;
             emit.pass(room, passCount);
-            $('#message').html('All players passed. Remove dead stones. ');
+            say('all players passed. remove dead stones');
         } else if (stage.stat == 'clean' ) {
             stage.count();
             passCount = 0;
