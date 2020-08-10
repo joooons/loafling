@@ -76,18 +76,9 @@ function addClickableDots( elem, num) {
 
 
 function addTallySquare( elem ) {
-    let x = $(elem).attr('cx') - 23;
-    let y = $(elem).attr('cy') - 23;
-    console.log(x,y);
-    let rect = document.createElementNS(ns, 'rect');
-        $(rect).attr('x', x);
-        $(rect).attr('y', y);
-        $(rect).attr('width', 46);
-        $(rect).attr('height', 46 );
-        $(rect).attr('stroke-width', '6px');
-        $(rect).attr('stroke', '#0003');
-        $(rect).attr('fill', '#fff1');
-    $(svgElem).append(rect);
+    $(elem).attr('r', 20);
+    $(elem).attr('stroke', '#fff');
+    $(elem).attr('stroke-width', '3');
 }
 
 
