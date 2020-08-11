@@ -22,7 +22,7 @@ var passCount = 0;
 
 const playerLimit = 4;
 const fadeTime = 500;
-const boardRatio = 1.5;
+const boardRatio = 1.3;
 
 var noName;
 var boardDim;
@@ -105,6 +105,7 @@ const lobbySpace = document.querySelector('#lobbySpace');
 const roomSpace = document.querySelector('#roomSpace');
 const boardSpace = document.querySelector('#boardSpace');
 const boardFrame = document.querySelector('#boardFrame');
+const message = document.querySelector('#message');
 
 const board = document.querySelector('#board');
 
@@ -369,8 +370,8 @@ function checkForBan(banPos, atkPos) {
 
 
 function resizeBoard() {
-    let x = window.innerWidth - 240;
-    let y = window.innerHeight - 30;
+    let x = window.innerWidth - 200;
+    let y = window.innerHeight - 80;
     let board_x, board_y;
     let windowRatio = x / y;
     let xLimit = 200;
@@ -386,13 +387,14 @@ function resizeBoard() {
         board_y = Math.max(yLimit,y);
     }
     
-    let dim = board_y - 50;
+    let dim = board_y - 70;
     
-
-    boardFrame.style.width = board_x + 'px';
-    boardFrame.style.height = board_y + 'px';
+    // boardFrame.style.width = board_x + 'px';
+    // boardFrame.style.height = board_y + 'px';
     board.style.width = dim + 'px';
     board.style.height = dim + 'px';
+    message.style.height = '50px';
+    
 }
 
 function setUpGrid( num ) {
