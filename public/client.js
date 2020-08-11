@@ -17,6 +17,8 @@ const socket = io();
 var name = 'none';
 var room = 'lobby';
 var passCount = 0;
+    // If the number of passing players is equal to number of players...
+    // ...the game moves to the next stage.
 
 const playerLimit = 4;
 const fadeTime = 500;
@@ -24,6 +26,12 @@ const boardRatio = 1.5;
 
 var noName;
 var boardDim;
+var banned;
+    // banned spots are illegal to place a stone on.
+    // might not need this....
+var bannedArr = [];
+    // Array of positions of banned locations.
+
 
 const config = {};
 config.dim = 6;
@@ -49,6 +57,9 @@ var gridArr = [];
 
 var countArr = [];
     // Like gridArr, except this is array of empty spaces owned by each player.
+
+
+
 
 var playerArr = [];
     // The local array of names of players in the current room, in order of entry.
@@ -166,9 +177,8 @@ socket.on('board config', dim => { setUpGrid( dim ); });
 //        MM      MM  MM    MM    MM    MM    MM  
 
 function calculateAttack(indexValue) {
-
     if (playerArr.length < 2) return;
-    console.log('--- attack!!! ---');
+        // Attack only if there are at least 2 players. Duh.
 
     let pos = indexValue + 1;
     let wallIndex = [];
@@ -177,15 +187,20 @@ function calculateAttack(indexValue) {
     let roster = [...playerArr];
         // Temporary list of players, starting with first victim.
         // Includes player who attacked.
+        // At this point, roster[0] is the NEXT player.
 
     roster.forEach( victim => {
         if ( !Game_Rox[victim] ) return;
+            // If this player has no data cuz he just started...
         if ( victim == name ) return;
+            // Can't attack yourself
 
         let walls = Game_Rox[victim].walls;
+            // If my stones perfectly match your walls, I surrounded you.
         let killList = [];
 
         walls.forEach( (wall,i) => { if (wall.includes(pos)) wallIndex.push(i); });
+            // Find the walls that at least TOUCH the stone I just put down.
         
         wallIndex.forEach( i => {
             let count = 0;
@@ -196,6 +211,10 @@ function calculateAttack(indexValue) {
             });
             if ( count == walls[i].length ) {
                 scoreObj[name] += team.length;
+
+                if ( team.length == 1) checkForBan(team[0], pos);
+                    // Apply a ban if the conditions for potential repetition are met.
+
                 attackSucceeded = true;
                 killList.push(i);
             }                
@@ -216,6 +235,7 @@ function calculateAttack(indexValue) {
     });     // END of roster.forEach( victim => {...} 
 
     if ( !attackSucceeded ) {
+        // Check for suicide move, and prohibit it.
         
         let teams = Game_Rox[name].teams;
         let index = 9999;           // arbitrary number 
@@ -228,7 +248,6 @@ function calculateAttack(indexValue) {
         wall.forEach( val => {
             if (_.without(roster, name).includes( gridArr[val-1])) count++;
         });
-
 
         if (count == wall.length) {
             gridArr[pos-1] = noName;
@@ -273,9 +292,9 @@ function shiftPlayerList(name) {
 function resetConfig() {
     revertStoneCSS();
     passCount = 0;
-    config.dim = 6;
-    config.strict = false;
-    config.playerLimit = 2;
+    // config.dim = 6;
+    config.strict = true;
+    // config.playerLimit = 2;
     stage.fight();    
     countArr = [];
     scoreObj[name] = 0;
@@ -284,6 +303,7 @@ function resetConfig() {
     colorObj = {};
     say('en garde!');
 }
+
 
 function findWinner() {
     let max = 0;
@@ -299,6 +319,36 @@ function findWinner() {
     strArr.forEach( nombre => { str += nombre; });
     say(`${str} won!`);
 }
+
+
+
+
+function checkForBan(banPos, atkPos) {
+    // This function is triggered when exactly ONE enemy stone was removed.
+    // Two more tests: Is this a 2 player game?
+    // Next: is the attack stone surrounded in 3 directions?
+    // If so, the place of the removed stone is a banned spot.
+    
+    // console.log(banPos, atkPos);
+
+    if (playerArr.length > 2) return;
+    let count = 0;
+    let wall = arrNESW(atkPos);
+    wall.forEach( val => {
+        // console.log(val, gridArr[val-1], playerArr[0]);
+        if (gridArr[val-1] == playerArr[0]) count++;
+    });
+    if (count == wall.length) {
+        // console.log('count is', count);
+        console.log(banPos, ' is banned!');
+        bannedArr.push(banPos);
+        // bannedPos = banPos;
+
+    }
+}
+
+
+
 
 
 
@@ -482,18 +532,10 @@ function addOnclick_JOIN( roomName ) {
         if ( playerNum < playerLimit ) {
 
             resetConfig();
-            // revertStoneCSS();
-            // countArr = [];
-            // passCount = 0;
-            // scoreObj[name] = 0;
 
             emit.pass(room, passCount);
-    
             emit.joinRoom(room);
-    
-            
             emit.updateScore(room, scoreObj);
-
             emit.updateClientGrid(room);
 
             $('#boardFrame').fadeIn(fadeTime);
@@ -515,11 +557,10 @@ function addOnclick_putStone( elem, index ) {
                 countStone(index);
             break;
             case 'count':
-                // showCountArr();
-                console.log('nothing to do here');
+                // console.log('nothing to do here');
             break;
             default:
-                console.log('this option does not exist');
+                // console.log('this option does not exist');
         }        
     }
 
@@ -543,6 +584,12 @@ function addOnclick_putStone( elem, index ) {
         emit.pass(room, passCount=0);
         say('');
 
+        if ( bannedArr.includes( index+1 ) ) {
+            console.log('banned!');
+            return; 
+        }
+            // Prohibit placing stone on banned spot.
+
         if (stone == name) { gridArr[index] = noName; }
         else if (stone == noName) { gridArr[index] = name; }
         else { return; }
@@ -555,12 +602,18 @@ function addOnclick_putStone( elem, index ) {
             // First, reset order. Then go to next player.
 
         if ( gridArr[index] == name ) {
+            // If I put a stone, as opposed to remove, then do this.
+
+            bannedArr= [0];
+                // Once a stone has been placed, all bans are released.
             calculateAttack(index);
+                // Inside calculateAttack, the bannedArr is updated too.
             changeScore();
         }
+                
+        emit.updateServerGrid(gridArr, bannedArr);
 
-        emit.updateServerGrid(gridArr);
-    }
+    }   // END of putStone()
 
     function countStone(index) {
         let stone = gridArr[index];
@@ -574,11 +627,11 @@ function addOnclick_putStone( elem, index ) {
         updateLocalGrid( gridArr );
         GridArrToGame_Rox();
         changeScore();
-        emit.updateServerGrid(gridArr);
+        emit.updateServerGrid(gridArr, bannedArr);
 
-    }
+    }   // END of countStone()
 
-}
+}   // END of addOnclick_putStone()
 
 
 
@@ -739,7 +792,6 @@ $('#pass').on('click', () => {
         return;
     }
     passCount++;
-    console.log('passCount is', passCount);
     emit.pass(room, passCount);
     say('pass!');
     shiftPlayerList();
@@ -773,7 +825,7 @@ var emit = {
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
-    updateServerGrid : (gridArr) => { socket.emit('update grid on server', gridArr); },
+    updateServerGrid : (gridArr, bannedArr) => { socket.emit('update grid on server', gridArr, bannedArr); },
     pass : (room, passCount) => { socket.emit('update pass', room, passCount )} 
     
 }
@@ -799,9 +851,10 @@ var emit = {
 
 // SOCKET ON EVENTS _______________________________________
 
-socket.on('synchronize variables', (blankName, dim) => {
+socket.on('synchronize variables', (blankName, dim, bannedName) => {
     noName = blankName;
     boardDim = dim;
+    banned = bannedName;
 });
 
 
@@ -849,7 +902,8 @@ socket.on('update player list', updatedPlayerList => {
 });
 
 
-socket.on('update grid', (colorObject, name_grid) => {
+socket.on('update grid', (colorObject, name_grid, banned_Arr) => {
+    if ( banned_Arr ) bannedArr = banned_Arr;
     colorObj = colorObject;
     showScoreboard(scoreObj);
     visualizeGrid(colorObj, name_grid);

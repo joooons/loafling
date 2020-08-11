@@ -50,6 +50,7 @@ var colorSet = [];
 
 const boardDim = 5;
 const noName = 'zz';
+const banned = '91fja8';
   // variables to synchronize to client
 
 
@@ -233,7 +234,7 @@ function updateScore(room, scoreObj) {
 io.on('connection', (socket) => {
   
   console.log(`--------- ${socket.id} connected ----------`);
-  socket.emit('synchronize variables', noName, boardDim);
+  socket.emit('synchronize variables', noName, boardDim, banned);
 
 
 
@@ -423,13 +424,13 @@ io.on('connection', (socket) => {
   
   // _______ UPDATE GRID ON SERVER ______________________________________
 
-  socket.on('update grid on server', gridArr => {
+  socket.on('update grid on server', (gridArr, bannedArr) => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
     let obj = Room_GameData.get(room);
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
-    io.to(room).emit('update grid', obj.colorObj, obj.grid ); 
+    io.to(room).emit('update grid', obj.colorObj, obj.grid, bannedArr ); 
   });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
 
