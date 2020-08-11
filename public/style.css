@@ -33,6 +33,7 @@
 
 body {
     font-family: 'Lato', sans-serif;
+    font-size: small;
     user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -92,8 +93,8 @@ button:hover {
 
 #container > div {
     background: white;
-    margin: 8px;
-    border-radius: 5px;
+    margin: 4px;
+    border-radius: 6px;
 }
 
 
@@ -111,11 +112,18 @@ button:hover {
 
 /* ***************** LOBBY SPACE ******************** */
 
+
 #lobbySpace {
     padding: 5px;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: scroll;
 }
 
-
+#lobbySpace::-webkit-scrollbar {
+    display: none;
+}
 
 
 
@@ -336,7 +344,13 @@ div[id^="rm-"] {
 
 
 .me {
-    background: #f001;
+    background: #0f02;
+    margin: 1px;
+}
+
+.them {
+    background: #8881;
+    margin: 1px;
 }
 
 

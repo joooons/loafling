@@ -42,7 +42,8 @@ var Room_GameData = new Map();
 var Room_PlayerArr = new Map();
 var Room_Score = new Map();
 
-const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
+// const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
+const nameSuffix = [', stop', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.

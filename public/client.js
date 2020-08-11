@@ -357,6 +357,8 @@ function createRoom() {
         return;    
     }
     room = $('#room-name').val();
+    room = room.slice(0,8);
+
 
     $('#room-name').val('');
     $('#room-name').attr('placeholder', 'room name');
@@ -377,7 +379,7 @@ function createRoom() {
 }
 
 function allowCreateRooms() {
-    $('#room-plus').html('<b>CREATE ROOM</b>');
+    $('#room-plus').html('<b>add room</b>');
     $('#room-plus').show();
     $('#room-plus').css('cursor', 'pointer');
     $('#room-name').hide(fadeTime);
@@ -390,7 +392,7 @@ function allowCreateRooms() {
 }
 
 function denyCreateRooms() {
-    $('#room-plus').html('<b>x</b>');
+    $('#room-plus').html('<b>&#10006;</b>');
     $('#room-plus').css('cursor', 'default');
     $('#room-plus').off('click');
 }
@@ -670,6 +672,7 @@ function updateNames( arrayOfObject ) {
     arrayOfObject.forEach( obj => {
         let [a, b, c ] = ['', obj.name, ''];
         if (name == obj.name) [a,c] = [ 'class="me"', ' (me)'];
+        if ( !(name == obj.name) ) [a,c] = [ 'class="them"', ''];
         $(`div[id="rm-${obj.room}"]`).append(`<div ${a}>${b} ${c}</div>`);
     });
 }
@@ -712,6 +715,7 @@ pickName.onchange = () => {
     name = pickName.value;
     pickName.value = '';
     modal.style.display = "none";
+    name = name.slice(0,8);
     emit.newUser(name);
 
 }
