@@ -86,13 +86,14 @@ button:hover {
     right: 0;
     display: grid;
     grid-template-columns: var(--col1) var(--col2) auto;
+    /* overflow-y: visible; */
     /* gap: 10px; */
 }
 
 #container > div {
     background: white;
-    margin: 4px;
-    border-radius: 4px;
+    margin: 8px;
+    border-radius: 5px;
 }
 
 
@@ -129,6 +130,17 @@ button:hover {
 /* MM    MM    MMMM      MMMM    MM      MM          MMMM    MM        MM    MM    MMMM    MMMMMMMM   */
 
 /* ******************* ROOM SPACE ***************** */
+
+#roomSpace {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: scroll;
+}
+
+#roomSpace::-webkit-scrollbar {
+    display: none;
+}
+
 
 #roomSpace > div {
     background: #0001;
