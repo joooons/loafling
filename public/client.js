@@ -271,6 +271,12 @@ function changeScore() {
 function updateLocalGrid( grid ) {
     gridArr = grid;
     GridArrToGame_Rox();
+
+    let num1 = gridArr.length;
+    let num2 = Game_Rox[noName].total.length;
+    let num3 = playerArr.length;
+    if ( num2 == num1 - (2 * num3) ) say('The game ends when all players PASS consecutively. ');
+
 }
 
 function ArrToMap( arr, keyStr, valStr ) {
@@ -302,7 +308,7 @@ function resetConfig() {
     gridArr = [];
     playerArr = [];
     colorObj = {};
-    say('en garde!');
+    say('En garde! Wait for your turn.');
 }
 
 
@@ -370,8 +376,8 @@ function checkForBan(banPos, atkPos) {
 
 
 function resizeBoard() {
-    let x = window.innerWidth - 200;
-    let y = window.innerHeight - 80;
+    let x = window.innerWidth - 220;
+    let y = window.innerHeight - 60;
     let board_x, board_y;
     let windowRatio = x / y;
     let xLimit = 200;
@@ -394,6 +400,7 @@ function resizeBoard() {
     board.style.width = dim + 'px';
     board.style.height = dim + 'px';
     message.style.height = '50px';
+    message.style.width = ( board_x - 40 ) + 'px';
     
 }
 
@@ -418,7 +425,7 @@ function createRoom() {
     $('#room-name').hide();
 
     resetConfig();
-    say('waiting for second player');
+    say('Waiting for second player. ');
 
     emit.createRoom(room);
 
@@ -896,7 +903,8 @@ socket.on('update color', arr => {
 socket.on('update player list', updatedPlayerList => {
     let num1 = playerArr.length;
     let num2 = updatedPlayerList.length;
-    if ( num1==1 && num2==2 ) { say('second player joined. you can start anytime') }
+    if ( num1==1 && num2==2 ) { say('Second player joined. Go ahead and start something.') }
+    if ( num2 > 2) { say(`Player numero ${num2} joined. Start playing already.`)   }
     playerArr = updatedPlayerList;
     let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
     $('#turn').html(str);

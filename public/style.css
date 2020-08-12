@@ -201,14 +201,12 @@ div[id^="rm-"] {
 /* ************* BOARD SPACE ************ */
 
 #boardSpace {
-    /* position: relative; */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #boardFrame {
-    /* border: 1px solid green; */
     background: #0001;
     padding: 8px;
     border-radius: 5px;
@@ -216,8 +214,7 @@ div[id^="rm-"] {
     gap: 4px;
     grid-template-columns: auto auto;
     /* grid-template-rows: 20px auto 60px; */
-    /* align-items: start; */
-    justify-items: center;
+    justify-items: start;
     visibility: hidden;
 }
 
@@ -226,33 +223,20 @@ div[id^="rm-"] {
 }
 
 #board {
-    /* place-self: center; */
-    /* grid-row: 2/3; */
-    /* background: #0002; */
     /* background-image: url('wood.jpg'); */
     background-image: url('whitepaint.jpg');
     background-size: cover;
-
     display: grid;
     padding: 2px;
 }
 
 .square {
     border-radius: 50%;
-    /* box-sizing: border-box; */
-    /* border: 2px solid #0002; */
 }
 
 .square:hover {
     cursor: pointer;
 }
-
-
-/* .square:active { */
-    /* color: red; */
-    /* font-size: large; */
-    /* font-weight: bold; */
-/* } */
 
 
 #boardHead {
@@ -278,16 +262,19 @@ div[id^="rm-"] {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: stretch;
+    align-items: left;
+    
 }
 
 #message {
     background: white;
     border-radius: 5px;
-    text-align: center;
-    width: 98%;
-    height: 100%;
+    /* text-align: center; */
+    word-wrap: break-word;
+    /* width: 100%; */
+    /* height: 100%; */
     padding: 4px;
+    text-align: left;
 }
 
 
