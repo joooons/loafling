@@ -1,3 +1,4 @@
+// const { first } = require("underscore");
 
 const socket = io();
 
@@ -26,7 +27,7 @@ const boardRatio = 1.3;
 
 var noName;
 var boardDim;
-var banned;
+// var banned;
     // banned spots are illegal to place a stone on.
     // might not need this....
 var bannedArr = [];
@@ -58,9 +59,6 @@ var gridArr = [];
 var countArr = [];
     // Like gridArr, except this is array of empty spaces owned by each player.
 
-
-
-
 var playerArr = [];
     // The local array of names of players in the current room, in order of entry.
     // Corresponds to Room_PlayerArr map in index.js.
@@ -73,6 +71,7 @@ var scoreObj = {};
 
 var colorObj = {};
     // Object with { name:color, name:color .... }
+
 
 
 
@@ -211,7 +210,18 @@ function calculateAttack(indexValue) {
                 if (_.without(roster, victim).includes( gridArr[posValue-1])) count++;
             });
             if ( count == walls[i].length ) {
-                scoreObj[name] += team.length;
+                // A successful attack.
+
+                let points = team.length;
+                scoreObj[victim] -= points;
+
+                if ( points == 1 ) {
+                    say(`${victim} says "Tis but a scratch."`);
+                    emit.shout(room, 'So it begins...');
+                } else if ( points > 4 ) {
+                    say(`Savage...`);
+                    emit.shout(room, 'It&#39;s getting real...');
+                }
 
                 if ( team.length == 1) checkForBan(team[0], pos);
                     // Apply a ban if the conditions for potential repetition are met.
@@ -252,6 +262,8 @@ function calculateAttack(indexValue) {
 
         if (count == wall.length) {
             gridArr[pos-1] = noName;
+
+            say('Hey, are you crazy? it&#39;s dangerous there!');
             GridArrToGame_Rox();
             shiftPlayerList(name);
         }
@@ -275,7 +287,8 @@ function updateLocalGrid( grid ) {
     let num1 = gridArr.length;
     let num2 = Game_Rox[noName].total.length;
     let num3 = playerArr.length;
-    if ( num2 == num1 - (2 * num3) ) say('The game ends when all players PASS consecutively. ');
+    if ( num2 == num1 - (2 * num3) ) say('Oh, by the way... The game ends when all players PASS consecutively. ');
+        // At an arbitrary point in time in the game, the players are notified of the rules.
 
 }
 
@@ -308,7 +321,7 @@ function resetConfig() {
     gridArr = [];
     playerArr = [];
     colorObj = {};
-    say('En garde! Wait for your turn.');
+    say('');
 }
 
 
@@ -339,6 +352,8 @@ function checkForBan(banPos, atkPos) {
     // console.log(banPos, atkPos);
 
     if (playerArr.length > 2) return;
+        // The ban applies only if there are exactly two players.
+
     let count = 0;
     let wall = arrNESW(atkPos);
     wall.forEach( val => {
@@ -346,7 +361,8 @@ function checkForBan(banPos, atkPos) {
         if (gridArr[val-1] == playerArr[0]) count++;
     });
     if (count == wall.length) {
-        // console.log('count is', count);
+        // All ban conditions are met.
+
         console.log(banPos, ' is banned!');
         bannedArr.push(banPos);
         // bannedPos = banPos;
@@ -425,7 +441,7 @@ function createRoom() {
     $('#room-name').hide();
 
     resetConfig();
-    say('Waiting for second player. ');
+    say('You&#39;re the first one in this room. Wait for the second player. ');
 
     emit.createRoom(room);
 
@@ -522,6 +538,8 @@ function addOnclick_LEAVE( roomName ) {
         scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
         emit.updateScore(room, scoreObj)
 
+        emit.shout(oldRoom, `Uh, ${name} just rage-quit. Good riddance.`);
+
         emit.joinRoom(room);
 
         playerArr = [];
@@ -532,7 +550,7 @@ function addOnclick_LEAVE( roomName ) {
 }
 
 function addOnclick_JOIN( roomName ) {
-    say('');
+    // say('');
     $(roomName).html('JOIN');
     $(roomName).off('click');
     $(roomName).on('click', () => {
@@ -542,6 +560,16 @@ function addOnclick_JOIN( roomName ) {
 
             resetConfig();
 
+            if (playerNum == 1) {
+                say('You&#39;re the second player. Wait for your turn.');
+                emit.shout(room, 'Second player joined. With at least 2 players, you can start playing. You go first.');
+            }
+
+            if (playerNum > 1 ) {
+                say(`You are player numero ${playerNum+1}. Wait for your turn.`);
+                emit.shout(room, `${name} joined. Yay.`);
+            }
+            
             emit.pass(room, passCount);
             emit.joinRoom(room);
             emit.updateScore(room, scoreObj);
@@ -549,6 +577,9 @@ function addOnclick_JOIN( roomName ) {
 
             $('#boardFrame').fadeIn(fadeTime);
             updateButtons();
+
+
+
         } else {
             alert('room full');
         }
@@ -584,17 +615,19 @@ function addOnclick_putStone( elem, index ) {
             // You cannot remove your own stone.
             if (playerArr.length == 1) return;
             if (playerArr[0] != name ) {
-                say('nacho turn');
+                say('It&#39;s nacho turn.');
                 return;
             }
             if (stone == name) return;
         }
 
         emit.pass(room, passCount=0);
-        say('');
+        // console.log('wait, is this happening?');
+        // say('');
 
         if ( bannedArr.includes( index+1 ) ) {
             console.log('banned!');
+            say('Uh, it&#39;s kind of an ill eagle to do that...');
             return; 
         }
             // Prohibit placing stone on banned spot.
@@ -612,6 +645,9 @@ function addOnclick_putStone( elem, index ) {
 
         if ( gridArr[index] == name ) {
             // If I put a stone, as opposed to remove, then do this.
+
+            say('');
+            emit.shout(room, '');
 
             bannedArr= [0];
                 // Once a stone has been placed, all bans are released.
@@ -797,12 +833,13 @@ $('#pass').on('click', () => {
     if ( playerArr.length < 2 ) return;
     if ( stage.stat == 'count') return;
     if ( playerArr[0] != name ) {
-        say('nacho turn');
+        say('You can&#39;t pass when it&#39;s nacho turn.');
         return;
     }
     passCount++;
     emit.pass(room, passCount);
-    say('pass!');
+    say('You passed!');
+    emit.shout(room, `${name} passed!`);
     shiftPlayerList();
 });
 
@@ -835,7 +872,8 @@ var emit = {
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
     updateServerGrid : (gridArr, bannedArr) => { socket.emit('update grid on server', gridArr, bannedArr); },
-    pass : (room, passCount) => { socket.emit('update pass', room, passCount )} 
+    pass : (room, passCount) => { socket.emit('update pass', room, passCount )},
+    shout : (room,str) => { socket.emit('shout', room, str)}
     
 }
 
@@ -860,10 +898,10 @@ var emit = {
 
 // SOCKET ON EVENTS _______________________________________
 
-socket.on('synchronize variables', (blankName, dim, bannedName) => {
+socket.on('synchronize variables', (blankName, dim) => {
     noName = blankName;
     boardDim = dim;
-    banned = bannedName;
+    // banned = bannedName;
 });
 
 
@@ -901,13 +939,13 @@ socket.on('update color', arr => {
 
 
 socket.on('update player list', updatedPlayerList => {
-    let num1 = playerArr.length;
-    let num2 = updatedPlayerList.length;
-    if ( num1==1 && num2==2 ) { say('Second player joined. Go ahead and start something.') }
-    if ( num2 > 2) { say(`Player numero ${num2} joined. Start playing already.`)   }
+    // let num1 = playerArr.length;
+    // let num2 = updatedPlayerList.length;
+    // if ( num1==1 && num2==2 ) { say(`Second player joined. With at least 2 players, you can start playing. ${playerArr[0]} goes first.`) }
+    // if ( num2 > 2) { say(`${playerArr[playerArr.length-1]} joined.`)   }
     playerArr = updatedPlayerList;
-    let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
-    $('#turn').html(str);
+    // let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
+    // if (playerArr[0] == name ) say('It&#39;s your turn! Hurry up!');
     showScoreboard(scoreObj);
 });
 
@@ -933,17 +971,22 @@ socket.on('update pass', count => {
             stage.clean();
             passCount = 0;
             emit.pass(room, passCount);
-            say('all players passed. remove dead stones');
+            say('All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
+            emit.shout(room, 'All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
         } else if (stage.stat == 'clean' ) {
             stage.count();
             passCount = 0;
             emit.pass(room, passCount);
             showCountArr();
         }
-        
-    }
+    } 
+
 })
 
+
+socket.on('shout', (str) => {
+    say(str);
+});
 
 
 

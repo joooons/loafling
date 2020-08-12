@@ -50,7 +50,7 @@ var colorSet = [];
 
 const boardDim = 5;
 const noName = 'zz';
-const banned = '91fja8';
+// const banned = '91fja8';
   // variables to synchronize to client
 
 
@@ -234,7 +234,7 @@ function updateScore(room, scoreObj) {
 io.on('connection', (socket) => {
   
   console.log(`--------- ${socket.id} connected ----------`);
-  socket.emit('synchronize variables', noName, boardDim, banned);
+  socket.emit('synchronize variables', noName, boardDim);
 
 
 
@@ -542,6 +542,25 @@ io.on('connection', (socket) => {
       io.to(room).emit('update pass', passCount );
     });   // _______ UPDATE PASS (END) ______________________________________
 
+
+
+
+
+
+
+
+//    MMMM    MM    MM    MMMM    MM    MM  MMMMMM  
+//  MM    MM  MM    MM  MM    MM  MM    MM    MM    
+//    MM      MMMMMMMM  MM    MM  MM    MM    MM    
+//      MM    MM    MM  MM    MM  MM    MM    MM    
+//  MM    MM  MM    MM  MM    MM  MM    MM    MM    
+//    MMMM    MM    MM    MMMM      MMMM      MM    
+    
+    // _______ SHOUT ________________________________________________________
+
+    socket.on('shout', (room, str) => {
+      socket.to(room).broadcast.emit('shout', str );
+    });   // _______ SHOUT (END) ____________________________________________
 
 
 
