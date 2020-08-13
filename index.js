@@ -48,7 +48,7 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 3;
+const boardDim = 5;
 const noName = 'zz';
 // const banned = '91fja8';
   // variables to synchronize to client
@@ -363,7 +363,7 @@ io.on('connection', (socket) => {
 
     io.emit('add roombox', room);
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
-    io.to(room).emit('update color', obj.colorObj );
+    // io.to(room).emit('update color', obj.colorObj );
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
   });   // _______ CREATE ROOM (END) ______________________________________

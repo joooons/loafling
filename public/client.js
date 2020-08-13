@@ -27,14 +27,12 @@ const boardRatio = 1.3;
 
 var noName;
 var boardDim;
-// var banned;
-    // banned spots are illegal to place a stone on.
-    // might not need this....
+
 var ban = {};
 ban.now = 0;
 ban.next = 0;
-    // Array of positions of banned locations.
 
+var bannedRoom = 'a82bah2gasdf';
 
 const config = {};
 config.dim = 6;
@@ -226,12 +224,8 @@ function calculateAttack(indexValue) {
                     emit.shout(room, 'It&#39;s getting real...');
                 }
 
-                if ( team.length == 1) {
-                    checkForBan(team[0], pos);
-                    // Apply a ban if the conditions for potential repetition are met.
-                }
-                
-
+                if ( team.length == 1) { checkForBan(team[0], pos); }
+                // Apply a ban if the conditions for potential repetition are met.
 
                 attackSucceeded = true;
                 killList.push(i);
@@ -280,16 +274,9 @@ function calculateAttack(indexValue) {
 
 }   // END of calculateAttack() {...}
 
-
-
-
 function changeScore() {
-    // However way you calculate the score.
-    // It can't be this simple...
-    
-    // scoreObj[name]++;
     emit.updateScore(room, scoreObj);
-}
+}   // END of changeScore()
 
 function updateLocalGrid( grid ) {
     gridArr = grid;
@@ -301,13 +288,11 @@ function updateLocalGrid( grid ) {
     if ( num2 == num1 - (2 * num3) ) say('Oh, by the way... The game ends when all players PASS consecutively. ');
         // At an arbitrary point in time in the game, the players are notified of the rules.
 
-}
+}   // END of updateLocalGrid()
 
 function ArrToMap( arr, keyStr, valStr ) {
     let newMap = new Map();
-    arr.forEach( obj => {
-        newMap.set(obj[keyStr], obj[valStr]);
-    });
+    arr.forEach( obj => { newMap.set(obj[keyStr], obj[valStr]); });
     return newMap;
 }
 
@@ -335,7 +320,6 @@ function resetConfig() {
     say('');
 }
 
-
 function findWinner() {
     let max = 0;
     let winners = [];
@@ -351,11 +335,7 @@ function findWinner() {
     say(`${str} won!`);
     emit.shout(room, `${str} won!`);
     $('#pass').fadeOut();
-
-    
 }
-
-
 
 function putStone(index) {
     // FOUR things could happen.
@@ -389,8 +369,6 @@ function putStone(index) {
     }
         // Prohibit placing stone on banned spot.
 
-
-
     // This is SCENARIO #2 and SCENARIO #3, and maybe SCENARIO #4.
     // Either remove a stone, or put a stone down...
     // ... and possibly take the stone back after putting it down.
@@ -411,20 +389,17 @@ function putStone(index) {
 
     if ( gridArr[index] == name ) {
         // If I put a stone, as opposed to remove, then do this.
-
         say('');
         emit.shout(room, '');
         calculateAttack(index);
         changeScore();
-    } else {
-        ban.next = 0;
-    }
+    } 
+    // else { ban.next = 0; }
     
     console.log('right before updateServerGrid, ban.next: ', ban.next );
     emit.updateServerGrid(gridArr, ban.next );
 
 }   // END of putStone()
-
 
 function countStone(index) {
     // Counting the stones for the final score.
@@ -447,7 +422,6 @@ function countStone(index) {
 
 
 }   // END of countStone()
-
 
 function checkForBan(banPos, atkPos) {
     // This function is triggered when exactly ONE enemy stone was removed.
@@ -539,6 +513,7 @@ function createRoom() {
     }
     room = $('#room-name').val();
     room = room.slice(0,8);
+    if (room == bannedRoom) bannedRoom = '1vb087230n87edsaf';
 
 
     $('#room-name').val('');
@@ -579,12 +554,17 @@ function denyCreateRooms() {
     $('#room-plus').off('click');
 }
 
-function allButtonsJoin() {
+function allButtonsJoin(elem) {
+    // All buttons should join, EXCEPT the one specified in the argument.
+
+    console.log('inside allButtonsJoin() ');
+    console.log(elem);
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        addOnclick_JOIN(`#${str}`);
+        console.log(str, elem);
+        if ( `#${str}` != elem ) addOnclick_JOIN(`#${str}`);
         $(`div[id^="rb-"]`).show();
     }
 }
@@ -601,7 +581,7 @@ function onlyThisButtonLeave( room ) {
 function updateButtons() {
     if ( room == 'lobby' ) {
         allowCreateRooms();
-        allButtonsJoin();
+        allButtonsJoin(bannedRoom);
     } else {
         denyCreateRooms();
         onlyThisButtonLeave(room);
@@ -617,6 +597,7 @@ function addRoomBox( room ) {
 
 function delRoomBox( room ) {
     $(`#rb-${room}`).remove();
+    if ( bannedRoom == `#bt-${room}` ) bannedRoom = ' ';
 }
 
 
@@ -644,9 +625,19 @@ function addOnclick_LEAVE( roomName ) {
         scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
         emit.updateScore(room, scoreObj);
 
-        if ( stage.stat != 'count' ) {
-            emit.shout(oldRoom, `Uh, ${name} just rage-quit. Buh bye~`);
+        if ( stage.stat != 'count' ) { 
+            emit.shout(oldRoom, `Uh, ${name} left. Buh bye~`); 
+        } else {
+            console.log('left game after end');
+            let elem = `#bt-${oldRoom}`;
+            console.log(elem);
+            $(elem).off("click");
+            $(elem).css('color', 'gray');
+            $(elem).html('CLOSED');
+            bannedRoom = elem;
         }
+
+
         emit.joinRoom(room);
 
         playerArr = [];
@@ -657,12 +648,16 @@ function addOnclick_LEAVE( roomName ) {
 }
 
 function addOnclick_JOIN( roomName ) {
-    // say('');
+    // the "roomName" argument is actually "bt-${room}"
+
     $(roomName).html('JOIN');
     $(roomName).off('click');
+    $(roomName).css('color', 'black');
     $(roomName).on('click', () => {
         room = roomName.slice(4);
         let playerNum = $(`#rm-${room} >`).length;
+
+
         if ( playerNum < playerLimit ) {
 
             resetConfig();
@@ -982,11 +977,10 @@ socket.on('update names', arr => {
 });
 
 
-socket.on('update color', arr => {
-    let array = arr;
-    console.log(arr);
-    
-});
+// socket.on('update color', arr => {
+//     let array = arr;
+//     console.log(arr);
+// });
 
 
 socket.on('update player list', updatedPlayerList => {
@@ -1002,7 +996,7 @@ socket.on('update player list', updatedPlayerList => {
 
 
 socket.on('update grid', (colorObject, name_grid, banNext) => {
-    if (stage.stat == 'count') return;
+    if (stage.stat == 'count') { return; }
     if ( banNext ) { ban.now = banNext;
     } else { ban.now = 0; }
     ban.next = 0;
@@ -1035,7 +1029,7 @@ socket.on('update pass', count => {
         }
     } 
 
-})
+});
 
 
 socket.on('shout', (str) => {
