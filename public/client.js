@@ -32,7 +32,7 @@ var ban = {};
 ban.now = 0;
 ban.next = 0;
 
-var bannedRoom = 'a82bah2gasdf';
+var bannedRoom = '  ';
 
 const config = {};
 config.dim = 6;
@@ -396,7 +396,7 @@ function putStone(index) {
     } 
     // else { ban.next = 0; }
     
-    console.log('right before updateServerGrid, ban.next: ', ban.next );
+    // console.log('right before updateServerGrid, ban.next: ', ban.next );
     emit.updateServerGrid(gridArr, ban.next );
 
 }   // END of putStone()
@@ -513,7 +513,7 @@ function createRoom() {
     }
     room = $('#room-name').val();
     room = room.slice(0,8);
-    if (room == bannedRoom) bannedRoom = '1vb087230n87edsaf';
+    // if (room == bannedRoom) bannedRoom = '1vb087230n87edsaf';
 
 
     $('#room-name').val('');
@@ -557,13 +557,13 @@ function denyCreateRooms() {
 function allButtonsJoin(elem) {
     // All buttons should join, EXCEPT the one specified in the argument.
 
-    console.log('inside allButtonsJoin() ');
-    console.log(elem);
+    // console.log('inside allButtonsJoin() ');
+    // console.log(elem);
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        console.log(str, elem);
+        // console.log(str, elem);
         if ( `#${str}` != elem ) addOnclick_JOIN(`#${str}`);
         $(`div[id^="rb-"]`).show();
     }
@@ -627,10 +627,12 @@ function addOnclick_LEAVE( roomName ) {
 
         if ( stage.stat != 'count' ) { 
             emit.shout(oldRoom, `Uh, ${name} left. Buh bye~`); 
-        } else {
-            console.log('left game after end');
+        } 
+        
+        if ( stage.stat != 'fight' ) {
+            // console.log('left game after end');
             let elem = `#bt-${oldRoom}`;
-            console.log(elem);
+            // console.log(elem);
             $(elem).off("click");
             $(elem).css('color', 'gray');
             $(elem).html('CLOSED');
