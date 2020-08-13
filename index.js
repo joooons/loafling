@@ -48,7 +48,7 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 5;
+const boardDim = 6;
 const noName = 'zz';
 // const banned = '91fja8';
   // variables to synchronize to client
@@ -424,13 +424,13 @@ io.on('connection', (socket) => {
   
   // _______ UPDATE GRID ON SERVER ______________________________________
 
-  socket.on('update grid on server', (gridArr, bannedArr) => {
+  socket.on('update grid on server', (gridArr, banNext) => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
     let obj = Room_GameData.get(room);
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
-    io.to(room).emit('update grid', obj.colorObj, obj.grid, bannedArr ); 
+    io.to(room).emit('update grid', obj.colorObj, obj.grid, banNext ); 
   });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
 

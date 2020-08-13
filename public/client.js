@@ -30,7 +30,9 @@ var boardDim;
 // var banned;
     // banned spots are illegal to place a stone on.
     // might not need this....
-var bannedArr = [];
+var ban = {};
+ban.now = 0;
+ban.next = 0;
     // Array of positions of banned locations.
 
 
@@ -183,6 +185,7 @@ function calculateAttack(indexValue) {
     let pos = indexValue + 1;
     let wallIndex = [];
     let attackSucceeded = false;
+    // ban.next = 0;
     
     let roster = [...playerArr];
         // Temporary list of players, starting with first victim.
@@ -223,8 +226,12 @@ function calculateAttack(indexValue) {
                     emit.shout(room, 'It&#39;s getting real...');
                 }
 
-                if ( team.length == 1) checkForBan(team[0], pos);
+                if ( team.length == 1) {
+                    checkForBan(team[0], pos);
                     // Apply a ban if the conditions for potential repetition are met.
+                }
+                
+
 
                 attackSucceeded = true;
                 killList.push(i);
@@ -244,6 +251,7 @@ function calculateAttack(indexValue) {
         wallIndex = [];
 
     });     // END of roster.forEach( victim => {...} 
+
 
     if ( !attackSucceeded ) {
         // Check for suicide move, and prohibit it.
@@ -270,7 +278,10 @@ function calculateAttack(indexValue) {
         
     }       // END of if ( !attackSucceeded ) {...}
 
-}
+}   // END of calculateAttack() {...}
+
+
+
 
 function changeScore() {
     // However way you calculate the score.
@@ -342,6 +353,97 @@ function findWinner() {
 
 
 
+function putStone(index) {
+    // FOUR things could happen.
+    // (1) Be prevented from placing a stone at all.
+    // (2) Remove a stone that belongs to me.
+    // (3) Put a stone down.
+    // (4) put a stone down, and then pick it up again.
+
+    ban.next = 0;
+    emit.pass(room, passCount=0);
+    // Hmmm... where does this belong???
+
+    let stone = gridArr[index];
+
+    // This is SCENARIO #1. Unable to put a stone down at all.
+    if (config.strict) {
+        // IF config is set to strict...
+        // You cannot play alone.
+        // You cannot play out of turn.
+        // You cannot remove your own stone.
+        if (playerArr.length == 1) return;
+        if (playerArr[0] != name ) { return say('It&#39;s nacho turn.'); }
+        if (stone == name) return;
+    }
+
+    // This is also SCENARIO #1. Unable to put a stone down at all.
+    if ( ban.now == index + 1 ) {
+        console.log('banned!');
+        say('Uh, it&#39;s kind of an ill eagle to do that...');
+        return; 
+    }
+        // Prohibit placing stone on banned spot.
+
+
+
+    // This is SCENARIO #2 and SCENARIO #3, and maybe SCENARIO #4.
+    // Either remove a stone, or put a stone down...
+    // ... and possibly take the stone back after putting it down.
+    if (stone == name) { gridArr[index] = noName; }
+    else if (stone == noName) { gridArr[index] = name; }
+    else { return; }
+
+
+    updateLocalGrid( gridArr );
+    GridArrToGame_Rox();
+    shiftPlayerList(name);
+    shiftPlayerList();
+        // In the case that I've put a stone down...
+        // ...even though I may have to pick it up again...
+        // ...I still have to update the Game_Rox in order to do calculations...
+        // ...about whether I have to take that stone back again.
+        // Also, reset order of players, and go to the next player.
+
+    if ( gridArr[index] == name ) {
+        // If I put a stone, as opposed to remove, then do this.
+
+        say('');
+        emit.shout(room, '');
+        calculateAttack(index);
+        changeScore();
+    } else {
+        ban.next = 0;
+    }
+    
+    console.log('right before updateServerGrid, ban.next: ', ban.next );
+    emit.updateServerGrid(gridArr, ban.next );
+
+}   // END of putStone()
+
+
+function countStone(index) {
+    // Counting the stones for the final score.
+
+    let stone = gridArr[index];
+    if ( stone == name ) return;
+    if ( stone == noName ) return;
+    console.log( stone );
+
+    scoreObj[stone]--;
+    gridArr[index] = noName;
+
+    updateLocalGrid( gridArr );
+    GridArrToGame_Rox();
+    changeScore();
+
+    
+    // console.log('right before updateServerGrid, ban.next: ', ban.next );
+    emit.updateServerGrid(gridArr, ban.next );
+
+
+}   // END of countStone()
+
 
 function checkForBan(banPos, atkPos) {
     // This function is triggered when exactly ONE enemy stone was removed.
@@ -362,12 +464,10 @@ function checkForBan(banPos, atkPos) {
     });
     if (count == wall.length) {
         // All ban conditions are met.
-
         console.log(banPos, ' is banned!');
-        bannedArr.push(banPos);
+        ban.next = banPos;
         // bannedPos = banPos;
-
-    }
+    } 
 }
 
 
@@ -527,7 +627,6 @@ function delRoomBox( room ) {
 //        MM    MM  MMMMMM    MMMMMM            MMMM    MM    MM    MMMM    MMMMMM  MMMMMM    MMMM    MM    MM  
 
 
-
 function addOnclick_LEAVE( roomName ) {
     $(roomName).html('LEAVE');
     $(roomName).off('click');
@@ -536,10 +635,8 @@ function addOnclick_LEAVE( roomName ) {
         room = 'lobby';
         
         scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
-        emit.updateScore(room, scoreObj)
-
+        emit.updateScore(room, scoreObj);
         emit.shout(oldRoom, `Uh, ${name} just rage-quit. Good riddance.`);
-
         emit.joinRoom(room);
 
         playerArr = [];
@@ -604,79 +701,16 @@ function addOnclick_putStone( elem, index ) {
         }        
     }
 
-    function putStone(index) {
-
-        let stone = gridArr[index];
-
-        if (config.strict) {
-            // IF config is set to strict...
-            // You cannot play alone.
-            // You cannot play out of turn.
-            // You cannot remove your own stone.
-            if (playerArr.length == 1) return;
-            if (playerArr[0] != name ) {
-                say('It&#39;s nacho turn.');
-                return;
-            }
-            if (stone == name) return;
-        }
-
-        emit.pass(room, passCount=0);
-        // console.log('wait, is this happening?');
-        // say('');
-
-        if ( bannedArr.includes( index+1 ) ) {
-            console.log('banned!');
-            say('Uh, it&#39;s kind of an ill eagle to do that...');
-            return; 
-        }
-            // Prohibit placing stone on banned spot.
-
-        if (stone == name) { gridArr[index] = noName; }
-        else if (stone == noName) { gridArr[index] = name; }
-        else { return; }
-
-        updateLocalGrid( gridArr );
-        GridArrToGame_Rox();
-
-        shiftPlayerList(name);
-        shiftPlayerList();
-            // First, reset order. Then go to next player.
-
-        if ( gridArr[index] == name ) {
-            // If I put a stone, as opposed to remove, then do this.
-
-            say('');
-            emit.shout(room, '');
-
-            bannedArr= [0];
-                // Once a stone has been placed, all bans are released.
-            calculateAttack(index);
-                // Inside calculateAttack, the bannedArr is updated too.
-            changeScore();
-        }
-                
-        emit.updateServerGrid(gridArr, bannedArr);
-
-    }   // END of putStone()
-
-    function countStone(index) {
-        let stone = gridArr[index];
-        if ( stone == name ) return;
-        if ( stone == noName ) return;
-        console.log( stone );
-
-        scoreObj[stone]--;
-        gridArr[index] = noName;
-
-        updateLocalGrid( gridArr );
-        GridArrToGame_Rox();
-        changeScore();
-        emit.updateServerGrid(gridArr, bannedArr);
-
-    }   // END of countStone()
-
 }   // END of addOnclick_putStone()
+
+
+
+
+
+
+
+
+
 
 
 
@@ -723,8 +757,10 @@ function showCountArr() {
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
         $('.square').eq(i).css('fill', "#fff0" );
+        // $('.square').eq(i).css('fill', colorObj[_name] );
+        // $('.square').eq(i).css('opacity', 0.5 );
         $('.square').eq(i).css('stroke', colorObj[_name]);
-        $('.square').eq(i).css('stroke-width', '4');
+        $('.square').eq(i).css('stroke-width', '5');
         $('.square').eq(i).css('stroke-linecap', 'round');
         $('.square').eq(i).css('stroke-dasharray', '10 13');
         $('.square').eq(i).css('r', '40');
@@ -780,6 +816,7 @@ function revertStoneCSS() {
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
         $('.square').eq(i).css('fill', "#fff0" );
+        // $('.square').eq(i).css('opacity', 1 );
         $('.square').eq(i).css('stroke-width', 0);
         $('.square').eq(i).css('r', 46);
     });
@@ -871,7 +908,7 @@ var emit = {
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
-    updateServerGrid : (gridArr, bannedArr) => { socket.emit('update grid on server', gridArr, bannedArr); },
+    updateServerGrid : (gridArr, banNext) => { socket.emit('update grid on server', gridArr, banNext); },
     pass : (room, passCount) => { socket.emit('update pass', room, passCount )},
     shout : (room,str) => { socket.emit('shout', room, str)}
     
@@ -950,8 +987,11 @@ socket.on('update player list', updatedPlayerList => {
 });
 
 
-socket.on('update grid', (colorObject, name_grid, banned_Arr) => {
-    if ( banned_Arr ) bannedArr = banned_Arr;
+socket.on('update grid', (colorObject, name_grid, banNext) => {
+    if ( banNext ) { 
+        ban.now = banNext;
+    } else { ban.now = 0; }
+    ban.next = 0;
     colorObj = colorObject;
     showScoreboard(scoreObj);
     visualizeGrid(colorObj, name_grid);
