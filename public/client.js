@@ -349,6 +349,10 @@ function findWinner() {
     if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
     strArr.forEach( nombre => { str += nombre; });
     say(`${str} won!`);
+    emit.shout(room, `${str} won!`);
+    $('#pass').fadeOut();
+
+    
 }
 
 
@@ -541,6 +545,7 @@ function createRoom() {
     $('#room-name').attr('placeholder', 'room name');
     $('#room-plus').show();
     $('#room-name').hide();
+    $('#pass').fadeIn();
 
     resetConfig();
     say('You&#39;re the first one in this room. Wait for the second player. ');
@@ -638,7 +643,10 @@ function addOnclick_LEAVE( roomName ) {
         
         scoreObj[name] = -9999;        // -9999 designated as sign of leaving.
         emit.updateScore(room, scoreObj);
-        emit.shout(oldRoom, `Uh, ${name} just rage-quit. Good riddance.`);
+
+        if ( stage.stat != 'count' ) {
+            emit.shout(oldRoom, `Uh, ${name} just rage-quit. Buh bye~`);
+        }
         emit.joinRoom(room);
 
         playerArr = [];
@@ -658,6 +666,8 @@ function addOnclick_JOIN( roomName ) {
         if ( playerNum < playerLimit ) {
 
             resetConfig();
+
+            $('#pass').fadeIn();
 
             if (playerNum == 1) {
                 say('You&#39;re the second player. Wait for your turn.');
@@ -869,6 +879,8 @@ $('#room-name').on('focusout', () => {
 });
 
 $('#pass').on('click', () => {
+
+
     if ( playerArr.length < 2 ) return;
     if ( stage.stat == 'count') return;
     if ( playerArr[0] != name ) {
@@ -990,8 +1002,8 @@ socket.on('update player list', updatedPlayerList => {
 
 
 socket.on('update grid', (colorObject, name_grid, banNext) => {
-    if ( banNext ) { 
-        ban.now = banNext;
+    if (stage.stat == 'count') return;
+    if ( banNext ) { ban.now = banNext;
     } else { ban.now = 0; }
     ban.next = 0;
     colorObj = colorObject;
@@ -1016,10 +1028,10 @@ socket.on('update pass', count => {
             say('All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
             emit.shout(room, 'All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
         } else if (stage.stat == 'clean' ) {
-            stage.count();
             passCount = 0;
             emit.pass(room, passCount);
             showCountArr();
+            stage.count();
         }
     } 
 
