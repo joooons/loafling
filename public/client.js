@@ -138,6 +138,7 @@ $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); })
 
 socket.on('board config', dim => { setUpGrid( dim ); });
 
+$('#config').hide();
 
 
 
@@ -519,17 +520,14 @@ function createRoom() {
     $('#room-name').hide();
     $('#pass').fadeIn();
 
-    resetConfig();
-    say('You&#39;re the first one in this room. Wait for the second player. ');
+    showConfig();
+    // resetConfig();
+    // say('You&#39;re the first one in this room. Wait for the second player. ');
+    // emit.createRoom(room);
+    // emit.updateClientGrid(room);
+    // emit.updateScore(room, scoreObj);
+    // $('#boardFrame').fadeIn(fadeTime);
 
-    emit.createRoom(room);
-
-    emit.updateClientGrid(room);
-
-    
-    emit.updateScore(room, scoreObj);
-
-    $('#boardFrame').fadeIn(fadeTime);
 }
 
 function allowCreateRooms() {
@@ -832,7 +830,17 @@ function say(str) {
 }
 
 
+function showConfig() {
+    $('#config').css('z-index', 1);
+    $('#config').show();
 
+
+}
+
+function hideConfig() {
+
+    $('#config').hide();
+}
 
 
 
@@ -887,7 +895,21 @@ $('#pass').on('click', () => {
     shiftPlayerList();
 });
 
+$('#config-btn').on('click', () => {
+    let num = $('#config-num').val();
+    let dim = $('#config-dim').val();
+    let strict = $('#config-strict').val();
+    console.log(num, dim, strict);
+    hideConfig();
 
+    resetConfig();
+    say('You&#39;re the first one in this room. Wait for the second player. ');
+    emit.createRoom(room);
+    emit.updateClientGrid(room);
+    emit.updateScore(room, scoreObj);
+    $('#boardFrame').fadeIn(fadeTime);
+
+});
 
 
 

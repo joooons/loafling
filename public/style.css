@@ -327,6 +327,47 @@ div[id^="rm-"] {
 
 
 
+#config {
+    /* display: none; */
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#config > div {
+    background: skyblue;
+    width: 200px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    /* transition: 1s; */
+}
+
+
+
+#config-head {
+    text-align: center;
+    /* grid-column: 1/3; */
+}
+
+
+
+
+
+
+
 
 /*   MMMM    MMMMMM  MM    MM  MMMMMMMM  MMMMMM     */
 /* MM    MM    MM    MM    MM  MM        MM    MM   */
@@ -334,6 +375,11 @@ div[id^="rm-"] {
 /* MM    MM    MM    MM    MM  MM        MM    MM   */
 /* MM    MM    MM    MM    MM  MM        MM    MM   */
 /*   MMMM      MM    MM    MM  MMMMMMMM  MM    MM   */
+
+
+.bar {
+    grid-column: 1/3;
+}
 
 .gone {
     /* display: none; */
