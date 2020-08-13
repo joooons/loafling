@@ -521,13 +521,6 @@ function createRoom() {
     $('#pass').fadeIn();
 
     showConfig();
-    // resetConfig();
-    // say('You&#39;re the first one in this room. Wait for the second player. ');
-    // emit.createRoom(room);
-    // emit.updateClientGrid(room);
-    // emit.updateScore(room, scoreObj);
-    // $('#boardFrame').fadeIn(fadeTime);
-
 }
 
 function allowCreateRooms() {
@@ -996,11 +989,6 @@ socket.on('update names', arr => {
     updateNames( arr );
 });
 
-
-// socket.on('update color', arr => {
-//     let array = arr;
-//     console.log(arr);
-// });
 
 
 socket.on('update player list', updatedPlayerList => {

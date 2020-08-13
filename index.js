@@ -305,7 +305,7 @@ io.on('connection', (socket) => {
 
   socket.on('new user', suggestedName => {
 
-    socket.emit('board config', boardDim);
+    // socket.emit('board config', boardDim);
     
     let name = avoidDuplicate( ID_Name, suggestedName, nameSuffix );
     if ( name != suggestedName ) { socket.emit('change name', name ); }
@@ -347,6 +347,11 @@ io.on('connection', (socket) => {
     Name_Room.set(name, room);
     socket.join(room);
       // be the first to join
+
+
+
+      
+    socket.emit('board config', boardDim);
 
     startPlayerList(room);
     addPlayer(room, name);
@@ -485,6 +490,9 @@ io.on('connection', (socket) => {
       // if oldroom is not empty, send player list to old room
 
     if ( room != 'lobby' ) { 
+
+      socket.emit('board config', boardDim);
+      
       socket.join(room); 
       let obj = Room_GameData.get(room);
 

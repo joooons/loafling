@@ -20,6 +20,9 @@ var svgElem;
 // LOCAL FUNCTIONS _________________________________________________
 
 function addSVGtoBoard( elem, num ) {
+    $(elem).html('');
+    // RESET the contents of 'board'
+
     let xDim = 100 * num;
     let yDim = 100 * num;
     // let svg = document.createElementNS(ns, 'svg');
