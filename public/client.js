@@ -517,6 +517,8 @@ function resizeBoard() {
     board.style.height = dim + 'px';
     message.style.height = '50px';
     message.style.width = ( board_x - 40 ) + 'px';
+    // message.style.left = 0;
+    // message.style.right = 0;
     
 }
 
@@ -740,7 +742,7 @@ function showScoreboard(obj) {
         let str = '';
         if (player == playerArr[0]) str = '&#8594;';
         $('#players').append(`<div>${str}</div>`);
-        $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
+        $('#players').append(`<div style="color: ${colorObj[player]}"><sup>&#11044;</sup></div>`);
         str = `${player}`;
         if ( player == name ) str = `<b>${player}</b>`;
         $('#players').append(`<div>${str}</div>`);
