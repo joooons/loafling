@@ -48,11 +48,12 @@ const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
-const boardDim = 5;
+// const boardDim = 5;
 const noName = 'zz';
 // const banned = '91fja8';
   // variables to synchronize to client
 
+  var Room_Config = new Map();
 
 
 
@@ -234,7 +235,7 @@ function updateScore(room, scoreObj) {
 io.on('connection', (socket) => {
   
   console.log(`--------- ${socket.id} connected ----------`);
-  socket.emit('synchronize variables', noName, boardDim);
+  socket.emit('synchronize variables', noName);
 
 
 
@@ -337,7 +338,10 @@ io.on('connection', (socket) => {
 
   // _______ CREATE ROOM ______________________________________
 
-  socket.on('create room', roomName => {
+  socket.on('create room', (roomName, configData) => {
+
+    console.log('configData');
+    console.log(configData);
 
     let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
     if ( room != roomName ) { socket.emit('change room name', room ); }
@@ -345,13 +349,18 @@ io.on('connection', (socket) => {
 
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
+
+    Room_Config.set(room, configData);
+
     socket.join(room);
       // be the first to join
 
+    console.log( Room_Config.get(room) );
 
 
-      
-    socket.emit('board config', boardDim);
+
+
+    socket.emit('board config', Room_Config.get(room) );
 
     startPlayerList(room);
     addPlayer(room, name);
@@ -361,7 +370,7 @@ io.on('connection', (socket) => {
     colorSet = randomizeColorset();
     obj.colorObj[noName] = giveUniqColor(obj.colorObj);
     obj.colorObj[name] = giveUniqColor(obj.colorObj);
-    obj.grid = emptyGrid( boardDim );
+    obj.grid = emptyGrid( Room_Config.get(room).dim );
     Room_GameData.set( room, obj );
       // Initialize Room_GameData map...
       // ...and assign colors.
@@ -491,7 +500,9 @@ io.on('connection', (socket) => {
 
     if ( room != 'lobby' ) { 
 
-      socket.emit('board config', boardDim);
+      // socket.emit('board config', boardDim);
+      socket.emit('board config', Room_Config.get(room) );
+
       
       socket.join(room); 
       let obj = Room_GameData.get(room);

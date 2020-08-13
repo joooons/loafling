@@ -82,7 +82,8 @@ function arrNESW(pos) {
     NESW.forEach( coord => {
         let xn = x + coord.x;
         let yn = y + coord.y;
-        let test = ( (xn>0)&&(yn>0)&&(xn<=boardDim)&&(yn<=boardDim) );
+        // let test = ( (xn>0)&&(yn>0)&&(xn<=boardDim)&&(yn<=boardDim) );
+        let test = ( (xn>0)&&(yn>0)&&(xn<=config.dim)&&(yn<=config.dim) );
         if (test) arr.push( XYtoPOS(xn, yn) );
     });
     sortA(arr);
@@ -174,9 +175,12 @@ function showRox(name) {
 
 // LOCAL FUNCTIONS (MINI) ________________________________________
 
-function XYtoPOS(x, y) { return x + boardDim * ( y - 1 ); }
-function POStoX(pos) { return (pos - 1) % boardDim + 1; }
-function POStoY(pos) { return ( ( pos - POStoX(pos, boardDim) ) / boardDim) + 1; }
+// function XYtoPOS(x, y) { return x + boardDim * ( y - 1 ); }
+function XYtoPOS(x, y) { return x + config.dim * ( y - 1 ); }
+// function POStoX(pos) { return (pos - 1) % boardDim + 1; }
+function POStoX(pos) { return (pos - 1) % config.dim + 1; }
+// function POStoY(pos) { return ( ( pos - POStoX(pos, boardDim) ) / boardDim) + 1; }
+function POStoY(pos) { return ( ( pos - POStoX(pos, config.dim) ) / config.dim) + 1; }
 function sortA(arr) { arr.sort( (a,b) => {return a-b} ); }
 function sortD(arr) { arr.sort( (a,b) => {return b-a} ); }
 

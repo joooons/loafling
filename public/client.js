@@ -34,10 +34,10 @@ ban.next = 0;
 
 var bannedRoom = '  ';
 
-const config = {};
-config.dim = 6;
+var config = {};
+config.dim = 0;
 config.strict = false;
-config.playerLimit = 2;
+config.playerLimit = 0;
     // IF config is set to "strict"...
     // You cannot play alone.
     // You cannot play out of turn.
@@ -136,7 +136,14 @@ $('#boardFrame').fadeOut(0, () => { $('#boardFrame').css('visibility', 'visible'
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
-socket.on('board config', dim => { setUpGrid( dim ); });
+socket.on('board config', configData => { 
+
+    console.log(" incoming: ", configData);
+    config = configData;
+    
+    console.log(" after = config: ", config );
+    setUpGrid( config.dim ); 
+});
 
 $('#config').hide();
 
@@ -310,7 +317,7 @@ function resetConfig() {
     revertStoneCSS();
     passCount = 0;
     // config.dim = 6;
-    config.strict = true;
+    // config.strict = true;
     // config.playerLimit = 2;
     stage.fight();    
     countArr = [];
@@ -520,6 +527,7 @@ function createRoom() {
     $('#room-name').hide();
     $('#pass').fadeIn();
 
+    setUpGrid(config.dim);
     showConfig();
 }
 
@@ -670,7 +678,8 @@ function addOnclick_JOIN( roomName ) {
 
             $('#boardFrame').fadeIn(fadeTime);
             updateButtons();
-
+            
+            setUpGrid(config.dim);
 
 
         } else {
@@ -765,7 +774,7 @@ function showCountArr() {
     function identifyHouse() {
         let teams = Game_Rox[noName].teams;
         let walls = Game_Rox[noName].walls;
-        countArr = new Array( Math.pow(boardDim, 2) ).fill(noName);
+        countArr = new Array( Math.pow( config.dim, 2) ).fill(noName);
         walls.forEach( (wall,i) => {
             let enemies = [];
             wall.forEach( pos => {
@@ -839,6 +848,11 @@ function hideConfig() {
 
 
 
+
+
+
+
+
 // _________________________________ LOCAL FUNCTIONS (END)
 
 //  MMMMMMMM  MM      MM  MMMMMMMM  MM    MM  MMMMMM    MMMM    
@@ -892,12 +906,24 @@ $('#config-btn').on('click', () => {
     let num = $('#config-num').val();
     let dim = $('#config-dim').val();
     let strict = $('#config-strict').val();
+    // strict = ( strict == 'true' ) ? true : false;
+
     console.log(num, dim, strict);
+    if ( num ) { config.playerLimit = num }
+    else { config.playerLimit = 2 }
+
+    if ( dim ) { config.dim = dim }
+    else { config.dim = 13 }
+
+    if ( strict ) { config.strict = true }
+    else { config.strict = false }
+
+    console.log(config);
     hideConfig();
 
     resetConfig();
     say('You&#39;re the first one in this room. Wait for the second player. ');
-    emit.createRoom(room);
+    emit.createRoom(room, config);
     emit.updateClientGrid(room);
     emit.updateScore(room, scoreObj);
     $('#boardFrame').fadeIn(fadeTime);
@@ -925,7 +951,7 @@ $('#config-btn').on('click', () => {
 
 var emit = {
     newUser : (name) => { socket.emit('new user', name); },
-    createRoom : (room) => { socket.emit('create room', room); },
+    createRoom : (room, config) => { socket.emit('create room', room, config); },
     joinRoom : (room) => { socket.emit('join room', room); },
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
