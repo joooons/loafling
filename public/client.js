@@ -21,12 +21,11 @@ var passCount = 0;
     // If the number of passing players is equal to number of players...
     // ...the game moves to the next stage.
 
-const playerLimit = 4;
+const playerLimit = 10;
 const fadeTime = 500;
 const boardRatio = 1.3;
 
 var noName;
-var boardDim;
 
 var ban = {};
 ban.now = 0;
@@ -140,7 +139,7 @@ socket.on('board config', configData => {
 
     console.log(" incoming: ", configData);
     config = configData;
-    
+
     console.log(" after = config: ", config );
     setUpGrid( config.dim ); 
 });
@@ -654,37 +653,8 @@ function addOnclick_JOIN( roomName ) {
         room = roomName.slice(4);
         let playerNum = $(`#rm-${room} >`).length;
 
+        emit.requestToJoinRoom(room);
 
-        if ( playerNum < playerLimit ) {
-
-            resetConfig();
-
-            $('#pass').fadeIn();
-
-            if (playerNum == 1) {
-                say('You&#39;re the second player. Wait for your turn.');
-                emit.shout(room, 'Second player joined. With at least 2 players, you can start playing. You go first.');
-            }
-
-            if (playerNum > 1 ) {
-                say(`You are player numero ${playerNum+1}. Wait for your turn.`);
-                emit.shout(room, `${name} joined. Yay.`);
-            }
-            
-            emit.pass(room, passCount);
-            emit.joinRoom(room);
-            emit.updateScore(room, scoreObj);
-            emit.updateClientGrid(room);
-
-            $('#boardFrame').fadeIn(fadeTime);
-            updateButtons();
-            
-            setUpGrid(config.dim);
-
-
-        } else {
-            alert('room full');
-        }
     });
 }
 
@@ -952,6 +922,7 @@ $('#config-btn').on('click', () => {
 var emit = {
     newUser : (name) => { socket.emit('new user', name); },
     createRoom : (room, config) => { socket.emit('create room', room, config); },
+    requestToJoinRoom : (room) => { socket.emit('request to join room', room); },
     joinRoom : (room) => { socket.emit('join room', room); },
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
@@ -983,10 +954,8 @@ var emit = {
 
 // SOCKET ON EVENTS _______________________________________
 
-socket.on('synchronize variables', (blankName, dim) => {
+socket.on('synchronize variables', blankName => {
     noName = blankName;
-    boardDim = dim;
-    // banned = bannedName;
 });
 
 
@@ -1009,6 +978,45 @@ socket.on('add roombox', roomName => {
 socket.on('del roombox', roomName => {
     delRoomBox( roomName );
 });
+
+
+socket.on('entry granted', (bool, configData) => {
+
+    if ( !bool ) {
+        alert('The room is full.');
+        return;
+    }
+
+    config = configData;
+    console.log('you may enter');
+
+    resetConfig();
+
+    $('#pass').fadeIn();
+
+    let playerNum = $(`#rm-${room} >`).length;
+    if (playerNum == 1) {
+        say('You&#39;re the second player. Wait for your turn.');
+        emit.shout(room, 'Second player joined. With at least 2 players, you can start playing. You go first.');
+    }
+
+    if (playerNum > 1 ) {
+        say(`You are player numero ${playerNum+1}. Wait for your turn.`);
+        emit.shout(room, `${name} joined. Yay.`);
+    }
+    
+    emit.pass(room, passCount);
+    emit.joinRoom(room);
+    emit.updateScore(room, scoreObj);
+    emit.updateClientGrid(room);
+
+    $('#boardFrame').fadeIn(fadeTime);
+    updateButtons();
+    
+    setUpGrid(config.dim);
+    
+});
+
 
 
 socket.on('update names', arr => {

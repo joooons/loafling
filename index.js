@@ -305,8 +305,6 @@ io.on('connection', (socket) => {
   // _______ NEW USER _________________________________________
 
   socket.on('new user', suggestedName => {
-
-    // socket.emit('board config', boardDim);
     
     let name = avoidDuplicate( ID_Name, suggestedName, nameSuffix );
     if ( name != suggestedName ) { socket.emit('change name', name ); }
@@ -452,6 +450,45 @@ io.on('connection', (socket) => {
 
 
 
+//  MMMMMM    MMMMMMMM    MMMMMM    MM    MM  MMMMMMMM    MMMM    MMMMMM        MMMMMM    MMMM          MMMMMM    MMMM    MMMMMM  MM    MM        MMMMMM      MMMM      MMMM    MM      MM  
+//  MM    MM  MM        MM      MM  MM    MM  MM        MM    MM    MM            MM    MM    MM            MM  MM    MM    MM    MMMM  MM        MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//  MMMMMM    MMMMMMMM  MM      MM  MM    MM  MMMMMMMM    MM        MM            MM    MM    MM            MM  MM    MM    MM    MM  MMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//  MM    MM  MM        MM  MM  MM  MM    MM  MM            MM      MM            MM    MM    MM            MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MM        MM    MM    MM    MM  MM        MM    MM    MM            MM    MM    MM            MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MMMMMMMM    MMMM  MM    MMMM    MMMMMMMM    MMMM      MM            MM      MMMM          MMMM      MMMM    MMMMMM  MM    MM        MM    MM    MMMM      MMMM    MM      MM  
+
+  // _______ REQUEST TO JOIN ROOM ____________________________________________________
+
+  socket.on('request to join room', room => {
+    console.log('request to join room received...');
+    console.log('trying to join this room: ', room);
+
+    let max = Room_Config.get(room).playerLimit;
+    let current = Room_PlayerArr.get(room).length;
+    console.log('room allows: ', max);
+    console.log('room has: ', current);
+    if (current < max) { 
+      socket.emit('entry granted', true, Room_Config.get(room) );
+    } else { 
+      socket.emit('entry granted', false, Room_Config.get(room) );
+      console.log('can not join. full already'); 
+    }
+
+
+
+  });   // _______ REQUEST TO JOIN ROOM (END) ________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -463,7 +500,7 @@ io.on('connection', (socket) => {
 //      MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
 //  MMMM      MMMM    MMMMMM  MM    MM        MM    MM    MMMM      MMMM    MM      MM  
 
-  // _______ JOIN ROOM ________________________________________
+  // _______ JOIN ROOM ____________________________________________________
 
   socket.on('join room', room => {
     
@@ -500,7 +537,6 @@ io.on('connection', (socket) => {
 
     if ( room != 'lobby' ) { 
 
-      // socket.emit('board config', boardDim);
       socket.emit('board config', Room_Config.get(room) );
 
       
