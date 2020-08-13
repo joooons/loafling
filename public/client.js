@@ -404,22 +404,19 @@ function putStone(index) {
 function countStone(index) {
     // Counting the stones for the final score.
 
-    let stone = gridArr[index];
-    if ( stone == name ) return;
-    if ( stone == noName ) return;
-    console.log( stone );
+    let stoneOwner = gridArr[index];
+    if ( stoneOwner != name ) return;
+    // if ( stone == noName ) return;
+    console.log( stoneOwner );
 
-    scoreObj[stone]--;
+    scoreObj[stoneOwner]--;
     gridArr[index] = noName;
 
     updateLocalGrid( gridArr );
     GridArrToGame_Rox();
     changeScore();
 
-    
-    // console.log('right before updateServerGrid, ban.next: ', ban.next );
     emit.updateServerGrid(gridArr, ban.next );
-
 
 }   // END of countStone()
 
@@ -630,15 +627,14 @@ function addOnclick_LEAVE( roomName ) {
         } 
         
         if ( stage.stat != 'fight' ) {
-            // console.log('left game after end');
+            // If you leave during "clean" or "count stage"...
+            // ...you cannot reenter the room. Sorry.
             let elem = `#bt-${oldRoom}`;
-            // console.log(elem);
             $(elem).off("click");
             $(elem).css('color', 'gray');
             $(elem).html('CLOSED');
             bannedRoom = elem;
         }
-
 
         emit.joinRoom(room);
 
@@ -1022,7 +1018,7 @@ socket.on('update pass', count => {
             passCount = 0;
             emit.pass(room, passCount);
             say('All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
-            emit.shout(room, 'All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
+            emit.shout(room, 'All players passed. Remove your stones that are as good as dead. Click PASS when you are done. ');
         } else if (stage.stat == 'clean' ) {
             passCount = 0;
             emit.pass(room, passCount);
