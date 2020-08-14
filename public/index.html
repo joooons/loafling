@@ -66,11 +66,16 @@
 
     <div id="config">
         <div>
-            <div class='bar' id='config-head'>Room Settings</div>
-            <span>Max # of players: </span><input type="text" id="config-num" placeholder='2'>
-            <span>Length of board: </span><input type="text" id="config-dim" placeholder='13'>
-            <span>strict mode?: </span><input type="text" id="config-strict" placeholder='true'>
-            <button class='bar' id="config-btn">ENTER</button>
+            <form action="#" id="config-form">
+                <div class='bar' id='config-head'>Room Settings</div>
+                <span>Max # of players: </span>
+                <input id="config-num" type="number" value="2" min="2" max="6" step="1" required autofocus>
+                <span>Length of board: </span>
+                <input id="config-dim" type="number" value="9" min="2" max="19" step="1" required>
+                <span>strict mode?: </span>
+                <input id="config-strict" type="checkbox">
+                <button class='bar' id="config-btn">ENTER</button>
+            </form>
         </div>
     </div>
 

@@ -137,10 +137,9 @@ $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); })
 
 socket.on('board config', configData => { 
 
-    console.log(" incoming: ", configData);
+    // console.log(" incoming: ", configData);
     config = configData;
-
-    console.log(" after = config: ", config );
+    // console.log(" after = config: ", config );
     setUpGrid( config.dim ); 
 });
 
@@ -872,21 +871,18 @@ $('#pass').on('click', () => {
     shiftPlayerList();
 });
 
-$('#config-btn').on('click', () => {
+$('#config-form').on('submit', ev => {
+    ev.preventDefault();
+
     let num = $('#config-num').val();
     let dim = $('#config-dim').val();
-    let strict = $('#config-strict').val();
-    // strict = ( strict == 'true' ) ? true : false;
-
+    let strict = document.querySelector('#config-strict').checked;
+    
     console.log(num, dim, strict);
-    if ( num ) { config.playerLimit = num }
-    else { config.playerLimit = 2 }
-
-    if ( dim ) { config.dim = dim }
-    else { config.dim = 13 }
-
-    if ( strict ) { config.strict = true }
-    else { config.strict = false }
+    
+    config.playerLimit = num;
+    config.dim = dim;
+    config.strict = strict;
 
     console.log(config);
     hideConfig();
@@ -899,6 +895,7 @@ $('#config-btn').on('click', () => {
     $('#boardFrame').fadeIn(fadeTime);
 
 });
+
 
 
 
