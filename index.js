@@ -191,8 +191,6 @@ function updateScore(room, scoreObj) {
 
   if ( !Room_Score.has(room) ) { 
     Room_Score.set(room, scoreObj); 
-    // console.log('new room, new map...');
-    // console.log('final Room_Score: ', Room_Score);
   } else {
     let obj = Room_Score.get(room);
     Object.keys(scoreObj).forEach( name => {
@@ -200,8 +198,6 @@ function updateScore(room, scoreObj) {
       if (obj[name] == -9999) delete obj[name];
     });
     Room_Score.set(room, obj);
-    // console.log('existing room...');
-    // console.log('final Room_Score: ', Room_Score);
   }
   
   io.to(room).emit('update score', Room_Score.get(room) );
@@ -327,6 +323,42 @@ io.on('connection', (socket) => {
 
 
 
+
+
+
+
+
+//  MMMMMM    MMMMMMMM    MMMMMM    MM    MM  MMMMMMMM    MMMM    MMMMMM        MMMMMM    MMMM            MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM        MMMMMM      MMMM      MMMM    MM      MM  
+//  MM    MM  MM        MM      MM  MM    MM  MM        MM    MM    MM            MM    MM    MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//  MMMMMM    MMMMMMMM  MM      MM  MM    MM  MMMMMMMM    MM        MM            MM    MM    MM        MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//  MM    MM  MM        MM  MM  MM  MM    MM  MM            MM      MM            MM    MM    MM        MM        MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MM        MM    MM    MM    MM  MM        MM    MM    MM            MM    MM    MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MMMMMMMM    MMMM  MM    MMMM    MMMMMMMM    MMMM      MM            MM      MMMM            MMMM    MM    MM  MMMMMMMM  MM    MM    MM    MMMMMMMM        MM    MM    MMMM      MMMM    MM      MM  
+
+  // _______ REQUET TO CREATE ROOM __________________________________________________
+
+  socket.on('request to create room', (roomName) => {
+
+    let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
+    // if ( room != roomName ) { socket.emit('change room name', room ); }
+      // Assign a unique name.
+
+    socket.emit('room creation granted', room);
+
+  });   // _______ REQUEST TO CREATE ROOM (END) ______________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
 //    MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM      MMMMMM      MMMM      MMMM    MM      MM  
 //  MM    MM  MM    MM  MM        MM    MM    MM    MM            MM    MM  MM    MM  MM    MM  MMMM  MMMM  
 //  MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM      MMMMMM    MM    MM  MM    MM  MM  MM  MM  
@@ -334,29 +366,21 @@ io.on('connection', (socket) => {
 //  MM    MM  MM    MM  MM        MM    MM    MM    MM            MM    MM  MM    MM  MM    MM  MM      MM  
 //    MMMM    MM    MM  MMMMMMMM  MM    MM    MM    MMMMMMMM      MM    MM    MMMM      MMMM    MM      MM  
 
-  // _______ CREATE ROOM ______________________________________
+  // _______ CREATE ROOM __________________________________________________
 
-  socket.on('create room', (roomName, configData) => {
+  socket.on('create room', (room, configData) => {
 
-    console.log('configData');
-    console.log(configData);
-
-    let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
-    if ( room != roomName ) { socket.emit('change room name', room ); }
+    // let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
+    // if ( room != roomName ) { socket.emit('change room name', room ); }
       // Assign a unique name.
+
+    
 
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
-
     Room_Config.set(room, configData);
 
-    socket.join(room);
-      // be the first to join
-
-    console.log( Room_Config.get(room) );
-
-
-
+    socket.join(room);    // You are first to join
 
     socket.emit('board config', Room_Config.get(room) );
 
@@ -460,13 +484,12 @@ io.on('connection', (socket) => {
   // _______ REQUEST TO JOIN ROOM ____________________________________________________
 
   socket.on('request to join room', room => {
-    console.log('request to join room received...');
-    console.log('trying to join this room: ', room);
 
     let max = Room_Config.get(room).playerLimit;
     let current = Room_PlayerArr.get(room).length;
-    console.log('room allows: ', max);
-    console.log('room has: ', current);
+
+    console.log('current:', current, '   max:', max);
+
     if (current < max) { 
       socket.emit('entry granted', true, Room_Config.get(room) );
     } else { 

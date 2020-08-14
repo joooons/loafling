@@ -135,13 +135,7 @@ $('#boardFrame').fadeOut(0, () => { $('#boardFrame').css('visibility', 'visible'
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
-socket.on('board config', configData => { 
 
-    // console.log(" incoming: ", configData);
-    config = configData;
-    // console.log(" after = config: ", config );
-    setUpGrid( config.dim ); 
-});
 
 $('#config').hide();
 
@@ -379,9 +373,7 @@ function putStone(index) {
 
     // This is also SCENARIO #1. Unable to put a stone down at all.
     if ( ban.now == index + 1 ) {
-        console.log('banned!');
-        say('Uh, it&#39;s kind of an ill eagle to do that...');
-        return; 
+        return say('Uh, you can&#39;t do that. Don&#39;t be an ill eagle...'); 
     }
         // Prohibit placing stone on banned spot.
 
@@ -423,8 +415,6 @@ function countStone(index) {
 
     let stoneOwner = gridArr[index];
     if ( stoneOwner != name ) return;
-    // if ( stone == noName ) return;
-    console.log( stoneOwner );
 
     scoreObj[stoneOwner]--;
     gridArr[index] = noName;
@@ -443,22 +433,17 @@ function checkForBan(banPos, atkPos) {
     // Next: is the attack stone surrounded in 3 directions?
     // If so, the place of the removed stone is a banned spot.
     
-    // console.log(banPos, atkPos);
-
     if (playerArr.length > 2) return;
         // The ban applies only if there are exactly two players.
 
     let count = 0;
     let wall = arrNESW(atkPos);
     wall.forEach( val => {
-        // console.log(val, gridArr[val-1], playerArr[0]);
         if (gridArr[val-1] == playerArr[0]) count++;
     });
     if (count == wall.length) {
         // All ban conditions are met.
-        console.log(banPos, ' is banned!');
         ban.next = banPos;
-        // bannedPos = banPos;
     } 
 }
 
@@ -525,10 +510,9 @@ function createRoom() {
         $('#room-name').val('');
         return;    
     }
-    room = $('#room-name').val();
-    room = room.slice(0,8);
-    // if (room == bannedRoom) bannedRoom = '1vb087230n87edsaf';
 
+    room = $('#room-name').val();
+    room = room.slice(0,12);
 
     $('#room-name').val('');
     $('#room-name').attr('placeholder', 'room name');
@@ -536,7 +520,6 @@ function createRoom() {
     $('#room-name').hide();
     $('#pass').fadeIn();
 
-    setUpGrid(config.dim);
     showConfig();
 }
 
@@ -562,25 +545,23 @@ function denyCreateRooms() {
 function allButtonsJoin(elem) {
     // All buttons should join, EXCEPT the one specified in the argument.
 
-    // console.log('inside allButtonsJoin() ');
-    // console.log(elem);
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        // console.log(str, elem);
         if ( `#${str}` != elem ) addOnclick_JOIN(`#${str}`);
         $(`div[id^="rb-"]`).show();
     }
 }
 
-function onlyThisButtonLeave( room ) {
+function onlyThisButtonLeave( roomName ) {
+
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) { $(`button[id^="bt-"]`).eq(i).hide(); }
     for ( i=0 ; i<num ; i++ ) { $(`div[id^="rb-"]`).eq(i).hide(); }
-    addOnclick_LEAVE(`#bt-${room}`);
-    $(`#bt-${room}`).show();
-    $(`div[id^="rb-${room}"]`).show();
+    addOnclick_LEAVE(`#bt-${roomName}`);
+    $(`#bt-${roomName}`).show();
+    $(`div[id="rb-${roomName}"]`).show();
 }
 
 function updateButtons() {
@@ -648,6 +629,7 @@ function addOnclick_LEAVE( roomName ) {
 
         playerArr = [];
         scoreObj = {};
+
         updateButtons();
 
         $('#message').html('');
@@ -681,10 +663,10 @@ function addOnclick_putStone( elem, index ) {
                 countStone(index);
             break;
             case 'count':
-                // console.log('nothing to do here');
+                // ...nothing to see here.
             break;
             default:
-                // console.log('this option does not exist');
+                // ...nothing to see here. move along.
         }        
     }
 
@@ -821,7 +803,6 @@ function showConfig() {
     $('#config').css('z-index', 1);
     $('#config').show();
 
-
 }
 
 function hideConfig() {
@@ -890,25 +871,16 @@ $('#pass').on('click', () => {
 $('#config-form').on('submit', ev => {
     ev.preventDefault();
 
-    let num = $('#config-num').val();
-    let dim = $('#config-dim').val();
-    let strict = document.querySelector('#config-strict').checked;
+    config.playerLimit = $('#config-num').val();
+    config.dim = $('#config-dim').val();
+    config.strict = document.querySelector('#config-strict').checked;
     
-    console.log(num, dim, strict);
-    
-    config.playerLimit = num;
-    config.dim = dim;
-    config.strict = strict;
-
-    console.log(config);
     hideConfig();
 
     resetConfig();
     say('You&#39;re the first player to join. Please wait for the second player. The game ends when all players PASS in order. ');
-    emit.createRoom(room, config);
-    emit.updateClientGrid(room);
-    emit.updateScore(room, scoreObj);
-    $('#boardFrame').fadeIn(fadeTime);
+
+    emit.requestToCreateRoom(room);
 
 });
 
@@ -934,6 +906,7 @@ $('#config-form').on('submit', ev => {
 
 var emit = {
     newUser : (name) => { socket.emit('new user', name); },
+    requestToCreateRoom : (room) => { socket.emit('request to create room', room); },
     createRoom : (room, config) => { socket.emit('create room', room, config); },
     requestToJoinRoom : (room) => { socket.emit('request to join room', room); },
     joinRoom : (room) => { socket.emit('join room', room); },
@@ -977,8 +950,9 @@ socket.on('change name', newName => {
 });
 
 
-socket.on('change room name', roomName => {
-    room = roomName;
+socket.on('board config', configData => { 
+    config = configData;
+    setUpGrid( config.dim ); 
 });
 
 
@@ -993,16 +967,10 @@ socket.on('del roombox', roomName => {
 });
 
 
-socket.on('entry granted', (bool, configData) => {
+socket.on('entry granted', (entry_granted, config_data) => {
+    if ( !entry_granted ) { return alert('The room is full.'); }
 
-    if ( !bool ) {
-        alert('The room is full.');
-        return;
-    }
-
-    config = configData;
-    console.log('you may enter');
-
+    config = config_data;
     resetConfig();
 
     $('#pass').fadeIn();
@@ -1024,9 +992,10 @@ socket.on('entry granted', (bool, configData) => {
     emit.updateClientGrid(room);
 
     $('#boardFrame').fadeIn(fadeTime);
+
     updateButtons();
     
-    setUpGrid(config.dim);
+    // setUpGrid(config.dim);
     
 });
 
@@ -1051,6 +1020,7 @@ socket.on('update grid', (colorObject, name_grid, banNext) => {
     ban.next = 0;
     colorObj = colorObject;
     showScoreboard(scoreObj);
+
     visualizeGrid(colorObj, name_grid);
 });
 
@@ -1083,6 +1053,17 @@ socket.on('update pass', count => {
 socket.on('shout', (str) => {
     say(str);
 });
+
+
+socket.on('room creation granted', roomName => {
+    room = roomName;
+    emit.createRoom(roomName, config);
+    emit.updateClientGrid(roomName);
+    emit.updateScore(roomName, scoreObj);
+    $('#boardFrame').fadeIn(fadeTime);
+});
+
+
 
 
 
