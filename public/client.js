@@ -224,7 +224,7 @@ function calculateAttack(indexValue) {
 
                 if ( points == 1 ) {
                     say(`${victim} says "Tis but a scratch."`);
-                    emit.shout(room, 'So it begins...');
+                    emit.shout(room, `${name} took a petty jab at ${victim}.`);
                 } else if ( points > 4 ) {
                     say(`Savage...`);
                     emit.shout(room, 'It&#39;s getting real...');
@@ -288,10 +288,10 @@ function updateLocalGrid( grid ) {
     gridArr = grid;
     GridArrToGame_Rox();
 
-    let num1 = gridArr.length;
-    let num2 = Game_Rox[noName].total.length;
-    let num3 = playerArr.length;
-    if ( num2 == num1 - (2 * num3) ) say('Oh, by the way... The game ends when all players PASS consecutively. ');
+    // let num1 = gridArr.length;
+    // let num2 = Game_Rox[noName].total.length;
+    // let num3 = playerArr.length;
+    // if ( num2 == num1 - (2 * num3) ) say('Oh, by the way... The game ends when all players PASS consecutively. ');
         // At an arbitrary point in time in the game, the players are notified of the rules.
 
 }   // END of updateLocalGrid()
@@ -405,13 +405,16 @@ function putStone(index) {
 
     if ( gridArr[index] == name ) {
         // If I put a stone, as opposed to remove, then do this.
+
+        say('You played a move.');
+        emit.shout(room, `${name} played a move.`);
+
         calculateAttack(index);
         changeScore();
     } 
     
     emit.updateServerGrid(gridArr, ban.next );
-    say('You played a move');
-    emit.shout(room, `${name} played a move.`);
+    
 
 }   // END of putStone()
 
@@ -809,7 +812,7 @@ function revertStoneCSS() {
 function say(str) {
 
     $('#message').append(`<div>${str}</div>`);
-    $('#message').animate( { scrollTop: $('#message').get(0).scrollHeight}, 1000);
+    $('#message').animate( { scrollTop: $('#message').get(0).scrollHeight}, 700);
 
 }
 
@@ -880,7 +883,7 @@ $('#pass').on('click', () => {
     passCount++;
     emit.pass(room, passCount);
     say('You passed!');
-    emit.shout(room, `${name} passed!`);
+    if (passCount < playerArr.length ) emit.shout(room, `${name} passed!`);
     shiftPlayerList();
 });
 
@@ -901,7 +904,7 @@ $('#config-form').on('submit', ev => {
     hideConfig();
 
     resetConfig();
-    say('You&#39;re the first one in this room. Wait for the second player. ');
+    say('You&#39;re the first player to join. Please wait for the second player. The game ends when all players PASS in order. ');
     emit.createRoom(room, config);
     emit.updateClientGrid(room);
     emit.updateScore(room, scoreObj);
@@ -1006,13 +1009,13 @@ socket.on('entry granted', (bool, configData) => {
 
     let playerNum = $(`#rm-${room} >`).length;
     if (playerNum == 1) {
-        say('You&#39;re the second player. Wait for your turn.');
-        emit.shout(room, 'Second player joined. With at least 2 players, you can start playing. You go first.');
+        say('You&#39;re the second player to join. Wait for your turn. The game ends when all players PASS in order.');
+        emit.shout(room, `${name} joined the game. Now that there are at least 2 players, go ahead and make your first move!`);
     }
 
     if (playerNum > 1 ) {
-        say(`You are player numero ${playerNum+1}. Wait for your turn.`);
-        emit.shout(room, `${name} joined. Yay.`);
+        say(`You are player numero ${playerNum+1}. Wait for your turn. The game ends when all players PASS in order.`);
+        emit.shout(room, `${name} is in the house!`);
     }
     
     emit.pass(room, passCount);
@@ -1065,7 +1068,7 @@ socket.on('update pass', count => {
             stage.clean();
             passCount = 0;
             emit.pass(room, passCount);
-            emit.shout(room, 'All players passed. Now, remove your stones that are as good as dead. Be honest now! Click PASS when you are done. ');
+            say('All players passed. Now, remove your stones that are as good as dead. Be honest now! Click PASS when you are done. ');
         } else if (stage.stat == 'clean' ) {
             passCount = 0;
             emit.pass(room, passCount);

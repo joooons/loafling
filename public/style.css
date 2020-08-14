@@ -272,6 +272,7 @@ div[id^="rm-"] {
 
 #message {
     background: white;
+    color: gray;
     border-radius: 5px;
     word-wrap: break-word;
     padding: 4px;
@@ -291,8 +292,8 @@ div[id^="rm-"] {
 }
 
 #message > div:last-child {
-    font-weight: bold;
-    color: blue;
+    font-weight: 600;
+    color: black;
 }
 
 
