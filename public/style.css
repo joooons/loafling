@@ -273,17 +273,27 @@ div[id^="rm-"] {
 #message {
     background: white;
     border-radius: 5px;
-    /* text-align: center; */
     word-wrap: break-word;
-    /* width: 100%; */
-    /* height: 100%; */
     padding: 4px;
     text-align: left;
+    /* -ms-overflow-style: none; */
+    /* scrollbar-width: none; */
+    overflow-y: scroll;
 }
 
+/* #message::-webkit-scrollbar {
+    display: none;
+} */
 
+#message > div {
+    font-size: 8pt;
+    margin: 5px 2px 2px 2px;
+}
 
-
+#message > div:last-child {
+    font-weight: bold;
+    color: blue;
+}
 
 
 

@@ -271,7 +271,7 @@ function calculateAttack(indexValue) {
         if (count == wall.length) {
             gridArr[pos-1] = noName;
 
-            say('Hey, are you crazy? it&#39;s dangerous there!');
+            say('Hey, are you crazy? That&#39;s suicide!');
             GridArrToGame_Rox();
             shiftPlayerList(name);
         }
@@ -314,16 +314,12 @@ function shiftPlayerList(name) {
 function resetConfig() {
     revertStoneCSS();
     passCount = 0;
-    // config.dim = 6;
-    // config.strict = true;
-    // config.playerLimit = 2;
     stage.fight();    
     countArr = [];
     scoreObj[name] = 0;
     gridArr = [];
     playerArr = [];
     colorObj = {};
-    say('');
 }
 
 function findWinner() {
@@ -331,15 +327,29 @@ function findWinner() {
     let winners = [];
     let strArr = [];
     let str = '';
-    Object.values(scoreObj).forEach( num => { max = Math.max( max, num ); });
-    Object.keys(scoreObj).forEach( nombre => { if ( scoreObj[nombre] == max ) winners.push(nombre); });
-    winners.forEach( (nombre,i) => { if (nombre == name) winners[i] = 'you'; });
-    winners.forEach( (nombre,i) => { strArr[i] = `${nombre}, `; });
-    strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
-    if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
-    strArr.forEach( nombre => { str += nombre; });
-    say(`${str} won!`);
-    emit.shout(room, `${str} won!`);
+
+    // NOTE: scoreObj may have scores of players that already left.
+    playerArr.forEach( player => {
+        // let score = scoreObj[player];
+        max = Math.max( max, scoreObj[player] );
+    });
+
+    playerArr.forEach( player => {
+        if ( scoreObj[player] == max ) winners.push(player);
+    });
+
+    if ( winners.length == playerArr.length ) {
+        // If everyone has the same score...
+        emit.shout(room, 'The war is over. You have brought balance to the world.');    
+    } else {
+        // If not everyone has the same score...
+        winners.forEach( (nombre,i) => { strArr[i] = `${nombre}, `; });
+        strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
+        if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
+        strArr.forEach( nombre => { str += nombre; });
+        emit.shout(room, `${str} won!`);
+    }
+    
     $('#pass').fadeOut();
 }
 
@@ -395,15 +405,13 @@ function putStone(index) {
 
     if ( gridArr[index] == name ) {
         // If I put a stone, as opposed to remove, then do this.
-        say('');
-        emit.shout(room, '');
         calculateAttack(index);
         changeScore();
     } 
-    // else { ban.next = 0; }
     
-    // console.log('right before updateServerGrid, ban.next: ', ban.next );
     emit.updateServerGrid(gridArr, ban.next );
+    say('You played a move');
+    emit.shout(room, `${name} played a move.`);
 
 }   // END of putStone()
 
@@ -638,6 +646,8 @@ function addOnclick_LEAVE( roomName ) {
         playerArr = [];
         scoreObj = {};
         updateButtons();
+
+        $('#message').html('');
         $('#boardFrame').fadeOut(fadeTime);
     });
 }
@@ -797,7 +807,10 @@ function revertStoneCSS() {
 }
 
 function say(str) {
-    $('#message').html(str);
+
+    $('#message').append(`<div>${str}</div>`);
+    $('#message').animate( { scrollTop: $('#message').get(0).scrollHeight}, 1000);
+
 }
 
 
@@ -1023,13 +1036,7 @@ socket.on('update names', arr => {
 
 
 socket.on('update player list', updatedPlayerList => {
-    // let num1 = playerArr.length;
-    // let num2 = updatedPlayerList.length;
-    // if ( num1==1 && num2==2 ) { say(`Second player joined. With at least 2 players, you can start playing. ${playerArr[0]} goes first.`) }
-    // if ( num2 > 2) { say(`${playerArr[playerArr.length-1]} joined.`)   }
     playerArr = updatedPlayerList;
-    // let str = `<div>${updatedPlayerList[0]}'s turn!</div>`;
-    // if (playerArr[0] == name ) say('It&#39;s your turn! Hurry up!');
     showScoreboard(scoreObj);
 });
 
@@ -1058,8 +1065,7 @@ socket.on('update pass', count => {
             stage.clean();
             passCount = 0;
             emit.pass(room, passCount);
-            say('All players passed. Now, carefully remove obviously dead stones. Click PASS when you are done. ');
-            emit.shout(room, 'All players passed. Remove your stones that are as good as dead. Click PASS when you are done. ');
+            emit.shout(room, 'All players passed. Now, remove your stones that are as good as dead. Be honest now! Click PASS when you are done. ');
         } else if (stage.stat == 'clean' ) {
             passCount = 0;
             emit.pass(room, passCount);
