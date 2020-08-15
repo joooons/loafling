@@ -217,7 +217,7 @@ function calculateAttack(indexValue) {
                     let str1 = coloredName(name, colorObj[name]);
                     let str2 = coloredName(victim, colorObj[victim]);
                     say(`${str2} says "Tis but a scratch."`);
-                    emit.shout(room, `${str1} took a petty jab at ${str2}.`);
+                    emit.shout(room, `${str1} is acting passive aggressive.`);
                 } else if ( points > 4 ) {
                     say(`Savage...`);
                     emit.shout(room, 'It&#39;s getting real...');
@@ -267,6 +267,10 @@ function calculateAttack(indexValue) {
             say('Hey, are you crazy? That&#39;s suicide!');
             GridArrToGame_Rox();
             shiftPlayerList(name);
+        } else {
+            say('You played a move.');
+            let str = coloredName(name, colorObj[name] );
+            emit.shout(room, `${str} played a move.`);
         }
         
     }       // END of if ( !attackSucceeded ) {...}
@@ -330,6 +334,10 @@ function findWinner() {
         emit.shout(room, 'The war is over. You have brought balance to the world.');    
     } else {
         // If not everyone has the same score...
+        winners.forEach( (nombre,i) => {
+            winners[i] = coloredName( nombre, colorObj[nombre] );
+        });
+
         winners.forEach( (nombre,i) => { strArr[i] = `${nombre}, `; });
         strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
         if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
@@ -390,9 +398,9 @@ function putStone(index) {
     if ( gridArr[index] == name ) {
         // If I put a stone, as opposed to remove, then do this.
 
-        say('You played a move.');
-        let str = coloredName(name, colorObj[name] );
-        emit.shout(room, `${str} played a move.`);
+        // say('You played a move.');
+        // let str = coloredName(name, colorObj[name] );
+        // emit.shout(room, `${str} played a move.`);
 
         calculateAttack(index);
         changeScore();
@@ -668,17 +676,14 @@ function addOnclick_LEAVE( roomName ) {
 }
 
 function addOnclick_JOIN( roomName ) {
-    // the "roomName" argument is actually "bt-${room}"
-
+    // NOTE: The "roomName" argument is actually "bt-${room}"
     $(roomName).html('JOIN');
     $(roomName).off('click');
     $(roomName).css('color', 'black');
     $(roomName).on('click', () => {
+        removeBlink( $('#create-room') );
         room = roomName.slice(4);
-        let playerNum = $(`#rm-${room} >`).length;
-
         emit.requestToJoinRoom(room);
-
     });
 }
 
@@ -926,6 +931,7 @@ $('#config-form').on('submit', ev => {
     emit.requestToCreateRoom(room);
 
 });
+
 
 
 
