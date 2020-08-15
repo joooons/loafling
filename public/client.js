@@ -220,8 +220,10 @@ function calculateAttack(indexValue) {
                 scoreObj[victim] -= points;
 
                 if ( points == 1 ) {
-                    say(`${victim} says "Tis but a scratch."`);
-                    emit.shout(room, `${name} took a petty jab at ${victim}.`);
+                    let str1 = coloredName(name, colorObj[name]);
+                    let str2 = coloredName(victim, colorObj[victim]);
+                    say(`${str2} says "Tis but a scratch."`);
+                    emit.shout(room, `${str1} took a petty jab at ${str2}.`);
                 } else if ( points > 4 ) {
                     say(`Savage...`);
                     emit.shout(room, 'It&#39;s getting real...');
@@ -284,12 +286,6 @@ function changeScore() {
 function updateLocalGrid( grid ) {
     gridArr = grid;
     GridArrToGame_Rox();
-
-    // let num1 = gridArr.length;
-    // let num2 = Game_Rox[noName].total.length;
-    // let num3 = playerArr.length;
-    // if ( num2 == num1 - (2 * num3) ) say('Oh, by the way... The game ends when all players PASS consecutively. ');
-        // At an arbitrary point in time in the game, the players are notified of the rules.
 
 }   // END of updateLocalGrid()
 
@@ -378,7 +374,6 @@ function putStone(index) {
     if ( ban.now == index + 1 ) {
         return say('Uh, you can&#39;t do that. Don&#39;t be an ill eagle...'); 
     }
-        // Prohibit placing stone on banned spot.
 
     // This is SCENARIO #2 and SCENARIO #3, and maybe SCENARIO #4.
     // Either remove a stone, or put a stone down...
@@ -402,7 +397,8 @@ function putStone(index) {
         // If I put a stone, as opposed to remove, then do this.
 
         say('You played a move.');
-        emit.shout(room, `${name} played a move.`);
+        let str = coloredName(name, colorObj[name] );
+        emit.shout(room, `${str} played a move.`);
 
         calculateAttack(index);
         changeScore();
@@ -491,14 +487,10 @@ function resizeBoard() {
     
     let dim = board_y - 70;
     
-    // boardFrame.style.width = board_x + 'px';
-    // boardFrame.style.height = board_y + 'px';
     board.style.width = dim + 'px';
     board.style.height = dim + 'px';
     message.style.height = '50px';
     message.style.width = ( board_x - 40 ) + 'px';
-    // message.style.left = 0;
-    // message.style.right = 0;
     
 }
 
@@ -609,11 +601,14 @@ function delRoomBox( room ) {
     if ( closedRoomArr.includes(room) ) {
         closedRoomArr = _.without(closedRoomArr, room);
     }
-    // if ( bannedRoom == `#bt-${room}` ) bannedRoom = ' ';
 }
 
 
 
+
+function coloredName( player, color ) {
+    return `<span style="color: ${color};">${player}</span>`;
+}
 
 
 
@@ -638,7 +633,9 @@ function addOnclick_LEAVE( roomName ) {
         emit.updateScore(room, scoreObj);
 
         if ( stage.stat != 'count' ) { 
-            emit.shout(oldRoom, `Uh, ${name} left. Buh bye~`); 
+
+            let str = coloredName(name,colorObj[name]);
+            emit.shout(oldRoom, `Uh, ${str} left. Buh bye~`); 
         } 
         
 
@@ -778,6 +775,11 @@ function showCountArr() {
 
 }
 
+function showRoomNameOnTop() {
+    let str = room.toUpperCase();
+    $('#boardHead').html(`You are in the ${str} room!`);
+}
+
 function visualizeGrid( colorObject, name_grid ) {
     name_grid.forEach( ( _name, i) => {
         let color = colorObject[_name];
@@ -809,10 +811,8 @@ function revertStoneCSS() {
 }
 
 function say(str) {
-
     $('#message').append(`<div>${str}</div>`);
     $('#message').animate( { scrollTop: $('#message').get(0).scrollHeight}, 700);
-
 }
 
 
@@ -881,7 +881,14 @@ $('#pass').on('click', () => {
     passCount++;
     emit.pass(room, passCount);
     say('You passed!');
-    if (passCount < playerArr.length ) emit.shout(room, `${name} passed!`);
+
+    
+
+    if (passCount < playerArr.length ) {
+        let str = coloredName(name, colorObj[name]);
+        emit.shout(room, `${str} passed!`); 
+    }
+
     shiftPlayerList();
 });
 
@@ -999,12 +1006,14 @@ socket.on('entry granted', (entry_granted, config_data) => {
     let playerNum = $(`#rm-${room} >`).length;
     if (playerNum == 1) {
         say('You&#39;re the second player to join. Wait for your turn. The game ends when all players PASS in order.');
-        emit.shout(room, `${name} joined the game. Now that there are at least 2 players, go ahead and make your first move!`);
+        let str = coloredName(name,colorObj[name]);
+        emit.shout(room, `${str} joined the game. Now that there are at least 2 players, go ahead and make your first move!`);
     }
 
     if (playerNum > 1 ) {
         say(`You are player numero ${playerNum+1}. Wait for your turn. The game ends when all players PASS in order.`);
-        emit.shout(room, `${name} is in the house!`);
+        let str = coloredName(name,colorObj[name]);
+        emit.shout(room, `${str} is in the house!`);
     }
     
     emit.pass(room, passCount);
