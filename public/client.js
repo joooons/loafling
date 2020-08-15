@@ -136,7 +136,11 @@ $('#room-name').hide(0, () => {
 
 $('#config').hide();
 
-
+$('#modal').hide(0, () => {
+    $('#modal').fadeOut(0);
+    $('#modal').removeClass('hidden');
+    $('#modal').fadeIn(fadeTime)
+})
 
 
 
@@ -881,6 +885,7 @@ pickName.onchange = () => {
     name = name.slice(0,10);
     emit.newUser(name);
     applyBlink( $('#create-room') );
+    $('#cover').addClass('hidden');
 }
 
 $('#room-name').on('change', () => {

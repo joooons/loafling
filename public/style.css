@@ -84,6 +84,21 @@ p {
 
 
 
+/* ************************* COVER ******************** */
+#cover {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: white;
+}
+
+
+
+
+
+
 
 
 /*    MMMM      MMMM    MM    MM  MMMMMM    MMMM    MMMMMM  MM    MM  MMMMMMMM  MMMMMM     */
@@ -452,7 +467,9 @@ div[id^="rm-"] {
     width: 105px;
 }
 
-
+.hidden {
+    visibility: hidden;
+}
 
 .gone {
     /* display: none; */
