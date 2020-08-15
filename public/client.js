@@ -23,7 +23,7 @@ var passCount = 0;
 
 const playerLimit = 10;
 const fadeTime = 500;
-const boardRatio = 1.3;
+const boardRatio = 1.2;
 
 var noName;
 
@@ -73,8 +73,6 @@ var scoreObj = {};
 
 var colorObj = {};
     // Object with { name:color, name:color .... }
-
-
 
 
 
@@ -468,8 +466,8 @@ function checkForBan(banPos, atkPos) {
 
 
 function resizeBoard() {
-    let x = window.innerWidth - 250;
-    let y = window.innerHeight - 70;
+    let x = window.innerWidth - 280;
+    let y = window.innerHeight - 100;
     let board_x, board_y;
     let windowRatio = x / y;
     let xLimit = 200;
@@ -489,8 +487,8 @@ function resizeBoard() {
     
     board.style.width = dim + 'px';
     board.style.height = dim + 'px';
-    message.style.height = '50px';
-    message.style.width = ( board_x - 40 ) + 'px';
+    message.style.height = '70px';
+    message.style.width = ( board_x - 10 ) + 'px';
     
 }
 
@@ -519,7 +517,7 @@ function createRoom() {
 }
 
 function allowCreateRooms() {
-    $('#room-plus').html('<b>add room</b>');
+    $('#room-plus').html('<b>Add room</b>');
     $('#room-plus').show();
     $('#room-plus').css('cursor', 'pointer');
     $('#room-name').hide(fadeTime);
@@ -607,7 +605,12 @@ function delRoomBox( room ) {
 
 
 function coloredName( player, color ) {
-    return `<span style="color: ${color};">${player}</span>`;
+    // I initially planned to show each player with their own color...
+    // ...but I discovered that colored words are hard to see...
+    // ...with certain background colors. Oh wells...
+    let clr = '#7ae';
+    return `<span style="color: ${clr};">${player}</span>`;
+    // return `<span style="color: ${color};">${player}</span>`;
 }
 
 
@@ -721,9 +724,13 @@ function showScoreboard(obj) {
 
     tempArr.forEach( player => {
         let str = '';
-        if (player == playerArr[0]) str = '&#8594;';
+        // if (player == playerArr[0]) str = '&#8702;';
+        // if (player == playerArr[0]) str = '&#8883;';
+        // if (player == playerArr[0]) str = '&#8594;';
+        if (player == playerArr[0]) { str = svgArt.arrow; }
         $('#players').append(`<div>${str}</div>`);
-        $('#players').append(`<div style="color: ${colorObj[player]}"><sup>&#11044;</sup></div>`);
+        // $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
+        $('#players').append(`<div style="color: ${colorObj[player]}">${svgArt.circle}</div>`);
         str = `${player}`;
         if ( player == name ) str = `<b>${player}</b>`;
         $('#players').append(`<div>${str}</div>`);
@@ -876,7 +883,7 @@ $('#pass').on('click', () => {
     if ( playerArr.length < 2 ) return;
     if ( stage.stat == 'count') return;
     if ( playerArr[0] != name ) {
-        say('You can&#39;t pass when it&#39;s nacho turn.');
+        say(`You can&#39;t pass when it&#39;s nacho turn.`);
         return;
     }
     passCount++;

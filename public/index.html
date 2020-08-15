@@ -9,7 +9,7 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.10.2/underscore-min.js"></script>
-
+    
 
     <link href="https://fonts.googleapis.com/css2?family=Alata&family=Lobster&family=Righteous&display=swap" rel="stylesheet">
 
@@ -41,7 +41,7 @@
         <div id="boardSpace">
 
             <div id="boardFrame">
-                <div class='bar' id="boardHead">PSEUDO-GO</div>
+                <div class='bar' id="boardHead">Imitation GO!</div>
                 <div id="board"></div>
                 <div>
                     <div id="players">names</div>
@@ -61,9 +61,10 @@
     <div id="modal">
         <div>
             <div class="card">
-                <!-- <div class='ooh'>IMITATION GO</div> -->
-                <h1>Imitation Go</h1>
-                <p>The game of Go... with a twist. You can modify the size of the board the number of players per game. You can also try the freestyle mode, where everyone can play out of turn!</p>
+                <!-- <h1>Imitation G&#11044;<img src="black-go-stone.png" width="10" alt="O"></h1> -->
+                <h1>Imitation G<img src="black-go-stone.png" width="30" alt="O"></h1>
+                <!-- <img src="black-go-stone.png" width="10" alt="O"> -->
+                <p>The game of Go... with a twist! <br>In this experimental version, you can modify the size of the board and the number of players. You can also turn on Freestyle Mode, where anyone can play out of turn!</p>
                 <span>ENTER YOUR NAME</span>
                 <input type="text" id="pick-name" autocomplete="off" autofocus>
             </div>
@@ -73,7 +74,7 @@
     <div id="config">
         <div>
             <form action="#" id="config-form">
-                <div class='bar mid' id='config-head'>Room Settings</div>
+                <div class='bar mid und' id='config-head'>Room Settings</div>
                 <span>Room name</span>
                 <div class='mid' id="modal-room-name"></div>
                 <span>Number of players</span>
