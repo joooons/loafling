@@ -1085,6 +1085,16 @@ socket.on('room creation granted', roomName => {
 });
 
 
+socket.on('announce room open', roomName => {
+    closedRoomArr = _.without(closedRoomArr, roomName);
+    updateButtons();
+});
+
+
+socket.on('announce room closed', roomName => {
+    closedRoomArr.push(roomName);
+    updateButtons();
+});
 
 
 

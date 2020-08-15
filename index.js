@@ -178,12 +178,26 @@ function startPlayerList(room) {
 
 function addPlayer(room, name) {
   Room_PlayerArr.get(room).push(name);
+  let limit = Room_Config.get(room).playerLimit;
+  console.log('playerLimit is', limit);
+  let num = Room_PlayerArr.get(room).length;
+  console.log('current num of players: ', num);
+
+  if ( num == limit ) {
+    console.log('Lot Full!');
+    io.emit('announce room closed', room);
+  }
+
+
 }
 
 
 function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
   Room_PlayerArr.set(room, _.without(arr, name) );
+
+  io.emit('announce room open', room);
+
 }
 
 
@@ -536,6 +550,9 @@ io.on('connection', (socket) => {
       // Leave old room. It's important to do this before what follows.
 
     if (oldRoom != 'lobby') {
+      // If you are leaving a room, not leaving the lobby...
+      // ...you have to clean up your stones...
+      // ...and sign off your name out of the room.
       console.log('---- leaving room -----');
       delPlayer(oldRoom, name);
       let obj = Room_GameData.get(oldRoom);
@@ -545,34 +562,35 @@ io.on('connection', (socket) => {
       Room_GameData.get(oldRoom).grid = obj.grid;
       io.to(oldRoom).emit('update grid', obj.colorObj, obj.grid ); 
     }
-      // remove player from playerlist
 
     if ( !hasMapValue(Name_Room, oldRoom) ) {
+      // IF the room no longer exists...
+      // ...you have to delete all traces of it.
       io.emit('del roombox', oldRoom );
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
       Room_Score.delete(oldRoom);
     } else {
+      // but if someone is still in the room...
+      // ...you have to keep updating the player list.
       io.to(oldRoom).emit('update player list', Room_PlayerArr.get(oldRoom) );
     }
-      // remove empty rooms.
-      // if oldroom is not empty, send player list to old room
+      
 
     if ( room != 'lobby' ) { 
+      // If the destination is not the lobby...
+      // "join" the socket room and assign color.
 
-      socket.emit('board config', Room_Config.get(room) );
-
-      
+      socket.emit('board config', Room_Config.get(room) );      
       socket.join(room); 
-      let obj = Room_GameData.get(room);
 
+      let obj = Room_GameData.get(room);
       if ( !hasObjKey(obj.colorObj, name) ) {
         obj.colorObj[name] = giveUniqColor(obj.colorObj);
         Room_GameData.set( room, obj );
       }
       addPlayer(room, name);
     }
-      // if destination is not lobby, join room and assign color
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
