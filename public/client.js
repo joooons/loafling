@@ -136,8 +136,6 @@ $('#boardFrame').fadeOut(0, () => { $('#boardFrame').css('visibility', 'visible'
 
 $('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
 
-
-
 $('#config').hide();
 
 
