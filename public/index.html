@@ -37,6 +37,7 @@
 
 
         <div id="boardSpace">
+
             <div id="boardFrame">
                 <div class='bar' id="boardHead">PSEUDO-GO</div>
                 <div id="board"></div>
@@ -58,7 +59,9 @@
     <div id="modal">
         <div>
             <div class="card">
-                <span>NAME</span>
+                <div class='ooh'>IMITATION GO</div>
+                <p>The game of Go... with a twist. You can modify the size of the board the number of players per game. You can also try the freestyle mode, where everyone can play out of turn!</p>
+                <span>ENTER YOUR NAME</span>
                 <input type="text" id="pick-name" autocomplete="off" autofocus>
             </div>
         </div>
@@ -72,8 +75,8 @@
                 <input id="config-num" type="number" value="2" min="2" max="6" step="1" required autofocus>
                 <span>Length of board: </span>
                 <input id="config-dim" type="number" value="3" min="2" max="19" step="1" required>
-                <span>strict mode?: </span>
-                <input id="config-strict" type="checkbox">
+                <span>Freestyle mode </span>
+                <input id="config-strict" type="checkbox" >
                 <button class='bar' id="config-btn">ENTER</button>
             </form>
         </div>

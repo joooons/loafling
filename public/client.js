@@ -897,7 +897,7 @@ $('#config-form').on('submit', ev => {
 
     config.playerLimit = $('#config-num').val();
     config.dim = $('#config-dim').val();
-    config.strict = document.querySelector('#config-strict').checked;
+    config.strict = !document.querySelector('#config-strict').checked;
     
     hideConfig();
 

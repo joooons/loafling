@@ -29,7 +29,11 @@
 
 /****************** GLOBAL **********************/
 
-@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap'); */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Lobster&family=Teko&display=swap');
+
 
 body {
     font-family: 'Lato', sans-serif;
@@ -68,6 +72,18 @@ button {
 button:hover {
     background: skyblue;
 }
+
+p {
+    font-size: 9pt;
+}
+
+.ooh {
+    color: red;
+    font-size: 20pt;
+}
+
+
+
 
 
 
@@ -331,9 +347,11 @@ div[id^="rm-"] {
 
 .card {
     background: white;
-    padding: 50px;
+    padding: 30px;
+    max-width: 240px;
     border-radius: 10px;
     box-shadow: 5px 5px 5px 0px #0005;
+    text-align: justify;
     display: flex;
     flex-flow: column;
     justify-content: center;
