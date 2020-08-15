@@ -139,8 +139,11 @@ $('#config').hide();
 $('#modal').hide(0, () => {
     $('#modal').fadeOut(0);
     $('#modal').removeClass('hidden');
-    $('#modal').fadeIn(fadeTime)
-})
+    $('#modal').fadeIn(fadeTime, () => {
+        $('#pick-name').focus();
+    });
+    
+});
 
 
 
@@ -212,7 +215,7 @@ function calculateAttack(indexValue) {
                 if (_.without(roster, victim).includes( gridArr[posValue-1])) count++;
             });
             if ( count == walls[i].length ) {
-                // A successful attack.
+                // A SUCCESSFUL ATTACK!
 
                 let points = team.length;
                 scoreObj[victim] -= points;
@@ -222,9 +225,15 @@ function calculateAttack(indexValue) {
                     let str2 = coloredName(victim, colorObj[victim]);
                     say(`${str2} says "Tis but a scratch."`);
                     emit.shout(room, `${str1} is acting passive aggressive.`);
-                } else if ( points > 4 ) {
-                    say(`Savage...`);
-                    emit.shout(room, 'It&#39;s getting real...');
+                } else if ( points > 6 ) {
+                    let str1 = coloredName(name, colorObj[name]);
+                    say(`You show no mercy!`);
+                    emit.shout(room, `${str1} is dominating. You should be afraid right about now.`);
+                } else {
+                    let str1 = coloredName(name, colorObj[name]);
+                    let str2 = coloredName(victim, colorObj[victim]);
+                    say(`You hurt ${str2}&#39;s feelings.`);
+                    emit.shout(room, `${str1} is getting kind of aggressive. You should try talking to ${str1}.`);
                 }
 
                 if ( team.length == 1) { checkForBan(team[0], pos); }
@@ -847,7 +856,9 @@ function say(str) {
 function showConfigModal() {
     $('#modal-room-name').html(room);
     $('#config').css('z-index', 1);
-    $('#config').show();
+    $('#config').show(0, () => {
+        $('#config-num').focus();
+    });
 
 }
 

@@ -49,7 +49,9 @@ input {
 }
 
 input[type="number"] {
+    border: none;
     width: 40px;
+    margin-left: 3px;
 }
 
 button {
@@ -68,6 +70,7 @@ button {
 button:hover {
     background: skyblue;
 }
+
 
 h1 {
     margin: 0px;
@@ -470,6 +473,11 @@ div[id^="rm-"] {
 .hidden {
     visibility: hidden;
 }
+
+.focusable:focus {
+    background: skyblue;
+}
+
 
 .gone {
     /* display: none; */
