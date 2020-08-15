@@ -468,8 +468,8 @@ function checkForBan(banPos, atkPos) {
 
 
 function resizeBoard() {
-    let x = window.innerWidth - 220;
-    let y = window.innerHeight - 60;
+    let x = window.innerWidth - 250;
+    let y = window.innerHeight - 70;
     let board_x, board_y;
     let windowRatio = x / y;
     let xLimit = 200;
@@ -515,7 +515,7 @@ function createRoom() {
     $('#room-name').hide();
     $('#pass').fadeIn();
 
-    showConfig();
+    showConfigModal();
 }
 
 function allowCreateRooms() {
@@ -816,13 +816,14 @@ function say(str) {
 }
 
 
-function showConfig() {
+function showConfigModal() {
+    $('#modal-room-name').html(room);
     $('#config').css('z-index', 1);
     $('#config').show();
 
 }
 
-function hideConfig() {
+function hideConfigModal() {
 
     $('#config').hide();
 }
@@ -853,7 +854,7 @@ pickName.onchange = () => {
     name = pickName.value;
     pickName.value = '';
     modal.style.display = "none";
-    name = name.slice(0,8);
+    name = name.slice(0,10);
     emit.newUser(name);
 
 }
@@ -899,7 +900,7 @@ $('#config-form').on('submit', ev => {
     config.dim = $('#config-dim').val();
     config.strict = !document.querySelector('#config-strict').checked;
     
-    hideConfig();
+    hideConfigModal();
 
     resetConfig();
     say('You&#39;re the first player to join. Please wait for the second player. The game ends when all players PASS in order. ');
