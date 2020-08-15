@@ -1,4 +1,4 @@
-// const { first } = require("underscore");
+
 
 const socket = io();
 
@@ -31,10 +31,8 @@ var ban = {};
 ban.now = 0;
 ban.next = 0;
 
-// var bannedRoom = '  ';
 var closedRoomArr = [];
     // Array of rooms that are closed...
-
 
 var config = {};
 config.dim = 0;
@@ -45,15 +43,12 @@ config.playerLimit = 0;
     // You cannot play out of turn.
     // You cannot remove your own stone.
 
-
 var stage =  {};
 stage['stat'] = 'fight';
 stage['fight'] = () => { stage.stat = 'fight'; }
 stage['clean'] = () => { stage.stat = 'clean'; }
 stage['count'] = () => { stage.stat = 'count'; }
     
-
-
 var gridArr = [];
     // The array of names assigned to the board grid.
     // Only for the room that the player is currently connected to.
@@ -134,7 +129,10 @@ allowCreateRooms();
 
 $('#boardFrame').fadeOut(0, () => { $('#boardFrame').css('visibility', 'visible'); });
 
-$('#room-name').hide(0, () => { $('#room-name').css('visibility', 'visible'); });
+$('#room-name').hide(0, () => { 
+    $('#room-name').css('visibility', 'visible'); 
+    $('#create-room').css('visibility', 'visible');
+});
 
 $('#config').hide();
 
@@ -515,19 +513,21 @@ function createRoom() {
 }
 
 function allowCreateRooms() {
+    $('#room-plus').css('color', 'black');
     $('#room-plus').html('<b>Add room</b>');
     $('#room-plus').show();
     $('#room-plus').css('cursor', 'pointer');
     $('#room-name').hide(fadeTime);
     $('#room-plus').on('click', () => {
+        removeBlink( $('#create-room') );
         $('#room-plus').hide();
-        $('#room-name').show(fadeTime);
-        $('#room-name').focus();
+        $('#room-name').show(fadeTime, () => { $('#room-name').focus(); });
         onlyThisButtonLeave('--------');
     });
 }
 
 function denyCreateRooms() {
+    $('#room-plus').css('color', '#0003');
     $('#room-plus').html('<b>&#10006;</b>');
     $('#room-plus').css('cursor', 'default');
     $('#room-plus').off('click');
@@ -599,9 +599,6 @@ function delRoomBox( room ) {
     }
 }
 
-
-
-
 function coloredName( player, color ) {
     // I initially planned to show each player with their own color...
     // ...but I discovered that colored words are hard to see...
@@ -610,6 +607,24 @@ function coloredName( player, color ) {
     return `<span style="color: ${clr};">${player}</span>`;
     // return `<span style="color: ${color};">${player}</span>`;
 }
+
+function applyBlink( elem ) {
+    $(elem).addClass('blink');
+}
+
+function removeBlink( elem ) {
+    if ( $(elem).hasClass('blink') ) $(elem).removeClass('blink');
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -798,7 +813,7 @@ function updateNames( arrayOfObject ) {
     for ( i=0 ; i<num ; i++ ) { $('div[id^="rm-"]').eq(i).html(''); }
     arrayOfObject.forEach( obj => {
         let [a, b, c ] = ['', obj.name, ''];
-        if (name == obj.name) [a,c] = [ 'class="me"', ' (me)'];
+        if (name == obj.name) [a,c] = [ 'class="me"', ' (you)'];
         if ( !(name == obj.name) ) [a,c] = [ 'class="them"', ''];
         $(`div[id="rm-${obj.room}"]`).append(`<div ${a}>${b} ${c}</div>`);
     });
@@ -819,7 +834,6 @@ function say(str) {
     $('#message').append(`<div>${str}</div>`);
     $('#message').animate( { scrollTop: $('#message').get(0).scrollHeight}, 700);
 }
-
 
 function showConfigModal() {
     $('#modal-room-name').html(room);
@@ -861,7 +875,7 @@ pickName.onchange = () => {
     modal.style.display = "none";
     name = name.slice(0,10);
     emit.newUser(name);
-
+    applyBlink( $('#create-room') );
 }
 
 $('#room-name').on('change', () => {
@@ -870,13 +884,12 @@ $('#room-name').on('change', () => {
 
 $('#room-name').on('focusout', () => {    
     $('#room-plus').show();
-    $('#room-name').hide();
+    $('#room-name').hide(0);
     $('#room-name').val('');
     updateButtons();
 });
 
 $('#pass').on('click', () => {
-
 
     if ( playerArr.length < 2 ) return;
     if ( stage.stat == 'count') return;
@@ -977,6 +990,7 @@ socket.on('synchronize variables', blankName => {
 
 
 socket.on('change name', newName => {
+    if ( name != newName) alert(`Your name was changed to "${newName}" because "${name}" was already taken. Sorry!`);
     name = newName;
 });
 
@@ -1036,11 +1050,9 @@ socket.on('entry granted', (entry_granted, config_data) => {
 });
 
 
-
 socket.on('update names', arr => {
     updateNames( arr );
 });
-
 
 
 socket.on('update player list', updatedPlayerList => {
@@ -1095,6 +1107,7 @@ socket.on('shout', (str) => {
 
 
 socket.on('room creation granted', roomName => {
+    if ( room != roomName) alert(`The room name was changed to "${roomName}" because "${room}" was already taken. Sorry!`);
     room = roomName;
     emit.createRoom(roomName, config);
     emit.updateClientGrid(roomName);
@@ -1115,6 +1128,10 @@ socket.on('announce room closed', roomName => {
     closedRoomArr.push(roomName);
     updateButtons();
 });
+
+
+
+
 
 
 

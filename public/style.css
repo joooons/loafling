@@ -78,6 +78,7 @@ h1 {
 p {
     color: #5ad;
     margin: 10px;
+    /* text-align: center; */
 }
 
 
@@ -184,6 +185,11 @@ p {
 #room-name {
     visibility: hidden;
 }
+
+#create-room {
+    visibility: hidden;
+}
+
 
 div[id^="bt-"] {
     margin-top: 5px;
@@ -342,7 +348,7 @@ div[id^="rm-"] {
     background: white;
     padding: 30px;
     max-width: 240px;
-    border-radius: 10px;
+    border-radius: 50px;
     box-shadow: 5px 5px 5px 0px #0005;
     text-align: justify;
     display: flex;
@@ -401,8 +407,6 @@ div[id^="rm-"] {
 }
 
 
-
-
 #config-btn {
     margin: auto;
 }
@@ -421,6 +425,17 @@ div[id^="rm-"] {
 /*   MMMM      MM    MM    MM  MMMMMMMM  MM    MM   */
 
 
+.blink {
+    animation: blink ease-in 1.3s infinite;
+}
+
+@keyframes blink {
+    0%   { background-color: #0001; }
+    50%  { background-color: #f207; }
+    100% { background-color: #0001;}
+}
+
+
 .bar {
    grid-column: 1/3;
 }
@@ -432,6 +447,11 @@ div[id^="rm-"] {
 .und {
     text-decoration: underline;
 }
+
+.short {
+    width: 105px;
+}
+
 
 
 .gone {

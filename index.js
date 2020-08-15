@@ -42,19 +42,17 @@ var Room_GameData = new Map();
 var Room_PlayerArr = new Map();
 var Room_Score = new Map();
 var Room_Open = new Map();
+var Room_Config = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
-// const nameSuffix = [', stop', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
 var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
-// const boardDim = 5;
-const noName = 'zz';
-// const banned = '91fja8';
+const noName = '2v7hqljweblks';
   // variables to synchronize to client
 
-  var Room_Config = new Map();
+
 
 
 
@@ -121,13 +119,11 @@ function hasObjValue( obj, item ) { return Object.values(obj).includes(item); }
 
 function hasObjKey( obj, key ) { return Object.keys(obj).includes(key); }
 
-
 function giveUniqColor( obj ) {   
   let num = colorSet.length-1;
   while ( hasObjValue(obj,colorSet[num]) == true ) { num--; }
   return colorSet[num];
 }
-
 
 function randomizeColorset() {
   let arr = [];
@@ -141,16 +137,13 @@ function randomizeColorset() {
   return arr;
 }
 
-
 function emptyGrid(num) { return new Array( Math.pow(num, 2) ).fill(noName); }
-
 
 function mapUniqValArr( map ) {
   let arr = [];
   map.forEach( val => { arr.push(val); });
   return _.uniq(arr);
 }
-
 
 function avoidDuplicate( map, root, suffix ) {
   let num = suffix.length;
@@ -171,11 +164,9 @@ function avoidDuplicate( map, root, suffix ) {
   return newName;
 }
 
-
 function startPlayerList(room) {
   Room_PlayerArr.set(room, []);
 }
-
 
 function addPlayer(room, name) {
   Room_PlayerArr.get(room).push(name);
@@ -192,7 +183,6 @@ function addPlayer(room, name) {
 
 }
 
-
 function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
   Room_PlayerArr.set(room, _.without(arr, name) );
@@ -201,7 +191,6 @@ function delPlayer(room, name) {
   if ( Room_Open.get(room) ) io.emit('announce room open', room);
 
 }
-
 
 function updateScore(room, scoreObj) {
 
@@ -245,7 +234,6 @@ function updateScore(room, scoreObj) {
 // THE SOCKET.IO ENVIRONMENT __________________________________
 
 io.on('connection', (socket) => {
-  
   console.log(`--------- ${socket.id} connected ----------`);
   socket.emit('synchronize variables', noName);
 
@@ -345,9 +333,6 @@ io.on('connection', (socket) => {
 
 
 
-
-
-
 //  MMMMMM    MMMMMMMM    MMMMMM    MM    MM  MMMMMMMM    MMMM    MMMMMM        MMMMMM    MMMM            MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM        MMMMMM      MMMM      MMMM    MM      MM  
 //  MM    MM  MM        MM      MM  MM    MM  MM        MM    MM    MM            MM    MM    MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MMMM  MMMM  
 //  MMMMMM    MMMMMMMM  MM      MM  MM    MM  MMMMMMMM    MM        MM            MM    MM    MM        MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
@@ -358,16 +343,9 @@ io.on('connection', (socket) => {
   // _______ REQUET TO CREATE ROOM __________________________________________________
 
   socket.on('request to create room', (roomName) => {
-
     let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
-    // if ( room != roomName ) { socket.emit('change room name', room ); }
-      // Assign a unique name.
-
     socket.emit('room creation granted', room);
-
   });   // _______ REQUEST TO CREATE ROOM (END) ______________________________________
-
-
 
 
 
@@ -522,13 +500,6 @@ io.on('connection', (socket) => {
 
 
   });   // _______ REQUEST TO JOIN ROOM (END) ________________________________________
-
-
-
-
-
-
-
 
 
 
@@ -695,6 +666,8 @@ io.on('connection', (socket) => {
 
 
 });   // END OF IO.ON() ______________________________________
+
+
 
 
 
