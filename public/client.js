@@ -31,7 +31,10 @@ var ban = {};
 ban.now = 0;
 ban.next = 0;
 
-var bannedRoom = '  ';
+// var bannedRoom = '  ';
+var closedRoomArr = [];
+    // Array of rooms that are closed...
+
 
 var config = {};
 config.dim = 0;
@@ -542,14 +545,28 @@ function denyCreateRooms() {
     $('#room-plus').off('click');
 }
 
-function allButtonsJoin(elem) {
-    // All buttons should join, EXCEPT the one specified in the argument.
+function allButtonsJoin( closed_room ) {
+    // All buttons should join, EXCEPT the rooms specified in the argument.
+    let arr = closedRoomArr;
+    if ( closed_room ) { arr = [closed_room]; }
+
+    console.clear();
+    console.log('----inside allButtonsJoin(); ---');
+    console.log('closedArr is', arr);
 
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
-        let str = $(`button[id^="bt-"]`).eq(i).attr('id');
-        if ( `#${str}` != elem ) addOnclick_JOIN(`#${str}`);
+        let str = $(`button[id^="bt-"]`).eq(i).attr('id').slice(3);
+        console.log('str is', str);
+        console.log( arr.includes(str) );
+
+        if ( arr.includes(str) ) {
+            $(`button[id^="bt-"]`).eq(i).off('click');
+            $(`button[id^="bt-"]`).eq(i).css('color', 'gray');
+            $(`button[id^="bt-"]`).eq(i).html('CLOSED');
+        } else { addOnclick_JOIN(`#bt-${str}`); }
+
         $(`div[id^="rb-"]`).show();
     }
 }
@@ -567,7 +584,8 @@ function onlyThisButtonLeave( roomName ) {
 function updateButtons() {
     if ( room == 'lobby' ) {
         allowCreateRooms();
-        allButtonsJoin(bannedRoom);
+        allButtonsJoin();
+
     } else {
         denyCreateRooms();
         onlyThisButtonLeave(room);
@@ -583,7 +601,10 @@ function addRoomBox( room ) {
 
 function delRoomBox( room ) {
     $(`#rb-${room}`).remove();
-    if ( bannedRoom == `#bt-${room}` ) bannedRoom = ' ';
+    if ( closedRoomArr.includes(room) ) {
+        closedRoomArr = _.without(closedRoomArr, room);
+    }
+    // if ( bannedRoom == `#bt-${room}` ) bannedRoom = ' ';
 }
 
 
@@ -619,10 +640,10 @@ function addOnclick_LEAVE( roomName ) {
             // If you leave during "clean" or "count stage"...
             // ...you cannot reenter the room. Sorry.
             let elem = `#bt-${oldRoom}`;
-            $(elem).off("click");
-            $(elem).css('color', 'gray');
-            $(elem).html('CLOSED');
-            bannedRoom = elem;
+
+            // bannedRoom = elem;
+            closedRoomArr.push(oldRoom);
+
         }
 
         emit.joinRoom(room);
