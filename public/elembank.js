@@ -47,6 +47,7 @@ function addSVGtoBoard( elem, num ) {
     svgElem = document.createElementNS(ns, 'svg');
         svgElem.setAttributeNS( null, "viewBox", `0 0 ${xDim} ${yDim}`);
         addGridLines( svgElem, xDim, yDim, num );
+        addHoshiDots( svgElem, num );
         addClickableDots(svgElem, num);
     $(elem).append(svgElem);
 }
@@ -76,6 +77,42 @@ function addGridLines( elem, xDim, yDim, num ) {
     }
 }
 
+
+
+function addHoshiDots( elem, num) {
+    if ( num > 9 ) {
+        [3,num-4].forEach( x => {
+            [3,num-4].forEach( y => {
+                let circ = document.createElementNS(ns, 'circle');
+                $(circ).attr('cx', (100*x) + 50 );
+                $(circ).attr('cy', (100*y) + 50 );
+                $(circ).attr('r', 14);
+                $(circ).attr('fill', '#000');
+                $(elem).append(circ);
+            });
+        });
+    }
+
+    if ( num > 12 && num%2 == 1 ) {
+        let mid = (num-1)/2;
+        [3,mid,num-4].forEach( x => {
+            let circ = document.createElementNS(ns, 'circle');
+            $(circ).attr('cx', (100*x) + 50 );
+            $(circ).attr('cy', (100*mid) + 50 );
+            $(circ).attr('r', 14);
+            $(circ).attr('fill', '#000');
+            $(elem).append(circ);
+        });
+        [3,num-4].forEach( y => {
+            let circ = document.createElementNS(ns, 'circle');
+            $(circ).attr('cx', (100*mid) + 50 );
+            $(circ).attr('cy', (100*y) + 50 );
+            $(circ).attr('r', 14);
+            $(circ).attr('fill', '#000');
+            $(elem).append(circ);
+        });
+    }
+}
 
 
 function addClickableDots( elem, num) {
