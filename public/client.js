@@ -597,6 +597,11 @@ function addRoomBox( room ) {
     $(`#rb-${room}`).append(`<b>${room}</b><br>`);
     $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
     $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
+    
+    if ( closedRoomArr.includes(room) ) {
+        closedRoomArr = _.without(closedRoomArr, room);
+    }
+
 }
 
 function delRoomBox( room ) {
@@ -636,15 +641,6 @@ function addOnclick_LEAVE( roomName ) {
             emit.shout(oldRoom, `Uh, ${name} left. Buh bye~`); 
         } 
         
-        if ( stage.stat != 'fight' ) {
-            // If you leave during "clean" or "count stage"...
-            // ...you cannot reenter the room. Sorry.
-            let elem = `#bt-${oldRoom}`;
-
-            // bannedRoom = elem;
-            closedRoomArr.push(oldRoom);
-
-        }
 
         emit.joinRoom(room);
 
@@ -935,8 +931,9 @@ var emit = {
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
     updateServerGrid : (gridArr, banNext) => { socket.emit('update grid on server', gridArr, banNext); },
-    pass : (room, passCount) => { socket.emit('update pass', room, passCount )},
-    shout : (room,str) => { socket.emit('shout', room, str)}
+    announceClosure : (room, bool) => { socket.emit('announce closure', room, bool); },
+    pass : (room, passCount) => { socket.emit('update pass', room, passCount); },
+    shout : (room,str) => { socket.emit('shout', room, str); }
     
 }
 
@@ -977,8 +974,11 @@ socket.on('board config', configData => {
 });
 
 
-socket.on('add roombox', roomName => {
+socket.on('add roombox', (roomName) => {
+    // if ( !bool ) closedRoomArr.push(roomName);
     addRoomBox( roomName );
+    console.log('inside add roombox');
+    console.log('closedRoomArr is', closedRoomArr);
     updateButtons();
 });
 
@@ -1057,6 +1057,9 @@ socket.on('update pass', count => {
     if ( passCount == playerArr.length ) {
         if (stage.stat == 'fight') {
             stage.clean();
+
+            emit.announceClosure(room, false);
+
             passCount = 0;
             emit.pass(room, passCount);
             say('All players passed. Now, remove your stones that are as good as dead. Be honest now! Click PASS when you are done. ');
@@ -1086,6 +1089,8 @@ socket.on('room creation granted', roomName => {
 
 
 socket.on('announce room open', roomName => {
+
+
     closedRoomArr = _.without(closedRoomArr, roomName);
     updateButtons();
 });

@@ -41,6 +41,7 @@ var Name_Room = new Map();
 var Room_GameData = new Map();
 var Room_PlayerArr = new Map();
 var Room_Score = new Map();
+var Room_Open = new Map();
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 // const nameSuffix = [', stop', 'ie' ];
@@ -196,7 +197,8 @@ function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
   Room_PlayerArr.set(room, _.without(arr, name) );
 
-  io.emit('announce room open', room);
+  
+  if ( Room_Open.get(room) ) io.emit('announce room open', room);
 
 }
 
@@ -291,6 +293,7 @@ io.on('connection', (socket) => {
       Room_GameData.delete(room);
       Room_PlayerArr.delete(room);
       Room_Score.delete(room);
+      Room_Open.delete(room);
     } else {
       io.to(room).emit('update player list', Room_PlayerArr.get(room) );
     }
@@ -324,7 +327,10 @@ io.on('connection', (socket) => {
     console.log(`${name} connected!`);
 
     mapUniqValArr( Name_Room ).forEach( val => {
-      if (val != 'lobby') { socket.emit('add roombox', val); }
+      if (val != 'lobby') { 
+        socket.emit('add roombox', val ); 
+        if ( !Room_Open.get(val) ) { io.emit('announce room closed', val); }
+      }
     });
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -392,9 +398,11 @@ io.on('connection', (socket) => {
 
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
+    Room_Open.set(room, true);
     Room_Config.set(room, configData);
 
     socket.join(room);    // You are first to join
+    // io.emit('announce room open', room);
 
     socket.emit('board config', Room_Config.get(room) );
 
@@ -411,7 +419,7 @@ io.on('connection', (socket) => {
       // Initialize Room_GameData map...
       // ...and assign colors.
 
-    io.emit('add roombox', room);
+    io.emit('add roombox', room );
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
     // io.to(room).emit('update color', obj.colorObj );
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
@@ -570,6 +578,7 @@ io.on('connection', (socket) => {
       Room_GameData.delete(oldRoom);
       Room_PlayerArr.delete(oldRoom);
       Room_Score.delete(oldRoom);
+      Room_Open.delete(oldRoom);
     } else {
       // but if someone is still in the room...
       // ...you have to keep updating the player list.
@@ -603,6 +612,29 @@ io.on('connection', (socket) => {
 
 
 
+
+//    MMMM    MM    MM  MM    MM    MMMM    MM    MM  MM    MM    MMMM    MMMMMMMM          MMMM    MM        MMMM      MMMM    MM    MM  MMMMMM    MMMMMMMM  
+//  MM    MM  MMMM  MM  MMMM  MM  MM    MM  MM    MM  MMMM  MM  MM    MM  MM              MM    MM  MM      MM    MM  MM    MM  MM    MM  MM    MM  MM        
+//  MMMMMMMM  MM  MMMM  MM  MMMM  MM    MM  MM    MM  MM  MMMM  MM        MMMMMMMM        MM        MM      MM    MM    MM      MM    MM  MMMMMM    MMMMMMMM  
+//  MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM        MM              MM        MM      MM    MM      MM    MM    MM  MM    MM  MM        
+//  MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM    MM  MM              MM    MM  MM      MM    MM  MM    MM  MM    MM  MM    MM  MM        
+//  MM    MM  MM    MM  MM    MM    MMMM      MMMM    MM    MM    MMMM    MMMMMMMM          MMMM    MMMMMM    MMMM      MMMM      MMMM    MM    MM  MMMMMMMM  
+
+  // _______ ANNOUNCE CLOSURE _________________________________________________
+
+  socket.on('announce closure', (room, bool ) => {
+    Room_Open.set(room, bool );
+    io.emit('announce room closed', room);
+  });   // _______ ANNOUNCE CLOSURE (END) ______________________________________
+
+
+
+
+
+
+
+
+
 //  MM    MM  MMMMMM    MMMMMM      MMMM    MMMMMM  MMMMMMMM        MMMMMM    MM        MMMM    MM      MM  MMMMMMMM  MMMMMM    
 //  MM    MM  MM    MM  MM    MM  MM    MM    MM    MM              MM    MM  MM      MM    MM    MM  MM    MM        MM    MM  
 //  MM    MM  MM    MM  MM    MM  MMMMMMMM    MM    MMMMMMMM        MM    MM  MM      MMMMMMMM      MM      MMMMMMMM  MMMMMM    
@@ -610,7 +642,7 @@ io.on('connection', (socket) => {
 //  MM    MM  MM        MM    MM  MM    MM    MM    MM              MM        MM      MM    MM      MM      MM        MM    MM  
 //    MMMM    MM        MMMMMM    MM    MM    MM    MMMMMMMM        MM        MMMMMM  MM    MM      MM      MMMMMMMM  MM    MM  
 
-  // _______ UPDATE PLAYER LIST ________________________________________
+  // _______ UPDATE PLAYER LIST _________________________________________________
 
   socket.on('update player list', (room,playerArr) => {
     Room_PlayerArr.set(room, playerArr);
