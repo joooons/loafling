@@ -33,6 +33,7 @@ ban.next = 0;
 
 var closedRoomArr = [];
     // Array of rooms that are closed...
+    // This information comes from the server.
 
 var config = {};
 config.dim = 0;
@@ -187,7 +188,6 @@ function calculateAttack(indexValue) {
     let pos = indexValue + 1;
     let wallIndex = [];
     let attackSucceeded = false;
-    // ban.next = 0;
     
     let roster = [...playerArr];
         // Temporary list of players, starting with first victim.
@@ -513,7 +513,7 @@ function setUpGrid( num ) {
     addSVGtoBoard(board, num);
 }
 
-function createRoom() {
+function beginToCreateRoom() {
     let reg = /[\s\"\']/;
     if ( reg.test( $('#room-name').val() ) ) {
         $('#room-name').attr('placeholder', 'no spaces!');
@@ -561,7 +561,7 @@ function allButtonsJoin( closed_room ) {
 
     console.clear();
     console.log('----inside allButtonsJoin(); ---');
-    console.log('closedArr is', arr);
+    console.log('closedRoomArr is', arr);
 
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
@@ -658,7 +658,6 @@ function removeBlink( elem ) {
 //        MM    MM  MM    MM  MM    MM        MM    MM  MM    MM  MM    MM  MM        MM    MM    MM  MM    MM  
 //        MM    MM  MMMMMM    MMMMMM            MMMM    MM    MM    MMMM    MMMMMM  MMMMMM    MMMM    MM    MM  
 
-
 function addOnclick_LEAVE( roomName ) {
     $(roomName).html('LEAVE');
     $(roomName).off('click');
@@ -748,19 +747,13 @@ function showScoreboard(obj) {
     let tempArr = [...playerArr];
     do { tempArr.push( tempArr.shift() ); 
     } while ( tempArr[0] != name );
-    
-    let str = '';
 
     $('#players').html('');
 
     tempArr.forEach( player => {
         let str = '';
-        // if (player == playerArr[0]) str = '&#8702;';
-        // if (player == playerArr[0]) str = '&#8883;';
-        // if (player == playerArr[0]) str = '&#8594;';
         if (player == playerArr[0]) { str = svgArt.arrow; }
         $('#players').append(`<div>${str}</div>`);
-        // $('#players').append(`<div style="color: ${colorObj[player]}">&#11044;</div>`);
         $('#players').append(`<div style="color: ${colorObj[player]}">${svgArt.circle}</div>`);
         str = `${player}`;
         if ( player == name ) str = `<b>${player}</b>`;
@@ -768,7 +761,6 @@ function showScoreboard(obj) {
         $('#players').append(`<div>&nbsp;&nbsp;&nbsp;${scoreObj[player]}</div>`);
     });
     
-    // $('#players').html(str);
 }
 
 function showCountArr() {
@@ -778,8 +770,6 @@ function showCountArr() {
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
         $('.square').eq(i).css('fill', "#fff0" );
-        // $('.square').eq(i).css('fill', colorObj[_name] );
-        // $('.square').eq(i).css('opacity', 0.5 );
         $('.square').eq(i).css('stroke', colorObj[_name]);
         $('.square').eq(i).css('stroke-width', '5');
         $('.square').eq(i).css('stroke-linecap', 'round');
@@ -842,7 +832,6 @@ function revertStoneCSS() {
     countArr.forEach( (_name, i) => {
         if ( _name == noName ) return;
         $('.square').eq(i).css('fill', "#fff0" );
-        // $('.square').eq(i).css('opacity', 1 );
         $('.square').eq(i).css('stroke-width', 0);
         $('.square').eq(i).css('r', 46);
     });
@@ -859,7 +848,6 @@ function showConfigModal() {
     $('#config').show(0, () => {
         $('#config-num').focus();
     });
-
 }
 
 function hideConfigModal() {
@@ -878,12 +866,12 @@ function hideConfigModal() {
 
 // _________________________________ LOCAL FUNCTIONS (END)
 
-//  MMMMMMMM  MM      MM  MMMMMMMM  MM    MM  MMMMMM    MMMM    
-//  MM        MM      MM  MM        MMMM  MM    MM    MM    MM  
-//  MMMMMMMM  MM      MM  MMMMMMMM  MM  MMMM    MM      MM      
-//  MM        MM      MM  MM        MM    MM    MM        MM    
-//  MM          MM  MM    MM        MM    MM    MM    MM    MM  
-//  MMMMMMMM      MM      MMMMMMMM  MM    MM    MM      MMMM    
+//  MMMMMMMM  MM      MM  MMMMMMMM  MM    MM  MMMMMM        MM    MM    MMMM    MM    MM  MMMMMM    MM      MMMMMMMM  MMMMMM      MMMM    
+//  MM        MM      MM  MM        MMMM  MM    MM          MM    MM  MM    MM  MMMM  MM  MM    MM  MM      MM        MM    MM  MM    MM  
+//  MMMMMMMM  MM      MM  MMMMMMMM  MM  MMMM    MM          MMMMMMMM  MMMMMMMM  MM  MMMM  MM    MM  MM      MMMMMMMM  MMMMMM      MM      
+//  MM        MM      MM  MM        MM    MM    MM          MM    MM  MM    MM  MM    MM  MM    MM  MM      MM        MM    MM      MM    
+//  MM          MM  MM    MM        MM    MM    MM          MM    MM  MM    MM  MM    MM  MM    MM  MM      MM        MM    MM  MM    MM  
+//  MMMMMMMM      MM      MMMMMMMM  MM    MM    MM          MM    MM  MM    MM  MM    MM  MMMMMM    MMMMMM  MMMMMMMM  MM    MM    MMMM    
 
 // EVENT HANDLERS ________________________________________
 
@@ -894,13 +882,15 @@ pickName.onchange = () => {
     pickName.value = '';
     modal.style.display = "none";
     name = name.slice(0,10);
+
     emit.newUser(name);
     applyBlink( $('#create-room') );
     $('#cover').addClass('hidden');
 }
 
 $('#room-name').on('change', () => {
-    createRoom();
+
+    beginToCreateRoom();
 });
 
 $('#room-name').on('focusout', () => {    
@@ -979,7 +969,7 @@ var emit = {
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
     updateServerGrid : (gridArr, banNext) => { socket.emit('update grid on server', gridArr, banNext); },
-    announceClosure : (room, bool) => { socket.emit('announce closure', room, bool); },
+    announceClosure : (room) => { socket.emit('announce closure', room); },
     pass : (room, passCount) => { socket.emit('update pass', room, passCount); },
     shout : (room,str) => { socket.emit('shout', room, str); }
     
@@ -1107,7 +1097,7 @@ socket.on('update pass', count => {
         if (stage.stat == 'fight') {
             stage.clean();
 
-            emit.announceClosure(room, false);
+            emit.announceClosure(room);
 
             passCount = 0;
             emit.pass(room, passCount);
@@ -1139,8 +1129,6 @@ socket.on('room creation granted', roomName => {
 
 
 socket.on('announce room open', roomName => {
-
-
     closedRoomArr = _.without(closedRoomArr, roomName);
     updateButtons();
 });

@@ -37,12 +37,29 @@ const io = socketIO(server);
 // LOCAL VARIABLES ____________________________________________
 
 var ID_Name = new Map();
+  // Example:   ID_Name.get(socket.id) == 'joon'
+
 var Name_Room = new Map();
+  // Example:   Name_Room.get('joon') == 'area51'
+
 var Room_GameData = new Map();
+  // Example:   Room_GameData.get('area51').colorObj['joon'] == 'black'
+  //            Room_GameData.get('narnia').grid == [ 'noName', 'joon', noName', ... ]
+
 var Room_PlayerArr = new Map();
+  // Example:   Room_PlayerArr.get('narnia') == ['joon', 'monk', 'foo']
+
 var Room_Score = new Map();
+  // Example:   Room_Score.get('area51')['joon'] == 5
+
 var Room_Open = new Map();
+  // Example:   Room_Open.get('narnia').vacanct == true
+  //            Room_Open.get('narnia').open == true
+
 var Room_Config = new Map();
+  // Example:   Room_Config.get('area51').dim == 19
+  //            Room_Config.get('area51').playerLimit == 2
+  //            Room_Config.get('area51').strict == false
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
@@ -50,7 +67,8 @@ var colorSet = [];
   // For iterating through variations to avoid duplicates.
 
 const noName = '2v7hqljweblks';
-  // variables to synchronize to client
+  // Variables to synchronize to client.
+  // Pretty arbitrary actually.
 
 
 
@@ -170,16 +188,9 @@ function startPlayerList(room) {
 
 function addPlayer(room, name) {
   Room_PlayerArr.get(room).push(name);
-  let limit = Room_Config.get(room).playerLimit;
-  console.log('playerLimit is', limit);
-  let num = Room_PlayerArr.get(room).length;
-  console.log('current num of players: ', num);
 
-  if ( num == limit ) {
-    console.log('Lot Full!');
-    io.emit('announce room closed', room);
-  }
-
+  console.log('inside addPlayer() ');
+  checkAndEmitVacancy(room);
 
 }
 
@@ -187,8 +198,8 @@ function delPlayer(room, name) {
   let arr = Room_PlayerArr.get(room);
   Room_PlayerArr.set(room, _.without(arr, name) );
 
-  
-  if ( Room_Open.get(room) ) io.emit('announce room open', room);
+  console.log('inside delPlayer() ');
+  checkAndEmitVacancy(room);
 
 }
 
@@ -208,7 +219,25 @@ function updateScore(room, scoreObj) {
   io.to(room).emit('update score', Room_Score.get(room) );
 }
 
+function checkAndEmitVacancy(room) {
 
+  if ( !Room_Config.get(room) ) return;
+
+  let arr = Room_PlayerArr.get(room);
+  let config = Room_Config.get(room);
+
+  console.log('Room_Config: ', Room_Config);
+
+  if (arr.length == config.playerLimit) { Room_Open.get(room).vacant = false; } 
+  else { Room_Open.get(room).vacant = true; }
+
+  let vac = Room_Open.get(room).vacant;
+  let open = Room_Open.get(room).open;
+
+  if (vac&&open) { io.emit('announce room open', room); } 
+  else { io.emit('announce room closed', room); }
+
+}
 
 
 
@@ -260,8 +289,8 @@ io.on('connection', (socket) => {
     Name_Room.delete(name);
     ID_Name.delete(socket.id);
 
-    console.log(`( user: ${name} ) disconnected...`);
-    console.log(`${ID_Name.size} users still connected`);
+    console.log(`--------- ( user: ${name} ) disconnected...`);
+    console.log(`--------- ${ID_Name.size} users still connected`);
 
     let scoreObj = {};
     scoreObj[name] = -1;
@@ -312,13 +341,12 @@ io.on('connection', (socket) => {
 
     ID_Name.set(socket.id, name);
     Name_Room.set(name, 'lobby');
-    console.log(`${name} connected!`);
+    console.log(`--------- ${name} connected! --------------------------`);
 
     mapUniqValArr( Name_Room ).forEach( val => {
-      if (val != 'lobby') { 
-        socket.emit('add roombox', val ); 
-        if ( !Room_Open.get(val) ) { io.emit('announce room closed', val); }
-      }
+      if ( val == 'lobby' ) return;
+      socket.emit('add roombox', val ); 
+      checkAndEmitVacancy(val);
     });
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -368,19 +396,14 @@ io.on('connection', (socket) => {
 
   socket.on('create room', (room, configData) => {
 
-    // let room = avoidDuplicate( Name_Room, roomName, roomSuffix );
-    // if ( room != roomName ) { socket.emit('change room name', room ); }
-      // Assign a unique name.
-
-    
-
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
-    Room_Open.set(room, true);
+
+    Room_Open.set(room, { 'vacant':true, 'open':true });
+    console.log('415 ', Room_Open);
     Room_Config.set(room, configData);
 
     socket.join(room);    // You are first to join
-    // io.emit('announce room open', room);
 
     socket.emit('board config', Room_Config.get(room) );
 
@@ -399,7 +422,6 @@ io.on('connection', (socket) => {
 
     io.emit('add roombox', room );
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
-    // io.to(room).emit('update color', obj.colorObj );
     io.to(room).emit('update player list', Room_PlayerArr.get(room) );
 
   });   // _______ CREATE ROOM (END) ______________________________________
@@ -485,19 +507,14 @@ io.on('connection', (socket) => {
 
   socket.on('request to join room', room => {
 
-    let max = Room_Config.get(room).playerLimit;
-    let current = Room_PlayerArr.get(room).length;
+    console.log('inside request to join room');
+    checkAndEmitVacancy(room);
 
-    console.log('current:', current, '   max:', max);
+    let vac = Room_Open.get(room).vacant;
+    let open = Room_Open.get(room).open;
 
-    if (current < max) { 
-      socket.emit('entry granted', true, Room_Config.get(room) );
-    } else { 
-      socket.emit('entry granted', false, Room_Config.get(room) );
-      console.log('can not join. full already'); 
-    }
-
-
+    if ( vac&&open) { socket.emit('entry granted', true, Room_Config.get(room) ); } 
+    else { socket.emit('entry granted', false, Room_Config.get(room) ); }
 
   });   // _______ REQUEST TO JOIN ROOM (END) ________________________________________
 
@@ -570,6 +587,7 @@ io.on('connection', (socket) => {
         Room_GameData.set( room, obj );
       }
       addPlayer(room, name);
+
     }
 
     io.emit('update names', MapToArray(Name_Room, "name", "room"));
@@ -593,9 +611,10 @@ io.on('connection', (socket) => {
 
   // _______ ANNOUNCE CLOSURE _________________________________________________
 
-  socket.on('announce closure', (room, bool ) => {
-    Room_Open.set(room, bool );
-    io.emit('announce room closed', room);
+  socket.on('announce closure', (room) => {
+    Room_Open.get(room).open = false;
+    console.log('inside announce closure');
+    checkAndEmitVacancy(room);
   });   // _______ ANNOUNCE CLOSURE (END) ______________________________________
 
 
