@@ -264,8 +264,14 @@ div[id^="rm-"] {
 
 #board {
     /* background-image: url('wood.jpg'); */
-    /* background-image: url('whitepaint.jpg'); */
-    background-image: url('wood-bkgd.jpg');
+    /* background-image: url('whitepaint.jpg'); */    
+    /* background-image: url('grass-1.jpg'); */
+    /* background-image: url('moon.jpg'); */
+    /* background-image: url('sponge-cake.jpg'); */
+    /* background-image: url('wood-bkgd.jpg'); */
+    background-image: url('wall-1.jpg');
+    /* background-image: url('gray-marble.jpg'); */
+
     background-size: cover;
     display: grid;
     padding: 2px;
