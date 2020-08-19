@@ -348,7 +348,8 @@ function findWinner() {
         strArr[winners.length-1] = `and ${winners[winners.length-1]}`;
         if (winners.length < 3 ) strArr[0] = `${winners[0]} `;
         strArr.forEach( nombre => { str += nombre; });
-        emit.shout(room, `${str} won!`);
+        say(`${str} won!`);
+        // emit.shout(room, `${str} won!`);
     }
     
     $('#pass').fadeOut();
@@ -701,7 +702,7 @@ function addOnclick_putStone( elem, index ) {
     elem.onclick = () => { 
         switch(stage.stat) {
             case 'fight':
-                console.log('    ');
+                // console.log('    ');
                 emit.requestToPutStone(room, index);
                 // putStone(index); 
             break;
@@ -1070,15 +1071,15 @@ socket.on('update names', arr => {
 
 socket.on('stone play request granted', (isGranted,index) => {
 
-    console.log('inside stone play request granted');
-    console.log(isGranted, index);
+    // console.log('inside stone play request granted');
+    // console.log(isGranted, index);
 
     if ( isGranted ) { 
-        console.log('stone play request granted'); 
+        // console.log('stone play request granted'); 
         putStone(index);
     }
     else { 
-        console.log('request rejected.'); 
+        // console.log('request rejected.'); 
         // emit.updateServerGrid(gridArr, banNext);
         // emit.updateServerGrid();
         emit.resetRoxReady(room);
