@@ -46,6 +46,11 @@ var Room_GameData = new Map();
   // Example:   Room_GameData.get('area51').colorObj['joon'] == 'black'
   //            Room_GameData.get('narnia').grid == [ 'noName', 'joon', noName', ... ]
 
+var Room_Config = new Map();
+  // Example:   Room_Config.get('area51').dim == 19
+  //            Room_Config.get('area51').playerLimit == 2
+  //            Room_Config.get('area51').strict == false
+
 var Room_PlayerArr = new Map();
   // Example:   Room_PlayerArr.get('narnia') == ['joon', 'monk', 'foo']
 
@@ -56,10 +61,10 @@ var Room_Open = new Map();
   // Example:   Room_Open.get('narnia').vacanct == true
   //            Room_Open.get('narnia').open == true
 
-var Room_Config = new Map();
-  // Example:   Room_Config.get('area51').dim == 19
-  //            Room_Config.get('area51').playerLimit == 2
-  //            Room_Config.get('area51').strict == false
+var Room_RoxReady = new Map();
+  // Example:   Room_RoxReady.get('narnia') == false
+  // This Map ensures that only one player at a time can make a move.
+
 
 const nameSuffix = [', stop', 'ster', 'ette', 'ness', 'man', 'lord', 'ie' ];
 const roomSuffix = [', stop', 'wood', 'istan', 'ia', 'ville', 'town', 'land' ];
@@ -188,8 +193,7 @@ function startPlayerList(room) {
 
 function addPlayer(room, name) {
   Room_PlayerArr.get(room).push(name);
-
-  console.log('inside addPlayer() ');
+  // console.log('inside addPlayer() ');
   checkAndEmitVacancy(room);
 
 }
@@ -226,7 +230,7 @@ function checkAndEmitVacancy(room) {
   let arr = Room_PlayerArr.get(room);
   let config = Room_Config.get(room);
 
-  console.log('Room_Config: ', Room_Config);
+  // console.log('Room_Config: ', Room_Config);
 
   if (arr.length == config.playerLimit) { Room_Open.get(room).vacant = false; } 
   else { Room_Open.get(room).vacant = true; }
@@ -311,6 +315,7 @@ io.on('connection', (socket) => {
       Room_PlayerArr.delete(room);
       Room_Score.delete(room);
       Room_Open.delete(room);
+      Room_RoxReady.delete(room);
     } else {
       io.to(room).emit('update player list', Room_PlayerArr.get(room) );
     }
@@ -361,12 +366,12 @@ io.on('connection', (socket) => {
 
 
 
-//  MMMMMM    MMMMMMMM    MMMMMM    MM    MM  MMMMMMMM    MMMM    MMMMMM        MMMMMM    MMMM            MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM        MMMMMM      MMMM      MMMM    MM      MM  
-//  MM    MM  MM        MM      MM  MM    MM  MM        MM    MM    MM            MM    MM    MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MMMM  MMMM  
-//  MMMMMM    MMMMMMMM  MM      MM  MM    MM  MMMMMMMM    MM        MM            MM    MM    MM        MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
-//  MM    MM  MM        MM  MM  MM  MM    MM  MM            MM      MM            MM    MM    MM        MM        MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
-//  MM    MM  MM        MM    MM    MM    MM  MM        MM    MM    MM            MM    MM    MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
-//  MM    MM  MMMMMMMM    MMMM  MM    MMMM    MMMMMMMM    MMMM      MM            MM      MMMM            MMMM    MM    MM  MMMMMMMM  MM    MM    MM    MMMMMMMM        MM    MM    MMMM      MMMM    MM      MM  
+//  MMMMMM    MMMMMMMM    MMMMMM            MMMM    MMMMMM    MMMMMMMM    MMMM    MMMMMM  MMMMMMMM        MMMMMM      MMMM      MMMM    MM      MM  
+//  MM    MM  MM        MM      MM        MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//  MMMMMM    MMMMMMMM  MM      MM        MM        MMMMMM    MMMMMMMM  MMMMMMMM    MM    MMMMMMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//  MM    MM  MM        MM  MM  MM  aaaa  MM        MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MM        MM    MM          MM    MM  MM    MM  MM        MM    MM    MM    MM              MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MMMMMMMM    MMMM  MM          MMMM    MM    MM  MMMMMMMM  MM    MM    MM    MMMMMMMM        MM    MM    MMMM      MMMM    MM      MM  
 
   // _______ REQUET TO CREATE ROOM __________________________________________________
 
@@ -399,8 +404,11 @@ io.on('connection', (socket) => {
     let name = ID_Name.get(socket.id);
     Name_Room.set(name, room);
 
+    Room_RoxReady.set(room, true);
+    console.log('Room_RoxReady: ', Room_RoxReady);
+
     Room_Open.set(room, { 'vacant':true, 'open':true });
-    console.log('415 ', Room_Open);
+    // console.log('415 ', Room_Open);
     Room_Config.set(room, configData);
 
     socket.join(room);    // You are first to join
@@ -452,6 +460,62 @@ io.on('connection', (socket) => {
 
 
 
+
+
+//  MMMMMM    MMMMMMMM    MMMMMM          MMMMMM    MM    MM  MMMMMM          MMMM    MMMMMM    MMMM    MM    MM  MMMMMMMM  
+//  MM    MM  MM        MM      MM        MM    MM  MM    MM    MM          MM    MM    MM    MM    MM  MMMM  MM  MM        
+//  MMMMMM    MMMMMMMM  MM      MM        MM    MM  MM    MM    MM            MM        MM    MM    MM  MM  MMMM  MMMMMMMM  
+//  MM    MM  MM        MM  MM  MM  aaaa  MMMMMM    MM    MM    MM              MM      MM    MM    MM  MM    MM  MM        
+//  MM    MM  MM        MM    MM          MM        MM    MM    MM          MM    MM    MM    MM    MM  MM    MM  MM        
+//  MM    MM  MMMMMMMM    MMMM  MM        MM          MMMM      MM            MMMM      MM      MMMM    MM    MM  MMMMMMMM  
+
+  // _______ REQUEST TO PUT STONE ______________________________________
+
+  socket.on('request to put stone', (room,index) => {
+    
+    console.log('-----------------');
+    console.log('request to put stone reveived');
+    console.log('Room_RoxReady.get(room): ', Room_RoxReady.get(room) );
+
+    socket.emit('stone play request granted', Room_RoxReady.get(room), index );
+    if ( Room_RoxReady.get(room) ) {
+      Room_RoxReady.set(room, false); 
+      console.log(`>> Room ${room} locked until stone placement complete.`);
+    } 
+
+  });   // ___________ REQUEST TO PUT STONE (END) __________________________________
+
+
+
+
+
+
+
+
+
+//  MMMMMM    MMMMMMMM    MMMM    MMMMMMMM  MMMMMM        MMMMMM      MMMM    MM      MM  MMMMMM    MMMMMMMM    MMMM    MMMMMM    MM      MM  
+//  MM    MM  MM        MM    MM  MM          MM          MM    MM  MM    MM    MM  MM    MM    MM  MM        MM    MM  MM    MM    MM  MM    
+//  MMMMMM    MMMMMMMM    MM      MMMMMMMM    MM          MMMMMM    MM    MM      MM      MMMMMM    MMMMMMMM  MMMMMMMM  MM    MM      MM      
+//  MM    MM  MM            MM    MM          MM          MM    MM  MM    MM    MM  MM    MM    MM  MM        MM    MM  MM    MM      MM      
+//  MM    MM  MM        MM    MM  MM          MM          MM    MM  MM    MM  MM      MM  MM    MM  MM        MM    MM  MM    MM      MM      
+//  MM    MM  MMMMMMMM    MMMM    MMMMMMMM    MM          MM    MM    MMMM    MM      MM  MM    MM  MMMMMMMM  MM    MM  MMMMMM        MM      
+
+// ___________________ RESET ROX_READY ___________________________________________
+
+socket.on('reset Rox_Ready', room => {
+  Room_RoxReady.set(room, true); 
+  console.log(`>> Room ${room} now ready for stone placement.`);
+
+});   // ___________ RESET ROX_READY (END) _______________________________________
+
+
+
+
+
+
+
+
+
 //    MMMM    MM      MMMMMM  MMMMMMMM  MM    MM  MMMMMM          MMMM    MMMMMM    MMMMMM  MMMMMM    
 //  MM    MM  MM        MM    MM        MMMM  MM    MM          MM    MM  MM    MM    MM    MM    MM  
 //  MM        MM        MM    MMMMMMMM  MM  MMMM    MM          MM        MMMMMM      MM    MM    MM  
@@ -486,28 +550,33 @@ io.on('connection', (socket) => {
     let name = ID_Name.get(socket.id);
     let room = Name_Room.get(name);
     let obj = Room_GameData.get(room);
+    
     obj.grid = gridArr;
     Room_GameData.set(room, obj);
     io.to(room).emit('update grid', obj.colorObj, obj.grid, banNext ); 
+    
   });   // _______ UPDATE GRID ON SERVER (END) ______________________________________
 
 
 
 
 
+  
 
-//  MMMMMM    MMMMMMMM    MMMMMM    MM    MM  MMMMMMMM    MMMM    MMMMMM        MMMMMM    MMMM          MMMMMM    MMMM    MMMMMM  MM    MM        MMMMMM      MMMM      MMMM    MM      MM  
-//  MM    MM  MM        MM      MM  MM    MM  MM        MM    MM    MM            MM    MM    MM            MM  MM    MM    MM    MMMM  MM        MM    MM  MM    MM  MM    MM  MMMM  MMMM  
-//  MMMMMM    MMMMMMMM  MM      MM  MM    MM  MMMMMMMM    MM        MM            MM    MM    MM            MM  MM    MM    MM    MM  MMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
-//  MM    MM  MM        MM  MM  MM  MM    MM  MM            MM      MM            MM    MM    MM            MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
-//  MM    MM  MM        MM    MM    MM    MM  MM        MM    MM    MM            MM    MM    MM            MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
-//  MM    MM  MMMMMMMM    MMMM  MM    MMMM    MMMMMMMM    MMMM      MM            MM      MMMM          MMMM      MMMM    MMMMMM  MM    MM        MM    MM    MMMM      MMMM    MM      MM  
+
+
+//  MMMMMM    MMMMMMMM    MMMMMM          MMMMMM    MMMM    MMMMMM  MM    MM        MMMMMM      MMMM      MMMM    MM      MM  
+//  MM    MM  MM        MM      MM            MM  MM    MM    MM    MMMM  MM        MM    MM  MM    MM  MM    MM  MMMM  MMMM  
+//  MMMMMM    MMMMMMMM  MM      MM            MM  MM    MM    MM    MM  MMMM        MMMMMM    MM    MM  MM    MM  MM  MM  MM  
+//  MM    MM  MM        MM  MM  MM  aaaa      MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MM        MM    MM              MM  MM    MM    MM    MM    MM        MM    MM  MM    MM  MM    MM  MM      MM  
+//  MM    MM  MMMMMMMM    MMMM  MM        MMMM      MMMM    MMMMMM  MM    MM        MM    MM    MMMM      MMMM    MM      MM  
 
   // _______ REQUEST TO JOIN ROOM ____________________________________________________
 
   socket.on('request to join room', room => {
 
-    console.log('inside request to join room');
+    // console.log('inside request to join room');
     checkAndEmitVacancy(room);
 
     let vac = Room_Open.get(room).vacant;
@@ -549,7 +618,7 @@ io.on('connection', (socket) => {
       // If you are leaving a room, not leaving the lobby...
       // ...you have to clean up your stones...
       // ...and sign off your name out of the room.
-      console.log('---- leaving room -----');
+      console.log(`---- ${name} left room ${oldRoom} -----`);
       delPlayer(oldRoom, name);
       let obj = Room_GameData.get(oldRoom);
       obj.grid.forEach( (v,i) => {
@@ -567,6 +636,7 @@ io.on('connection', (socket) => {
       Room_PlayerArr.delete(oldRoom);
       Room_Score.delete(oldRoom);
       Room_Open.delete(oldRoom);
+      Room_RoxReady.delete(oldRoom);
     } else {
       // but if someone is still in the room...
       // ...you have to keep updating the player list.

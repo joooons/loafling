@@ -167,13 +167,6 @@ $('#modal').hide(0, () => {
 
 
 
-
-
-
-
-
-
-
 //        MM      MM    MMMM    MMMMMM  MM    MM  
 //        MMMM  MMMM  MM    MM    MM    MM    MM  
 //        MM  MM  MM  MMMMMMMM    MM    MMMMMMMM  
@@ -380,13 +373,24 @@ function putStone(index) {
         // You cannot play alone.
         // You cannot play out of turn.
         // You cannot remove your own stone.
-        if (playerArr.length == 1) return;
-        if (playerArr[0] != name ) { return say('It&#39;s nacho turn.'); }
-        if (stone == name) return;
+
+        if (playerArr.length == 1) {
+            emit.resetRoxReady(room);
+            return; 
+        }
+        if (playerArr[0] != name ) { 
+            emit.resetRoxReady(room);
+            return say('It&#39;s nacho turn.'); 
+        }
+        if (stone == name) {
+            emit.resetRoxReady(room);
+            return; 
+        }
     }
 
     // This is also SCENARIO #1. Unable to put a stone down at all.
     if ( ban.now == index + 1 ) {
+        emit.resetRoxReady(room);
         return say('Uh, you can&#39;t do that. Don&#39;t be an ill eagle...'); 
     }
 
@@ -395,7 +399,10 @@ function putStone(index) {
     // ... and possibly take the stone back after putting it down.
     if (stone == name) { gridArr[index] = noName; }
     else if (stone == noName) { gridArr[index] = name; }
-    else { return; }
+    else { 
+        emit.resetRoxReady(room);
+        return; 
+    }
 
 
     updateLocalGrid( gridArr );
@@ -411,16 +418,12 @@ function putStone(index) {
     if ( gridArr[index] == name ) {
         // If I put a stone, as opposed to remove, then do this.
 
-        // say('You played a move.');
-        // let str = coloredName(name, colorObj[name] );
-        // emit.shout(room, `${str} played a move.`);
-
         calculateAttack(index);
         changeScore();
     } 
     
     emit.updateServerGrid(gridArr, ban.next );
-    
+    emit.resetRoxReady(room);
 
 }   // END of putStone()
 
@@ -559,16 +562,10 @@ function allButtonsJoin( closed_room ) {
     let arr = closedRoomArr;
     if ( closed_room ) { arr = [closed_room]; }
 
-    console.clear();
-    console.log('----inside allButtonsJoin(); ---');
-    console.log('closedRoomArr is', arr);
-
     let num = $(`button[id^="bt-"]`).length;
     for ( i=0 ; i<num ; i++ ) {
         $(`button[id^="bt-"]`).eq(i).show();
         let str = $(`button[id^="bt-"]`).eq(i).attr('id').slice(3);
-        console.log('str is', str);
-        console.log( arr.includes(str) );
 
         if ( arr.includes(str) ) {
             $(`button[id^="bt-"]`).eq(i).off('click');
@@ -704,7 +701,9 @@ function addOnclick_putStone( elem, index ) {
     elem.onclick = () => { 
         switch(stage.stat) {
             case 'fight':
-                putStone(index); 
+                console.log('    ');
+                emit.requestToPutStone(room, index);
+                // putStone(index); 
             break;
             case 'clean':
                 countStone(index);
@@ -966,6 +965,8 @@ var emit = {
     requestToJoinRoom : (room) => { socket.emit('request to join room', room); },
     joinRoom : (room) => { socket.emit('join room', room); },
     updatePlayerList : (room, playerArr) => {socket.emit('update player list', room, playerArr ); },
+    requestToPutStone : (room,index) => { socket.emit('request to put stone', room, index); },
+    resetRoxReady : (room) => { socket.emit('reset Rox_Ready', room); },
     updateClientGrid : (room) => { socket.emit('update grid on client', room ); },
     updateScore : (room, scoreObj) => { socket.emit('update score', room, scoreObj); },
     updateServerGrid : (gridArr, banNext) => { socket.emit('update grid on server', gridArr, banNext); },
@@ -1016,8 +1017,8 @@ socket.on('board config', configData => {
 socket.on('add roombox', (roomName) => {
     // if ( !bool ) closedRoomArr.push(roomName);
     addRoomBox( roomName );
-    console.log('inside add roombox');
-    console.log('closedRoomArr is', closedRoomArr);
+    // console.log('inside add roombox');
+    // console.log('closedRoomArr is', closedRoomArr);
     updateButtons();
 });
 
@@ -1064,6 +1065,24 @@ socket.on('entry granted', (entry_granted, config_data) => {
 
 socket.on('update names', arr => {
     updateNames( arr );
+});
+
+
+socket.on('stone play request granted', (isGranted,index) => {
+
+    console.log('inside stone play request granted');
+    console.log(isGranted, index);
+
+    if ( isGranted ) { 
+        console.log('stone play request granted'); 
+        putStone(index);
+    }
+    else { 
+        console.log('request rejected.'); 
+        // emit.updateServerGrid(gridArr, banNext);
+        // emit.updateServerGrid();
+        emit.resetRoxReady(room);
+    }
 });
 
 
