@@ -485,15 +485,33 @@ div[id^="rm-"] {
     position: relative;
     background: white;
     width: 300px;
-    height: 440px;
+    height: 360px;
     overflow: hidden;
 }
 
 #helpSpace .slide {
     position: absolute;
+    /* background: lemonchiffon; */
+    background: white;
     padding: 5px 20px 20px 20px;
+    box-sizing: border-box;
+    display: none;
+    height: 320px;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: scroll;
+
+}
+
+
+
+#helpSpace .slide::-webkit-scrollbar {
     display: none;
 }
+
+
+
 
 #helpSpace p {
     text-align: justify;
@@ -520,6 +538,7 @@ div[id^="rm-"] {
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 -10px 10px 10px white;
 }
 
 #help-controls .btnLeft {
