@@ -37,7 +37,6 @@
             
         </div>
 
-
         <div id="boardSpace">
 
             <div id="boardFrame">
@@ -73,6 +72,62 @@
         </div>
     </div>
 
+    <div id="help">
+        <div>
+            <div id="helpSpace">
+                <div class="slide">
+                    <h4>1</h4>
+                    <h4>THE RULES</h4>
+                    <p>Stones are captured when they are surrounded by stones belonging to any combination of opponents. Points are lost for each captured stone.</p>
+                    <p>At the end of the game, you gain points based on territory surrounded only by your team and the board boundaries </p>
+                    <p>You cannot play a suicide move unless the move results in the removal of at least one enemy stone.</p>
+                    <p>You cannot play a move that reverts the board back to the previous state.</p>
+                </div>
+                <div class="slide">
+                    <h4>2</h4>
+                    <h4>3+ PLAYER GAMES</h4>
+                    <p>When the game has more than two players, the game dynamic changes slightly.</p>
+                    <p>When a move captures stones from more than one team, the team whose turn is coming up sooner is the first to be captured. If capturing the first team breaks the chain that would have captured the second team, the second team is not harmed.</p>
+                    <p>While the possibilty of a cooperative attack generally makes survival more challenging, sometimes territory with only one "eye" can survive because the cost of attacking outweighs the benefits.</p>
+                </div>
+                <div class="slide">
+                    <h4>3</h4>
+                    <h4>THE FREESTYLE MODE</h4>
+                    <p>Freestyle Mode allows the player to do the following: </p>
+                    <p class='left'>1) The first player may place stones on the board before the second player has entered the game.</p>
+                    <p class='left'>2) Players may play out-of-turn.</p>
+                    <p class='left'>3) Players may remove stones belonging to the player.</p>
+                    <p>While Freestyle Mode allows players to play out of turn, passing must still be done in order.</p>
+                </div>
+                <div class="slide">
+                    <h4>4</h4>
+                    <h4>THE CLEAN UP STAGE</h4>
+                    <p>A player may choose to skip a turn by clicking <b>PASS</b>. When all players PASS in order, this stage ends and the Clean Up stage begins.</p>
+                    <p>During the Clean Up stage, players are encouraged to remove stones belonging to them if they concede that these stones have no hope of survival. When all players have clicked on <b>PASS</b> in order, the score becomes final and the game ends.</p>
+                </div>
+                <div class="slide">
+                    <h4>5</h4>
+                    <h4>HOW TO BEGIN</h4>
+                    <p>Click on <b>START</b>. Then, click on <b>JOIN</b> if you wish to join an existing game room. Click on <b>Add room</b> if you wish to create your own room.</p>
+                    <div>
+                        <button id="end-help">START</button>
+                    </div>
+                </div>
+
+                <div id="help-controls">
+                    <span class="btnLeft" onclick="moveSlide('left')">&#10094;</span>
+                    <span class="badge" onclick="pickSlide(1)"></span>
+                    <span class="badge" onclick="pickSlide(2)"></span>
+                    <span class="badge" onclick="pickSlide(3)"></span>
+                    <span class="badge" onclick="pickSlide(4)"></span>
+                    <span class="badge" onclick="pickSlide(5)"></span>
+                    <span class="btnRight" onclick="moveSlide('right')">&#10095;</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
     <div id="cover"></div>
 
     <div id="modal" class="hidden">
@@ -82,7 +137,7 @@
                 <h1>Imitation G<img src="black-go-stone.png" width="30" alt="O"></h1>
                 <!-- <img src="black-go-stone.png" width="10" alt="O"> -->
                 <br>
-                <p>The game of Go... with a twist! <br>In this experimental version, you can modify the size of the board and the number of players. You can also turn on Freestyle Mode, where anyone can play out of turn!</p>
+                <p>The game of Go... with a twist! <br>In this experimental version, you can modify the size of the board and the number of players. You can also turn on Freestyle Mode, which allows players to play with less restrictions.</p>
                 <br>
                 <span>ENTER YOUR NAME</span>
                 <input class="short" type="text" id="pick-name" autocomplete="off" autofocus>

@@ -15,6 +15,8 @@ const socket = io();
 
 // LOCAL VARIABLES ________________________________________
 
+var slideNum = 1;
+
 var name = 'none';
 var room = 'lobby';
 var passCount = 0;
@@ -136,6 +138,8 @@ $('#room-name').hide(0, () => {
 });
 
 $('#config').hide();
+
+pickSlide(slideNum);
 
 $('#modal').hide(0, () => {
     $('#modal').fadeOut(0);
@@ -635,10 +639,30 @@ function removeBlink( elem ) {
     if ( $(elem).hasClass('blink') ) $(elem).removeClass('blink');
 }
 
+function pickSlide( num ) {
+    let slides = document.getElementsByClassName('slide');
+    let badges = document.getElementsByClassName('badge');
+    let len = slides.length;
+    for ( i=0 ; i<len ; i++ ) { 
+        slides[i].style.display = 'none'; 
+        badges[i].style.background = '#0001';
+    }
+    slides[num-1].style.display = 'block';
+    badges[num-1].style.background = '#5ad';
+    slideNum = num;
+}
 
+function moveSlide( text ) {
+    let slides = document.getElementsByClassName('slide');
+    if ( text == 'left' ) slideNum--;
+    if ( text == 'right' ) slideNum++;
+    // if ( slideNum < 1 ) slideNum = slides.length;
+    // if ( slideNum > slides.length ) slideNum = 1;
+    if ( slideNum < 1 ) slideNum = 1;
+    if ( slideNum > slides.length ) slideNum = slides.length;
+    pickSlide(slideNum);
 
-
-
+}
 
 
 
@@ -938,7 +962,9 @@ $('#config-form').on('submit', ev => {
 
 });
 
-
+$('#end-help').on('click', () => {
+    $('#help').css('display', 'none');
+});
 
 
 
