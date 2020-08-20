@@ -485,7 +485,7 @@ div[id^="rm-"] {
     position: relative;
     background: white;
     width: 300px;
-    height: 360px;
+    height: 380px;
     overflow: hidden;
 }
 
@@ -496,7 +496,7 @@ div[id^="rm-"] {
     padding: 5px 20px 20px 20px;
     box-sizing: border-box;
     display: none;
-    height: 320px;
+    height: 340px;
     overflow-x: hidden;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -505,12 +505,9 @@ div[id^="rm-"] {
 }
 
 
-
 #helpSpace .slide::-webkit-scrollbar {
     display: none;
 }
-
-
 
 
 #helpSpace p {
@@ -538,7 +535,7 @@ div[id^="rm-"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 -10px 10px 10px white;
+    box-shadow: 0 0px 15px 15px white;
 }
 
 #help-controls .btnLeft {
@@ -561,6 +558,19 @@ div[id^="rm-"] {
     border-radius: 50%;
     transition: 0.5s;
 }
+
+#help-controls .badge:nth-child(6) {
+    animation: flash ease-in 1.3s infinite;
+}
+
+
+@keyframes flash {
+    0%   { box-shadow: 0px 0px 6px -3px skyblue; }
+    50%  { box-shadow: 0px 0px 6px 0px skyblue; }
+    100% { box-shadow: 0px 0px 6px -3px skyblue;}
+}
+
+
 
 #end-help {
     text-align: center;
