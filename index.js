@@ -474,14 +474,14 @@ io.on('connection', (socket) => {
   socket.on('request to put stone', (room,index) => {
     let name = ID_Name.get(socket.id);
 
-    console.log('-----------------');
-    console.log(`<${name}> is requesting permission to play a stone.`);
+    console.log('----------------------------------------------');
+    // console.log(`<${name}> is requesting permission to play a stone.`);
     // console.log('Room_RoxReady.get(room) =', Room_RoxReady.get(room) );
 
     socket.emit('stone play request granted', Room_RoxReady.get(room), index );
     if ( Room_RoxReady.get(room) ) {
       Room_RoxReady.set(room, false); 
-      console.log(`>> Room <${room}> locked until <${name}> completes a move.`);
+      console.log(`>> [Room:${room}] locked until <${name}> completes a move.`);
     } 
 
   });   // ___________ REQUEST TO PUT STONE (END) __________________________________
@@ -507,7 +507,7 @@ socket.on('reset Rox_Ready', room => {
   let name = ID_Name.get(socket.id);
 
   Room_RoxReady.set(room, true); 
-  console.log(`>> <${name}> played a move. Room <${room}> is now ready for the next player.`);
+  console.log(`>> <${name}> played a move. [Room:${room}] is now ready for the next player.`);
 
 });   // ___________ RESET ROX_READY (END) _______________________________________
 

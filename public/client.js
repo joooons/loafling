@@ -1,5 +1,4 @@
 
-
 const socket = io();
 
 
@@ -47,7 +46,9 @@ config.playerLimit = 0;
     // You cannot remove your own stone.
 
 var stage =  {};
-stage['stat'] = 'fight';
+stage['stat'] = 'start';
+stage['start'] = () => { stage.stat = 'start'; }
+stage['learn'] = () => { stage.stat = 'learn'; }
 stage['fight'] = () => { stage.stat = 'fight'; }
 stage['clean'] = () => { stage.stat = 'clean'; }
 stage['count'] = () => { stage.stat = 'count'; }
@@ -650,6 +651,8 @@ function pickSlide( num ) {
     slides[num-1].style.display = 'block';
     badges[num-1].style.background = '#5ad';
     slideNum = num;
+
+    if ( slideNum == len ) $('#end-help').focus(); 
 }
 
 function moveSlide( text ) {
@@ -664,10 +667,6 @@ function moveSlide( text ) {
 
 }
 
-// function changeColor( elem ) {
-//     let color = $(elem).css('color');
-//     console.log(color);
-// }
 
 
 
@@ -698,7 +697,6 @@ function addOnclick_LEAVE( roomName ) {
             let str = coloredName(name,colorObj[name]);
             emit.shout(oldRoom, `Uh, ${str} left. Buh bye~`); 
         } 
-        
 
         emit.joinRoom(room);
 
@@ -914,7 +912,7 @@ pickName.onchange = () => {
     pickName.value = '';
     modal.style.display = "none";
     name = name.slice(0,10);
-
+    stage.learn();
     emit.newUser(name);
     applyBlink( $('#create-room') );
     $('#cover').addClass('hidden');
@@ -971,10 +969,27 @@ $('#config-form').on('submit', ev => {
 });
 
 $('#end-help').on('click', () => {
+    stage.fight();
     $('#help').css('display', 'none');
+    // $('#room-plus').focus();
 });
 
-
+document.addEventListener('keydown', ev => {
+    if (stage.stat != 'learn' ) return;
+    // console.log(ev.keyCode);
+    switch ( ev.keyCode ) {
+        case 37:
+            // console.log('left');
+            moveSlide('left');
+            break;
+        case 39:
+            // console.log('right');
+            moveSlide('right');
+            break;
+        default:
+            break;
+    }
+});
 
 
 
