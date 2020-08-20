@@ -53,7 +53,6 @@ function addSVGtoBoard( elem, num ) {
 }
 
 
-
 function addGridLines( elem, xDim, yDim, num ) {
     for ( i=0 ; i<num ; i++ ) {
         let lineH = document.createElementNS(ns, 'line');
@@ -76,7 +75,6 @@ function addGridLines( elem, xDim, yDim, num ) {
         $(elem).append(lineV);
     }
 }
-
 
 
 function addHoshiDots( elem, num) {

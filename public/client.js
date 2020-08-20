@@ -664,7 +664,10 @@ function moveSlide( text ) {
 
 }
 
-
+// function changeColor( elem ) {
+//     let color = $(elem).css('color');
+//     console.log(color);
+// }
 
 
 
@@ -778,6 +781,11 @@ function showScoreboard(obj) {
         let str = '';
         if (player == playerArr[0]) { str = svgArt.arrow; }
         $('#players').append(`<div>${str}</div>`);
+        // let dotElem = document.createElement('div');
+        //     dotElem.onclick = ev => { changeColor(ev.target); }
+        //     dotElem.style.color = `${colorObj[player]}`;
+        //     dotElem.innerHTML = `${svgArt.circle}`;
+        // $('#players').append(dotElem);
         $('#players').append(`<div style="color: ${colorObj[player]}">${svgArt.circle}</div>`);
         str = `${player}`;
         if ( player == name ) str = `<b>${player}</b>`;
