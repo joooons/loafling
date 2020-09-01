@@ -169,6 +169,9 @@ $('#modal').hide(0, () => {
 // LOCAL FUNCTIONS ____________________________________________
 
 
+// temporary. I can delete this later.
+function oh(str) { console.log(str); }
+
 
 
 
@@ -609,7 +612,9 @@ function addRoomBox( room ) {
     $(`#rb-${room}`).append(`<b>${room}</b><br>`);
     $(`#rb-${room}`).append(`<button id="bt-${room}">JOIN</button>`);
     $(`#rb-${room}`).append(`<div id="rm-${room}"></div>`);
-    
+
+    oh('inside addRoomBox()');
+
     if ( closedRoomArr.includes(room) ) {
         closedRoomArr = _.without(closedRoomArr, room);
     }
@@ -1066,6 +1071,7 @@ socket.on('board config', configData => {
 
 socket.on('add roombox', (roomName) => {
     // if ( !bool ) closedRoomArr.push(roomName);
+    if (name == 'none') return;
     addRoomBox( roomName );
     // console.log('inside add roombox');
     // console.log('closedRoomArr is', closedRoomArr);
